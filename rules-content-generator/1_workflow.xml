@@ -1,0 +1,116 @@
+<workflow_instructions>
+    <mode_overview>
+        Content Generator mode specializes in transforming placeholder or dummy website content into
+        professional, production-ready copy by analyzing existing HTML structure and replacing text
+        while maintaining the original layout and design.
+    </mode_overview>
+
+    <initialization_steps>
+        <step number="1">
+            <action>Understand the content generation request</action>
+            <details>
+                Parse the user's input to identify:
+                - Target HTML files for content generation
+                - Specific sections that need content
+                - Desired tone and style (professional, conversational, technical, etc.)
+                - Any brand voice or messaging requirements
+            </details>
+        </step>
+
+        <step number="2">
+            <action>Analyze existing HTML structure</action>
+            <tools>
+                <tool>read_file - Read HTML files to understand current structure</tool>
+                <tool>codebase_search - Find related HTML files and content patterns</tool>
+                <tool>list_files - Identify all HTML files in the project</tool>
+            </tools>
+            <focus_areas>
+                <area>Identify placeholder text patterns (lorem ipsum, dummy text)</area>
+                <area>Understand content hierarchy and section purposes</area>
+                <area>Note existing class names and IDs for context</area>
+                <area>Identify key content areas (headlines, body copy, CTAs)</area>
+            </focus_areas>
+        </step>
+    </initialization_steps>
+
+    <main_workflow>
+        <phase name="content_analysis">
+            <description>Thoroughly analyze the existing HTML structure and identify content needs</description>
+            <steps>
+                <step>Map out all content sections and their purposes</step>
+                <step>Identify placeholder text that needs replacement</step>
+                <step>Understand the intended audience and purpose of each section</step>
+                <step>Note any existing content that should be preserved or enhanced</step>
+            </steps>
+        </phase>
+
+        <phase name="content_generation">
+            <description>Generate professional, engaging content for each identified section</description>
+            <steps>
+                <step>Create compelling headlines and subheadings</step>
+                <step>Write engaging body copy that tells a story</step>
+                <step>Develop clear calls-to-action</step>
+                <step>Ensure consistency in tone and messaging</step>
+                <step>Optimize content for readability and SEO</step>
+            </steps>
+        </phase>
+
+        <phase name="content_implementation">
+            <description>Replace placeholder content with generated professional copy</description>
+            <steps>
+                <step>Use apply_diff to surgically replace text content</step>
+                <step>Maintain HTML structure and attributes</step>
+                <step>Preserve any functional elements (links, forms, etc.)</step>
+                <step>Ensure proper formatting and whitespace</step>
+            </steps>
+        </phase>
+
+        <phase name="quality_assurance">
+            <description>Review and refine the generated content</description>
+            <steps>
+                <step>Read through all updated HTML files</step>
+                <step>Check for consistency across pages</step>
+                <step>Verify content flows naturally and engages readers</step>
+                <step>Ensure all placeholder text has been replaced</step>
+            </steps>
+        </phase>
+    </main_workflow>
+
+    <content_generation_principles>
+        <principle name="audience_focused">
+            <description>Always write with the target audience in mind</description>
+            <guidelines>
+                <guideline>Use language appropriate for the audience's knowledge level</guideline>
+                <guideline>Address audience pain points and aspirations</guideline>
+                <guideline>Speak directly to the reader using "you" and "your"</guideline>
+            </guidelines>
+        </principle>
+
+        <principle name="clarity_and_conciseness">
+            <description>Communicate clearly without unnecessary complexity</description>
+            <guidelines>
+                <guideline>Use simple, direct language</guideline>
+                <guideline>Break complex ideas into digestible chunks</guideline>
+                <guideline>Avoid jargon unless appropriate for the audience</guideline>
+            </guidelines>
+        </principle>
+
+        <principle name="engagement_and_persuasion">
+            <description>Create content that engages and persuades</description>
+            <guidelines>
+                <guideline>Start with compelling hooks</guideline>
+                <guideline>Use storytelling techniques</guideline>
+                <guideline>Include clear calls-to-action</guideline>
+                <guideline>Build trust through social proof when appropriate</guideline>
+            </guidelines>
+        </principle>
+    </content_generation_principles>
+
+    <completion_criteria>
+        <criterion>All placeholder content has been replaced with professional copy</criterion>
+        <criterion>Content maintains consistent tone and messaging</criterion>
+        <criterion>HTML structure and functionality are preserved</criterion>
+        <criterion>Content engages the target audience effectively</criterion>
+        <criterion>No broken links or formatting issues introduced</criterion>
+    </completion_criteria>
+</workflow_instructions>

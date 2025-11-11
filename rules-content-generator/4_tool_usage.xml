@@ -1,0 +1,219 @@
+<tool_usage_guide>
+    <tool_priorities>
+        <priority level="1">
+            <tool>codebase_search</tool>
+            <when>Always use first to find HTML files and understand content structure</when>
+            <why>Semantic search finds relevant HTML files and content patterns more effectively
+                than file listing</why>
+        </priority>
+        <priority level="2">
+            <tool>read_file</tool>
+            <when>After identifying HTML files with codebase_search</when>
+            <why>Get full context of HTML structure and existing content</why>
+        </priority>
+        <priority level="3">
+            <tool>apply_diff</tool>
+            <when>Making surgical content replacements in HTML files</when>
+            <why>Preserves HTML structure while replacing text content precisely</why>
+        </priority>
+        <priority level="4">
+            <tool>ask_followup_question</tool>
+            <when>Need clarification on tone, audience, or content requirements</when>
+            <why>Ensures content matches user expectations and brand voice</why>
+        </priority>
+    </tool_priorities>
+
+    <tool_specific_guidance>
+        <tool name="codebase_search">
+            <best_practices>
+                <practice>Search for HTML files using semantic queries like "landing page" or "about
+                    page"</practice>
+                <practice>Look for placeholder text patterns like "lorem ipsum" or "dummy text"</practice>
+                <practice>Use descriptive queries that match the content you're looking to generate</practice>
+            </best_practices>
+            <example_queries>
+                <query>Find HTML files with placeholder text</query>
+                <query>Search for hero sections in website</query>
+                <query>Locate about page content</query>
+                <query>Find contact form sections</query>
+            </example_queries>
+        </tool>
+
+        <tool name="read_file">
+            <best_practices>
+                <practice>Read HTML files to understand current structure and content hierarchy</practice>
+                <practice>Focus on text content within HTML tags while preserving structure</practice>
+                <practice>Note class names and IDs that indicate section purposes</practice>
+                <practice>Identify patterns in placeholder text for systematic replacement</practice>
+            </best_practices>
+            <html_analysis_focus>
+                <element>Headings (h1, h2, h3) for section titles</element>
+                <element>Paragraphs (p) for body content</element>
+                <element>Lists (ul, ol) for feature points</element>
+                <element>Buttons and links for calls-to-action</element>
+                <element>Form elements for contact sections</element>
+            </html_analysis_focus>
+        </tool>
+
+        <tool name="apply_diff">
+            <best_practices>
+                <practice>Always read file first to ensure exact content match</practice>
+                <practice>Replace only text content, preserving HTML tags and attributes</practice>
+                <practice>Make multiple content replacements in one diff when possible</practice>
+                <practice>Include proper line numbers for accuracy</practice>
+                <practice>Maintain proper indentation and formatting</practice>
+            </best_practices>
+            <example><![CDATA[
+<apply_diff>
+<path>index.html</path>
+<diff>
+<<<<<<< SEARCH
+:start_line:45
+-------
+<h1>Lorem Ipsum Dolor Sit Amet</h1>
+<p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+=======
+<h1>Transform Your Business with AI Solutions</h1>
+<p>Streamline operations and boost productivity with our cutting-edge artificial intelligence platform designed for modern enterprises.</p>
+>>>>>>> REPLACE
+</diff>
+</apply_diff>
+      ]]></example>
+            <content_replacement_rules>
+                <rule>Preserve all HTML tags and attributes</rule>
+                <rule>Maintain original whitespace and formatting</rule>
+                <rule>Only replace text content between tags</rule>
+                <rule>Keep functional elements like links and forms intact</rule>
+            </content_replacement_rules>
+        </tool>
+
+        <tool name="ask_followup_question">
+            <best_practices>
+                <practice>Provide 2-4 specific, actionable content direction options</practice>
+                <practice>Ask about tone preference (professional, conversational, technical)</practice>
+                <practice>Clarify target audience and their primary needs</practice>
+                <practice>Get approval on content direction before full implementation</practice>
+            </best_practices>
+            <example_questions>
+                <question>
+                    <scenario>Hero section content direction</scenario>
+                    <options>
+                        <option>Professional corporate tone focusing on business outcomes</option>
+                        <option>Conversational startup tone emphasizing innovation</option>
+                        <option>Technical tone highlighting features and specifications</option>
+                    </options>
+                </question>
+                <question>
+                    <scenario>Target audience clarification</scenario>
+                    <options>
+                        <option>Enterprise businesses looking for scalable solutions</option>
+                        <option>Small businesses seeking affordable tools</option>
+                        <option>Individual professionals wanting productivity tools</option>
+                    </options>
+                </question>
+            </example_questions>
+        </tool>
+
+        <tool name="list_files">
+            <best_practices>
+                <practice>Use to get overview of HTML file structure in project</practice>
+                <practice>Filter by file extension to focus on HTML files</practice>
+                <practice>Understand project organization and page relationships</practice>
+            </best_practices>
+            <usage_scenarios>
+                <scenario>Initial project exploration</scenario>
+                <scenario>Finding all HTML files across directories</scenario>
+                <scenario>Understanding site structure and navigation</scenario>
+            </usage_scenarios>
+        </tool>
+    </tool_specific_guidance>
+
+    <html_content_extraction_guidelines>
+        <guideline name="text_content_only">
+            <description>Focus on extracting and replacing text content within HTML elements</description>
+            <elements_to_target>
+                <element>h1, h2, h3, h4, h5, h6 - Headings and subheadings</element>
+                <element>p - Paragraph text</element>
+                <element>li - List items</element>
+                <element>span, div - Inline and block text containers</element>
+                <element>a - Link text (preserve href attributes)</element>
+                <element>button - Button labels</element>
+                <element>label - Form labels</element>
+                <element>placeholder - Input placeholder text</element>
+            </elements_to_target>
+        </guideline>
+
+        <guideline name="preserve_structure">
+            <description>Maintain all HTML structure, classes, IDs, and attributes</description>
+            <elements_to_preserve>
+                <element>All HTML tags and their attributes</element>
+                <element>Class names and IDs for styling and functionality</element>
+                <element>Data attributes and custom properties</element>
+                <element>Form inputs and their types/values</element>
+                <element>Links and their href destinations</element>
+                <element>Image sources and alt text</element>
+            </elements_to_preserve>
+        </guideline>
+
+        <guideline name="content_hierarchy">
+            <description>Understand and respect the existing content hierarchy</description>
+            <analysis_points>
+                <point>Identify main headings (h1) for page titles</point>
+                <point>Recognize section headings (h2, h3) for content organization</point>
+                <point>Note paragraph structures for body content flow</point>
+                <point>Understand list hierarchies for feature points</point>
+                <point>Identify call-to-action placement and prominence</point>
+            </analysis_points>
+        </guideline>
+    </html_content_extraction_guidelines>
+
+    <workflow_integration>
+        <phase name="discovery">
+            <tools>
+                <tool>codebase_search - Find HTML files</tool>
+                <tool>list_files - Understand project structure</tool>
+                <tool>read_file - Analyze existing content</tool>
+            </tools>
+            <output>Map of HTML files and content sections needing generation</output>
+        </phase>
+
+        <phase name="content_planning">
+            <tools>
+                <tool>ask_followup_question - Clarify requirements</tool>
+                <tool>read_file - Deep dive into specific sections</tool>
+            </tools>
+            <output>Content strategy and tone direction</output>
+        </phase>
+
+        <phase name="implementation">
+            <tools>
+                <tool>apply_diff - Replace placeholder content</tool>
+                <tool>read_file - Verify changes</tool>
+            </tools>
+            <output>Updated HTML files with professional content</output>
+        </phase>
+
+        <phase name="quality_assurance">
+            <tools>
+                <tool>read_file - Review all updated files</tool>
+                <tool>codebase_search - Check for missed placeholder text</tool>
+            </tools>
+            <output>Verified complete content replacement</output>
+        </phase>
+    </workflow_integration>
+
+    <token_optimization>
+        <strategy name="focused_reading">
+            <description>Read only necessary HTML files and sections</description>
+            <implementation>Use codebase_search to identify relevant files before reading</implementation>
+        </strategy>
+        <strategy name="surgical_edits">
+            <description>Make precise content replacements using apply_diff</description>
+            <implementation>Replace only text content while preserving HTML structure</implementation>
+        </strategy>
+        <strategy name="batch_operations">
+            <description>Group related content changes together</description>
+            <implementation>Make multiple content replacements in single apply_diff operations</implementation>
+        </strategy>
+    </token_optimization>
+</tool_usage_guide>

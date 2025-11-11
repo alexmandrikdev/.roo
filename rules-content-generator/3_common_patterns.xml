@@ -1,0 +1,345 @@
+<common_patterns>
+    <website_sections>
+        <section name="hero">
+            <description>Main headline and introductory section at the top of a page</description>
+            <content_structure>
+                <element name="headline">
+                    <purpose>Grab attention and communicate main value proposition</purpose>
+                    <characteristics>
+                        <characteristic>Short and impactful (4-8 words)</characteristic>
+                        <characteristic>Benefit-focused</characteristic>
+                        <characteristic>Action-oriented</characteristic>
+                    </characteristics>
+                </element>
+                <element name="subheadline">
+                    <purpose>Provide additional context and support the main headline</purpose>
+                    <characteristics>
+                        <characteristic>Explains the how or why</characteristic>
+                        <characteristic>Slightly more detailed than headline</characteristic>
+                        <characteristic>Builds on the value proposition</characteristic>
+                    </characteristics>
+                </element>
+                <element name="call_to_action">
+                    <purpose>Guide users to take the next step</purpose>
+                    <characteristics>
+                        <characteristic>Clear action verb</characteristic>
+                        <characteristic>Specific and compelling</characteristic>
+                        <characteristic>Creates urgency when appropriate</characteristic>
+                    </characteristics>
+                </element>
+            </content_structure>
+            <examples>
+                <example type="saas_product">
+                    <headline>Transform Your Workflow with AI</headline>
+                    <subheadline>Automate repetitive tasks and boost team productivity by 40% with
+                        our intelligent platform</subheadline>
+                    <cta>Start Free Trial</cta>
+                </example>
+                <example type="consulting_service">
+                    <headline>Strategic Growth for Modern Businesses</headline>
+                    <subheadline>Data-driven consulting that delivers measurable results and
+                        sustainable growth</subheadline>
+                    <cta>Schedule Consultation</cta>
+                </example>
+                <example type="ecommerce">
+                    <headline>Premium Quality, Unbeatable Prices</headline>
+                    <subheadline>Discover our curated collection of handcrafted products with free
+                        shipping on all orders</subheadline>
+                    <cta>Shop Now</cta>
+                </example>
+            </examples>
+        </section>
+
+        <section name="features_services">
+            <description>Section highlighting key features, services, or product offerings</description>
+            <content_structure>
+                <element name="section_header">
+                    <purpose>Introduce the features/services section</purpose>
+                    <characteristics>
+                        <characteristic>Clear and descriptive</characteristic>
+                        <characteristic>Sets expectations for what follows</characteristic>
+                    </characteristics>
+                </element>
+                <element name="feature_item">
+                    <purpose>Describe individual features or services</purpose>
+                    <characteristics>
+                        <characteristic>Benefit-focused title</characteristic>
+                        <characteristic>Clear explanation of value</characteristic>
+                        <characteristic>Specific outcomes or results</characteristic>
+                    </characteristics>
+                </element>
+            </content_structure>
+            <examples>
+                <example type="feature_grid">
+                    <feature>
+                        <title>Advanced Analytics</title>
+                        <description>Gain deep insights into your performance with real-time
+                            dashboards and custom reports</description>
+                    </feature>
+                    <feature>
+                        <title>Automated Workflows</title>
+                        <description>Streamline operations with customizable automation that saves
+                            hours of manual work</description>
+                    </feature>
+                    <feature>
+                        <title>Team Collaboration</title>
+                        <description>Work seamlessly together with shared workspaces and real-time
+                            collaboration tools</description>
+                    </feature>
+                </example>
+            </examples>
+        </section>
+
+        <section name="about_company">
+            <description>Company story, mission, and values section</description>
+            <content_structure>
+                <element name="company_story">
+                    <purpose>Share the company's origin and mission</purpose>
+                    <characteristics>
+                        <characteristic>Authentic and relatable</characteristic>
+                        <characteristic>Focus on purpose and values</characteristic>
+                        <characteristic>Builds emotional connection</characteristic>
+                    </characteristics>
+                </element>
+                <element name="values">
+                    <purpose>Communicate core company values</purpose>
+                    <characteristics>
+                        <characteristic>Clear and actionable</characteristic>
+                        <characteristic>Reflect company culture</characteristic>
+                        <characteristic>Demonstrate through examples</characteristic>
+                    </characteristics>
+                </element>
+                <element name="team">
+                    <purpose>Introduce key team members when appropriate</purpose>
+                    <characteristics>
+                        <characteristic>Focus on expertise and passion</characteristic>
+                        <characteristic>Humanize the company</characteristic>
+                        <characteristic>Build trust and credibility</characteristic>
+                    </characteristics>
+                </element>
+            </content_structure>
+            <examples>
+                <example type="mission_statement">
+                    <story>Founded in 2020, we started with a simple mission: to make complex
+                        technology accessible to everyone. What began as three developers in a
+                        garage has grown into a team of 50+ passionate experts dedicated to
+                        simplifying the digital world.</story>
+                    <mission>Our mission is to empower businesses with intuitive tools that drive
+                        growth and innovation.</mission>
+                    <values>
+                        <value>Innovation: We constantly push boundaries to deliver cutting-edge
+                            solutions</value>
+                        <value>Transparency: We believe in open communication and honest
+                            partnerships</value>
+                        <value>Excellence: We're committed to delivering exceptional quality in
+                            everything we do</value>
+                    </values>
+                </example>
+            </examples>
+        </section>
+
+        <section name="testimonials">
+            <description>Customer testimonials and social proof section</description>
+            <content_structure>
+                <element name="testimonial">
+                    <purpose>Showcase real customer experiences and results</purpose>
+                    <characteristics>
+                        <characteristic>Specific and measurable results</characteristic>
+                        <characteristic>Authentic voice and tone</characteristic>
+                        <characteristic>Includes customer details (name, company, role)</characteristic>
+                    </characteristics>
+                </element>
+            </content_structure>
+            <examples>
+                <example type="b2b_testimonial">
+                    <quote>"This platform transformed how our team collaborates. We've seen a 45%
+                        increase in project completion rates and our team is more aligned than
+                        ever."</quote>
+                    <attribution>Sarah Johnson, CEO at TechGrowth Inc.</attribution>
+                </example>
+                <example type="b2c_testimonial">
+                    <quote>"I was skeptical at first, but the results speak for themselves. My
+                        conversion rates doubled within the first month of using their service."</quote>
+                    <attribution>Michael Chen, Small Business Owner</attribution>
+                </example>
+            </examples>
+        </section>
+
+        <section name="contact">
+            <description>Contact information and call-to-action section</description>
+            <content_structure>
+                <element name="contact_heading">
+                    <purpose>Encourage users to get in touch</purpose>
+                    <characteristics>
+                        <characteristic>Warm and inviting</characteristic>
+                        <characteristic>Clear value proposition for contacting</characteristic>
+                    </characteristics>
+                </element>
+                <element name="contact_methods">
+                    <purpose>Provide clear ways to connect</purpose>
+                    <characteristics>
+                        <characteristic>Multiple contact options</characteristic>
+                        <characteristic>Clear instructions for each method</characteristic>
+                        <characteristic>Response time expectations</characteristic>
+                    </characteristics>
+                </element>
+            </content_structure>
+            <examples>
+                <example type="general_contact">
+                    <heading>Ready to Get Started?</heading>
+                    <subheading>Let's discuss how we can help achieve your goals. Our team is here
+                        to answer any questions and provide personalized recommendations.</subheading>
+                    <cta>Contact Us Today</cta>
+                </example>
+            </examples>
+        </section>
+    </website_sections>
+
+    <content_templates>
+        <template name="problem_solution">
+            <description>Classic problem-agitate-solution framework for persuasive content</description>
+            <structure>
+                <step number="1">
+                    <name>Identify the Problem</name>
+                    <description>Clearly state the challenge or pain point your audience faces</description>
+                    <example>"Are you struggling to manage multiple projects and deadlines?"</example>
+                </step>
+                <step number="2">
+                    <name>Agitate the Pain</name>
+                    <description>Highlight the consequences and frustrations of the problem</description>
+                    <example>"Missing deadlines leads to stressed teams, unhappy clients, and lost
+                        revenue opportunities."</example>
+                </step>
+                <step number="3">
+                    <name>Present the Solution</name>
+                    <description>Introduce your product/service as the clear solution</description>
+                    <example>"Our project management platform streamlines workflow, ensures on-time
+                        delivery, and keeps everyone aligned."</example>
+                </step>
+                <step number="4">
+                    <name>Show the Benefits</name>
+                    <description>Highlight the positive outcomes and results</description>
+                    <example>"Teams using our platform report 60% faster project completion and 40%
+                        higher client satisfaction."</example>
+                </step>
+            </structure>
+        </template>
+
+        <template name="benefit_feature">
+            <description>Focus on benefits rather than just listing features</description>
+            <structure>
+                <step number="1">
+                    <name>Start with the Benefit</name>
+                    <description>Lead with what the user gains</description>
+                    <example>"Save 10+ hours per week on administrative tasks"</example>
+                </step>
+                <step number="2">
+                    <name>Explain the Feature</name>
+                    <description>Describe how the feature enables the benefit</description>
+                    <example>"with our automated reporting and scheduling tools"</example>
+                </step>
+                <step number="3">
+                    <name>Provide Evidence</name>
+                    <description>Add credibility with data or examples</description>
+                    <example>"Our customers typically recover 40% of their time previously spent on
+                        manual processes."</example>
+                </step>
+            </structure>
+        </template>
+
+        <template name="storytelling">
+            <description>Use narrative to engage and persuade</description>
+            <structure>
+                <step number="1">
+                    <name>Set the Scene</name>
+                    <description>Introduce the context and characters</description>
+                    <example>"Meet Sarah, a marketing manager overwhelmed by disconnected data
+                        sources..."</example>
+                </step>
+                <step number="2">
+                    <name>Present the Challenge</name>
+                    <description>Describe the obstacles and struggles</description>
+                    <example>"She spent hours each week compiling reports from different platforms,
+                        leaving little time for strategic work."</example>
+                </step>
+                <step number="3">
+                    <name>Introduce the Solution</name>
+                    <description>Show how your product/service helped</description>
+                    <example>"Then she discovered our integrated analytics platform..."</example>
+                </step>
+                <step number="4">
+                    <name>Reveal the Transformation</name>
+                    <description>Highlight the positive outcomes and results</description>
+                    <example>"Now Sarah generates comprehensive reports in minutes and has reclaimed
+                        15 hours per week for high-impact strategy."</example>
+                </step>
+            </structure>
+        </template>
+    </content_templates>
+
+    <industry_specific_patterns>
+        <industry name="technology_saas">
+            <focus_areas>
+                <area>Product features and capabilities</area>
+                <area>Integration possibilities</area>
+                <area>Security and reliability</area>
+                <area>Scalability and performance</area>
+            </focus_areas>
+            <key_phrases>
+                <phrase>Streamline your workflow</phrase>
+                <phrase>Boost productivity and efficiency</phrase>
+                <phrase>Seamless integration</phrase>
+                <phrase>Enterprise-grade security</phrase>
+                <phrase>Scale with your business</phrase>
+            </key_phrases>
+        </industry>
+
+        <industry name="professional_services">
+            <focus_areas>
+                <area>Expertise and experience</area>
+                <area>Client results and case studies</area>
+                <area>Methodology and approach</area>
+                <area>Partnership and collaboration</area>
+            </focus_areas>
+            <key_phrases>
+                <phrase>Proven track record</phrase>
+                <phrase>Tailored solutions</phrase>
+                <phrase>Strategic partnership</phrase>
+                <phrase>Measurable results</phrase>
+                <phrase>Industry expertise</phrase>
+            </key_phrases>
+        </industry>
+
+        <industry name="ecommerce_retail">
+            <focus_areas>
+                <area>Product quality and benefits</area>
+                <area>Customer experience</area>
+                <area>Shipping and returns</area>
+                <area>Social proof and reviews</area>
+            </focus_areas>
+            <key_phrases>
+                <phrase>Premium quality</phrase>
+                <phrase>Fast, free shipping</phrase>
+                <phrase>Easy returns</phrase>
+                <phrase>Customer favorite</phrase>
+                <phrase>Limited time offer</phrase>
+            </key_phrases>
+        </industry>
+
+        <industry name="health_wellness">
+            <focus_areas>
+                <area>Health benefits and outcomes</area>
+                <area>Safety and quality standards</area>
+                <area>Expert endorsements</area>
+                <area>Natural ingredients</area>
+            </focus_areas>
+            <key_phrases>
+                <phrase>Clinically proven</phrase>
+                <phrase>Doctor recommended</phrase>
+                <phrase>Natural ingredients</phrase>
+                <phrase>Health benefits</phrase>
+                <phrase>Quality guaranteed</phrase>
+            </key_phrases>
+        </industry>
+    </industry_specific_patterns>
+</common_patterns>

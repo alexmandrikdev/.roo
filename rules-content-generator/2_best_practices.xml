@@ -1,0 +1,183 @@
+<best_practices>
+    <general_principles>
+        <principle priority="high">
+            <name>Content Quality Over Quantity</name>
+            <description>Focus on creating high-quality, engaging content rather than simply filling
+                space</description>
+            <rationale>Quality content drives engagement, builds trust, and converts better than
+                generic filler text</rationale>
+            <example>
+                <scenario>Replacing lorem ipsum in a hero section</scenario>
+                <good>"Transform your business with AI-powered solutions that drive real results"</good>
+                <bad>"We offer many services that can help your business grow and succeed in the
+                    market"</bad>
+            </example>
+        </principle>
+
+        <principle priority="high">
+            <name>Audience-Centric Language</name>
+            <description>Write content that speaks directly to the target audience's needs and
+                aspirations</description>
+            <rationale>Content that resonates with the audience is more likely to engage and convert</rationale>
+            <example>
+                <scenario>Service description for a B2B software company</scenario>
+                <good>"Streamline your workflow and boost team productivity by 40% with our
+                    intuitive project management platform"</good>
+                <bad>"Our software helps companies manage projects and tasks effectively"</bad>
+            </example>
+        </principle>
+
+        <principle priority="medium">
+            <name>SEO Optimization</name>
+            <description>Incorporate relevant keywords naturally while maintaining readability</description>
+            <rationale>Proper SEO helps content get discovered while keeping it engaging for human
+                readers</rationale>
+            <example>
+                <scenario>About page for a web design agency</scenario>
+                <good>"As a leading web design agency in New York, we create stunning, responsive
+                    websites that convert visitors into customers"</good>
+                <bad>"We make websites. Our web design services include responsive design and we are
+                    located in New York."</bad>
+            </example>
+        </principle>
+    </general_principles>
+
+    <content_conventions>
+        <convention category="headlines">
+            <rule>Create compelling, benefit-driven headlines</rule>
+            <examples>
+                <good>"Boost Your Revenue with Data-Driven Marketing Strategies"</good>
+                <bad>"Our Marketing Services"</bad>
+            </examples>
+            <guidelines>
+                <guideline>Use action-oriented language</guideline>
+                <guideline>Include clear benefits or outcomes</guideline>
+                <guideline>Keep headlines concise (6-12 words)</guideline>
+                <guideline>Use title case for main headlines</guideline>
+            </guidelines>
+        </convention>
+
+        <convention category="body_copy">
+            <rule>Write engaging, scannable body content</rule>
+            <template>
+                Start with a compelling opening sentence that hooks the reader.
+
+                Break content into short paragraphs (2-4 sentences each) for better readability.
+
+                Use bullet points or numbered lists to present multiple points clearly.
+
+                Include specific examples and data points when possible to build credibility.
+
+                End with a clear transition to the next section or call-to-action.
+            </template>
+            <guidelines>
+                <guideline>Use simple, direct language</guideline>
+                <guideline>Address the reader directly with "you"</guideline>
+                <guideline>Include specific numbers and results</guideline>
+                <guideline>Break up text with subheadings every 2-3 paragraphs</guideline>
+            </guidelines>
+        </convention>
+
+        <convention category="calls_to_action">
+            <rule>Create clear, action-oriented CTAs</rule>
+            <examples>
+                <good>"Start Your Free Trial Today"</good>
+                <good>"Download Our Free Guide"</good>
+                <good>"Schedule Your Consultation"</good>
+                <bad>"Click Here"</bad>
+                <bad>"Learn More"</bad>
+            </examples>
+            <guidelines>
+                <guideline>Use action verbs (Start, Get, Download, Schedule)</guideline>
+                <guideline>Include clear value or benefit</guideline>
+                <guideline>Create urgency when appropriate (Today, Now)</guideline>
+                <guideline>Keep CTAs concise and specific</guideline>
+            </guidelines>
+        </convention>
+    </content_conventions>
+
+    <tone_and_style_guidelines>
+        <tone_variation name="professional">
+            <description>Formal, authoritative tone for corporate and B2B websites</description>
+            <characteristics>
+                <characteristic>Uses complete sentences and proper grammar</characteristic>
+                <characteristic>Focuses on expertise and credibility</characteristic>
+                <characteristic>More formal vocabulary and structure</characteristic>
+            </characteristics>
+            <appropriate_for>Corporate websites, B2B services, financial institutions</appropriate_for>
+        </tone_variation>
+
+        <tone_variation name="conversational">
+            <description>Friendly, approachable tone for consumer-facing websites</description>
+            <characteristics>
+                <characteristic>Uses contractions (you'll, we're)</characteristic>
+                <characteristic>More casual vocabulary</characteristic>
+                <characteristic>Direct address to the reader</characteristic>
+            </characteristics>
+            <appropriate_for>Startups, consumer brands, creative agencies</appropriate_for>
+        </tone_variation>
+
+        <tone_variation name="technical">
+            <description>Precise, detailed tone for technical products and services</description>
+            <characteristics>
+                <characteristic>Includes technical specifications</characteristic>
+                <characteristic>Uses industry-specific terminology</characteristic>
+                <characteristic>Focuses on features and capabilities</characteristic>
+            </characteristics>
+            <appropriate_for>Software products, engineering services, technical tools</appropriate_for>
+        </tone_variation>
+    </tone_and_style_guidelines>
+
+    <common_pitfalls>
+        <pitfall>
+            <description>Overusing corporate jargon and buzzwords</description>
+            <why_problematic>Makes content sound generic and untrustworthy</why_problematic>
+            <correct_approach>Use specific, concrete language that clearly communicates value</correct_approach>
+            <examples>
+                <avoid>"leverage synergistic solutions"</avoid>
+                <use>"combine our tools to work better together"</use>
+            </examples>
+        </pitfall>
+
+        <pitfall>
+            <description>Writing in passive voice</description>
+            <why_problematic>Makes content less engaging and harder to read</why_problematic>
+            <correct_approach>Use active voice to create more dynamic, engaging content</correct_approach>
+            <examples>
+                <avoid>"Results can be achieved by using our platform"</avoid>
+                <use>"Achieve better results with our platform"</use>
+            </examples>
+        </pitfall>
+
+        <pitfall>
+            <description>Being too vague or generic</description>
+            <why_problematic>Fails to differentiate from competitors and doesn't build trust</why_problematic>
+            <correct_approach>Include specific details, examples, and data points</correct_approach>
+            <examples>
+                <avoid>"We help businesses grow"</avoid>
+                <use>"We've helped over 500 businesses increase revenue by an average of 35%"</use>
+            </examples>
+        </pitfall>
+    </common_pitfalls>
+
+    <quality_checklist>
+        <category name="before_starting">
+            <item>Identify the target audience and their primary needs</item>
+            <item>Determine the appropriate tone and style</item>
+            <item>Review existing HTML structure and content hierarchy</item>
+            <item>Note any brand voice or messaging requirements</item>
+        </category>
+        <category name="during_content_creation">
+            <item>Write with the audience's perspective in mind</item>
+            <item>Use clear, benefit-driven language</item>
+            <item>Break content into scannable sections</item>
+            <item>Include specific examples and data when possible</item>
+        </category>
+        <category name="before_completion">
+            <item>Read content aloud to check flow and readability</item>
+            <item>Verify all placeholder text has been replaced</item>
+            <item>Ensure consistent tone across all sections</item>
+            <item>Check that CTAs are clear and action-oriented</item>
+        </category>
+    </quality_checklist>
+</best_practices>
