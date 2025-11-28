@@ -1,0 +1,156 @@
+<best_practices>
+    <general_principles>
+        <principle priority="high">
+            <name>Pareto Principle Application</name>
+            <description>Focus on the 20% of issues that will deliver 80% of the impact. Prioritize
+                fixes that provide the most value with the least effort.</description>
+            <rationale>This ensures developers address the most critical issues first and don't get
+                bogged down in minor improvements that have little practical impact.</rationale>
+            <example>
+                <scenario>When reviewing a large codebase with multiple issues</scenario>
+                <good>Prioritize security vulnerabilities and performance bottlenecks over minor
+                    code style issues</good>
+                <bad>Treat all issues with equal priority regardless of impact</bad>
+            </example>
+        </principle>
+
+        <principle priority="high">
+            <name>Context-Aware Review</name>
+            <description>Always consider the code in its broader context - project architecture,
+                team conventions, business requirements, and existing patterns.</description>
+            <rationale>Code that might be problematic in isolation could be appropriate given the
+                project's constraints and existing patterns.</rationale>
+            <example>
+                <scenario>When reviewing a function that doesn't follow general best practices</scenario>
+                <good>Check if this pattern exists elsewhere in the codebase and understand why it's
+                    used</good>
+                <bad>Immediately suggest changes without understanding the context</bad>
+            </example>
+        </principle>
+
+        <principle priority="medium">
+            <name>Constructive Feedback</name>
+            <description>Provide feedback that helps the developer improve, not just criticism.
+                Include specific examples and alternative approaches.</description>
+            <rationale>Constructive feedback leads to better outcomes and maintains positive team
+                dynamics.</rationale>
+            <example>
+                <scenario>When identifying a problematic code pattern</scenario>
+                <good>"Consider using X pattern here because it handles Y edge case and is more
+                    maintainable. Example: [code example]"</good>
+                <bad>"This code is bad. Fix it."</bad>
+            </example>
+        </principle>
+    </general_principles>
+
+    <review_categories>
+        <category name="security">
+            <priority_levels>
+                <level name="critical">
+                    <description>Immediate security threats that could lead to data breaches or
+                        system compromise</description>
+                    <examples>
+                        <example>SQL injection vulnerabilities</example>
+                        <example>Authentication bypass</example>
+                        <example>Hardcoded credentials</example>
+                    </examples>
+                </level>
+                <level name="high">
+                    <description>Security issues that could be exploited but require specific
+                        conditions</description>
+                    <examples>
+                        <example>Insecure direct object references</example>
+                        <example>Missing input validation</example>
+                        <example>Weak cryptographic implementations</example>
+                    </examples>
+                </level>
+            </priority_levels>
+        </category>
+
+        <category name="performance">
+            <priority_levels>
+                <level name="critical">
+                    <description>Issues causing significant performance degradation or resource
+                        exhaustion</description>
+                    <examples>
+                        <example>N+1 database queries</example>
+                        <example>Memory leaks</example>
+                        <example>Blocking operations in critical paths</example>
+                    </examples>
+                </level>
+                <level name="medium">
+                    <description>Optimization opportunities that would improve efficiency</description>
+                    <examples>
+                        <example>Inefficient algorithms</example>
+                        <example>Unnecessary computations</example>
+                        <example>Poor caching strategies</example>
+                    </examples>
+                </level>
+            </priority_levels>
+        </category>
+
+        <category name="code_quality">
+            <priority_levels>
+                <level name="high">
+                    <description>Issues affecting maintainability and long-term code health</description>
+                    <examples>
+                        <example>High cyclomatic complexity</example>
+                        <example>Deep coupling between modules</example>
+                        <example>Violation of SOLID principles</example>
+                    </examples>
+                </level>
+                <level name="low">
+                    <description>Minor style and consistency issues</description>
+                    <examples>
+                        <example>Inconsistent naming</example>
+                        <example>Minor formatting issues</example>
+                        <example>Missing comments on non-critical code</example>
+                    </examples>
+                </level>
+            </priority_levels>
+        </category>
+    </review_categories>
+
+    <common_pitfalls>
+        <pitfall>
+            <description>Over-engineering solutions for simple problems</description>
+            <why_problematic>Adds unnecessary complexity and maintenance burden without delivering
+                proportional value</why_problematic>
+            <correct_approach>Balance elegance with practicality. Simple, readable solutions are
+                often better than complex, "perfect" ones.</correct_approach>
+        </pitfall>
+
+        <pitfall>
+            <description>Ignoring the team's existing patterns and conventions</description>
+            <why_problematic>Creates inconsistency and makes the codebase harder to maintain</why_problematic>
+            <correct_approach>Respect established patterns unless there's a compelling reason to
+                change them.</correct_approach>
+        </pitfall>
+
+        <pitfall>
+            <description>Focusing only on the code without considering the broader impact</description>
+            <why_problematic>Misses important architectural, performance, or security implications</why_problematic>
+            <correct_approach>Always consider how changes affect the system as a whole.</correct_approach>
+        </pitfall>
+    </common_pitfalls>
+
+    <quality_checklist>
+        <category name="before_starting">
+            <item>Understand the purpose and scope of the changes</item>
+            <item>Review the project's existing architecture and patterns</item>
+            <item>Identify any specific concerns or focus areas</item>
+        </category>
+        <category name="during_review">
+            <item>Apply Pareto principle to prioritize issues</item>
+            <item>Consider both immediate and long-term implications</item>
+            <item>Provide specific, actionable recommendations</item>
+            <item>Balance technical perfection with practical constraints</item>
+        </category>
+        <category name="before_completion">
+            <item>Verify all critical issues are addressed</item>
+            <item>Ensure feedback is constructive and helpful</item>
+            <item>Double-check that recommendations are practical</item>
+            <item>Consider the developer's perspective and experience level</item>
+        </category>
+    </quality_checklist>
+</best_practices>

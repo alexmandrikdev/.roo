@@ -1,0 +1,310 @@
+<examples>
+    <example name="security_review">
+        <description>Comprehensive security review of authentication code</description>
+        <context>When reviewing new authentication features or security-sensitive code changes</context>
+        <workflow>
+            <step number="1">Use codebase_search to find authentication-related code</step>
+            <step number="2">Examine authentication middleware and validation logic</step>
+            <step number="3">Check for common security vulnerabilities (SQL injection, XSS, etc.)</step>
+            <step number="4">Review password handling and session management</step>
+            <step number="5">Assess input validation and sanitization</step>
+            <step number="6">Provide prioritized feedback using Pareto principle</step>
+        </workflow>
+        <code><![CDATA[
+// Example security issue found during review
+// BAD: SQL injection vulnerability
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+  const query = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`;
+  db.query(query, (err, results) => {
+    if (err) throw err;
+    if (results.length > 0) {
+      res.send('Login successful');
+    } else {
+      res.send('Invalid credentials');
+    }
+  });
+});
+
+// GOOD: Secure alternative using parameterized queries
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+  const query = 'SELECT * FROM users WHERE username = ? AND password = ?';
+  db.query(query, [username, password], (err, results) => {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).send('Internal server error');
+    }
+    if (results.length > 0) {
+      res.send('Login successful');
+    } else {
+      res.status(401).send('Invalid credentials');
+    }
+  });
+});
+    ]]></code>
+        <feedback_example><![CDATA[
+## Security Review Results - Authentication Code
+
+### Critical Issues (Fix Immediately - 80% Impact)
+
+**SQL Injection Vulnerability**
+- **Issue**: Direct string interpolation in SQL queries allows SQL injection attacks
+- **Impact**: High - Could lead to complete database compromise
+- **Recommendation**: Use parameterized queries or prepared statements
+- **Priority**: Fix immediately
+
+**Missing Error Handling**
+- **Issue**: Database errors are thrown to the client, exposing internal details
+- **Impact**: Medium - Information disclosure and potential denial of service
+- **Recommendation**: Implement proper error handling and logging
+- **Priority**: Fix in next sprint
+
+### Important Improvements (Fix Soon)
+
+**Password Security**
+- **Issue**: Passwords stored/transmitted in plain text
+- **Impact**: High - Credential exposure risk
+- **Recommendation**: Implement password hashing with bcrypt
+- **Priority**: Fix in next sprint
+
+### Nice to Have (Fix When Convenient)
+
+**Response Consistency**
+- **Issue**: Inconsistent HTTP status codes in responses
+- **Impact**: Low - Does not affect security
+- **Recommendation**: Use consistent status codes (200, 401, 500)
+- **Priority**: Fix when convenient
+    ]]></feedback_example>
+    </example>
+
+    <example name="performance_review">
+        <description>Performance analysis of database query patterns</description>
+        <context>When reviewing code that interacts with databases or handles large datasets</context>
+        <workflow>
+            <step number="1">Identify database query patterns using search_files</step>
+            <step number="2">Analyze loops and iterations for N+1 query problems</step>
+            <step number="3">Check for inefficient algorithms or data structures</step>
+            <step number="4">Review caching strategies and memory usage</step>
+            <step number="5">Assess scalability and resource utilization</step>
+        </workflow>
+        <code><![CDATA[
+// Example performance issue - N+1 query problem
+// BAD: Inefficient multiple queries in loop
+app.get('/users/:id/posts', async (req, res) => {
+  const userId = req.params.id;
+  const user = await User.findById(userId);
+  
+  const posts = [];
+  for (const postId of user.postIds) {
+    const post = await Post.findById(postId);
+    posts.push(post);
+  }
+  
+  res.json({ user, posts });
+});
+
+// GOOD: Optimized single query with join
+app.get('/users/:id/posts', async (req, res) => {
+  const userId = req.params.id;
+  
+  const userWithPosts = await User.aggregate([
+    { $match: { _id: userId } },
+    {
+      $lookup: {
+        from: 'posts',
+        localField: 'postIds',
+        foreignField: '_id',
+        as: 'posts'
+      }
+    }
+  ]);
+  
+  res.json(userWithPosts[0]);
+});
+    ]]></code>
+        <feedback_example><![CDATA[
+## Performance Review Results - Database Queries
+
+### Critical Issues (Fix Immediately - 80% Impact)
+
+**N+1 Query Problem**
+- **Issue**: Multiple database queries executed in loop instead of single join query
+- **Impact**: High - Exponential performance degradation with data growth
+- **Recommendation**: Use database joins or aggregation pipelines
+- **Priority**: Fix immediately
+
+### Important Improvements (Fix Soon)
+
+**Missing Indexes**
+- **Issue**: Frequent queries on non-indexed fields
+- **Impact**: Medium - Slow query performance
+- **Recommendation**: Add database indexes for frequently queried fields
+- **Priority**: Fix in next sprint
+
+**Memory Usage**
+- **Issue**: Large datasets loaded into memory without pagination
+- **Impact**: Medium - Potential memory exhaustion
+- **Recommendation**: Implement pagination or streaming for large results
+- **Priority**: Fix in next sprint
+
+### Nice to Have (Fix When Convenient)
+
+**Query Optimization**
+- **Issue**: Some queries select more fields than needed
+- **Impact**: Low - Minor performance improvement
+- **Recommendation**: Use field projection to select only necessary fields
+- **Priority**: Fix when convenient
+    ]]></feedback_example>
+    </example>
+
+    <example name="architecture_review">
+        <description>Architectural review of component design and dependencies</description>
+        <context>When reviewing new features or refactoring existing code structure</context>
+        <workflow>
+            <step number="1">Analyze module dependencies and coupling</step>
+            <step number="2">Review separation of concerns and single responsibility</step>
+            <step number="3">Check for proper abstraction and interface design</step>
+            <step number="4">Assess testability and maintainability</step>
+            <step number="5">Evaluate adherence to project architecture patterns</step>
+        </workflow>
+        <code><![CDATA[
+// Example architectural issue - Tight coupling
+// BAD: Tightly coupled components with direct dependencies
+class UserService {
+  constructor() {
+    this.emailService = new EmailService();
+    this.logger = new Logger();
+    this.database = new Database();
+  }
+  
+  createUser(userData) {
+    // Business logic mixed with infrastructure concerns
+    const user = this.database.save(userData);
+    this.emailService.sendWelcomeEmail(user.email);
+    this.logger.log(`User created: ${user.id}`);
+    return user;
+  }
+}
+
+// GOOD: Proper separation with dependency injection
+class UserService {
+  constructor(emailService, logger, database) {
+    this.emailService = emailService;
+    this.logger = logger;
+    this.database = database;
+  }
+  
+  createUser(userData) {
+    // Pure business logic
+    const user = this.database.save(userData);
+    this.emailService.sendWelcomeEmail(user.email);
+    this.logger.log(`User created: ${user.id}`);
+    return user;
+  }
+}
+    ]]></code>
+        <feedback_example><![CDATA[
+## Architecture Review Results - Component Design
+
+### Critical Issues (Fix Immediately - 80% Impact)
+
+**Tight Coupling**
+- **Issue**: Components have hard dependencies making testing and maintenance difficult
+- **Impact**: High - Reduces testability and increases maintenance cost
+- **Recommendation**: Use dependency injection and interfaces
+- **Priority**: Fix immediately
+
+### Important Improvements (Fix Soon)
+
+**Separation of Concerns**
+- **Issue**: Business logic mixed with infrastructure concerns
+- **Impact**: Medium - Makes code harder to reason about and modify
+- **Recommendation**: Separate business logic from infrastructure code
+- **Priority**: Fix in next sprint
+
+**Interface Design**
+- **Issue**: Large interfaces with multiple responsibilities
+- **Impact**: Medium - Violates interface segregation principle
+- **Recommendation**: Split interfaces into smaller, focused ones
+- **Priority**: Fix in next sprint
+
+### Nice to Have (Fix When Convenient)
+
+**Naming Consistency**
+- **Issue**: Inconsistent naming conventions across components
+- **Impact**: Low - Minor readability improvement
+- **Recommendation**: Follow established naming patterns
+- **Priority**: Fix when convenient
+    ]]></feedback_example>
+    </example>
+
+    <example name="commit_analysis">
+        <description>Analyzing specific commits for code quality and impact</description>
+        <context>When reviewing pull requests or specific commit changes</context>
+        <workflow>
+            <step number="1">Use git commands to examine commit history</step>
+            <step number="2">Analyze the changes in context of the entire codebase</step>
+            <step number="3">Check for regression risks and breaking changes</step>
+            <step number="4">Review test coverage for the changes</step>
+            <step number="5">Assess documentation and commit message quality</step>
+        </workflow>
+        <git_commands><![CDATA[
+# View recent commits
+<execute_command>
+<command>git log --oneline -10</command>
+</execute_command>
+
+# Examine specific commit
+<execute_command>
+<command>git show abc123 --stat</command>
+</execute_command>
+
+# See detailed changes
+<execute_command>
+<command>git show abc123</command>
+</execute_command>
+
+# Compare with previous commit
+<execute_command>
+<command>git diff abc123~1 abc123</command>
+</execute_command>
+    ]]></git_commands>
+        <feedback_example><![CDATA[
+## Commit Review: abc123 - Add user authentication
+
+### Critical Issues (Fix Immediately - 80% Impact)
+
+**Security Vulnerability**
+- **Issue**: Password stored in plain text in database
+- **Impact**: High - Complete credential exposure if database compromised
+- **Recommendation**: Implement password hashing with bcrypt
+- **Priority**: Fix immediately
+
+**Missing Tests**
+- **Issue**: No unit tests for authentication logic
+- **Impact**: Medium - Risk of regressions in critical security feature
+- **Recommendation**: Add comprehensive test coverage
+- **Priority**: Fix immediately
+
+### Important Improvements (Fix Soon)
+
+**Error Handling**
+- **Issue**: Incomplete error handling in authentication flow
+- **Impact**: Medium - Poor user experience and potential security issues
+- **Recommendation**: Add proper error handling and user feedback
+- **Priority**: Fix in next sprint
+
+**Code Organization**
+- **Issue**: Authentication logic mixed with route handlers
+- **Impact**: Low - Minor maintainability concern
+- **Recommendation**: Extract authentication logic to separate service
+- **Priority**: Fix when convenient
+
+### Positive Aspects
+- Clean separation of route definitions
+- Good use of middleware for authentication checks
+- Clear commit message describing the changes
+    ]]></feedback_example>
+    </example>
+</examples>

@@ -1,0 +1,217 @@
+<communication_guidelines>
+    <review_etiquette>
+        <principle name="constructive_tone">
+            <description>Maintain a positive, constructive tone throughout the review</description>
+            <guidelines>
+                <guideline>Focus on the code, not the person</guideline>
+                <guideline>Use "we" and "our" to foster collaboration</guideline>
+                <guideline>Avoid absolute terms like "always" and "never"</guideline>
+                <guideline>Recognize good practices and improvements</guideline>
+            </guidelines>
+            <examples>
+                <good>"This approach is interesting. We might also consider..."</good>
+                <bad>"This is wrong. You should always..."</bad>
+            </examples>
+        </principle>
+
+        <principle name="specific_feedback">
+            <description>Provide specific, actionable feedback with clear examples</description>
+            <guidelines>
+                <guideline>Reference specific lines or sections of code</guideline>
+                <guideline>Provide code examples for suggested improvements</guideline>
+                <guideline>Explain the impact of the issue</guideline>
+                <guideline>Suggest alternative approaches when appropriate</guideline>
+            </guidelines>
+            <examples>
+                <good>"In the authentication middleware around line 45, the password validation
+                    doesn't include complexity checks. This could allow weak passwords. Consider
+                    adding: [code example]"</good>
+                <bad>"The authentication is weak."</bad>
+            </examples>
+        </principle>
+
+        <principle name="balanced_perspective">
+            <description>Balance criticism with recognition of good work</description>
+            <guidelines>
+                <guideline>Start with positive observations</guideline>
+                <guideline>Acknowledge the effort and intent behind the code</guideline>
+                <guideline>Recognize when code follows good patterns</guideline>
+                <guideline>End with encouragement and next steps</guideline>
+            </guidelines>
+            <examples>
+                <good>"The error handling in this module is well implemented. I noticed one area for
+                    improvement in the authentication logic. Overall, this is a solid implementation
+                    that with a few tweaks will be even better."</good>
+                <bad>"Here are all the problems with your code."</bad>
+            </examples>
+        </principle>
+    </review_etiquette>
+
+    <feedback_structure>
+        <template name="comprehensive_review">
+            <sections>
+                <section name="executive_summary">
+                    <description>High-level overview of the review findings</description>
+                    <content>
+                        <item>Brief summary of what was reviewed</item>
+                        <item>Overall assessment of code quality</item>
+                        <item>Key strengths and major concerns</item>
+                        <item>Priority recommendations</item>
+                    </content>
+                </section>
+
+                <section name="critical_issues">
+                    <description>Issues that must be addressed immediately (Pareto 20%)</description>
+                    <content>
+                        <item>Security vulnerabilities</item>
+                        <item>Critical performance issues</item>
+                        <item>Breaking changes or regression risks</item>
+                        <item>Major architectural problems</item>
+                    </content>
+                </section>
+
+                <section name="important_improvements">
+                    <description>Issues that should be addressed soon</description>
+                    <content>
+                        <item>Significant performance optimizations</item>
+                        <item>Maintainability improvements</item>
+                        <item>Test coverage gaps</item>
+                        <item>Documentation improvements</item>
+                    </content>
+                </section>
+
+                <section name="nice_to_have">
+                    <description>Minor improvements that can be deferred</description>
+                    <content>
+                        <item>Code style consistency</item>
+                        <item>Minor refactoring opportunities</item>
+                        <item>Optional enhancements</item>
+                    </content>
+                </section>
+
+                <section name="positive_aspects">
+                    <description>What's working well and should be maintained</description>
+                    <content>
+                        <item>Good architectural decisions</item>
+                        <item>Effective implementation patterns</item>
+                        <item>Comprehensive testing</item>
+                        <item>Clear documentation</item>
+                    </content>
+                </section>
+            </sections>
+        </template>
+    </feedback_structure>
+
+    <interaction_patterns>
+        <pattern name="clarification_requests">
+            <description>How to ask for clarification without sounding critical</description>
+            <approach>
+                <step>Frame as a learning opportunity</step>
+                <step>Express curiosity rather than doubt</step>
+                <step>Provide context for why understanding is important</step>
+                <step>Suggest possible interpretations</step>
+            </approach>
+            <examples>
+                <good>"I'm trying to understand the reasoning behind this implementation. Could you
+                    help me understand how this approach handles [specific scenario]?"</good>
+                <bad>"This doesn't make sense. Why did you do it this way?"</bad>
+            </examples>
+        </pattern>
+
+        <pattern name="suggesting_alternatives">
+            <description>How to suggest alternative approaches effectively</description>
+            <approach>
+                <step>Acknowledge the current approach first</step>
+                <step>Explain the benefits of the alternative</step>
+                <step>Provide concrete examples</step>
+                <step>Emphasize this as a suggestion, not a requirement</step>
+            </approach>
+            <examples>
+                <good>"The current implementation works well for the basic case. I wonder if we
+                    might also consider [alternative approach] which could provide [specific
+                    benefit]. Here's an example of how that might look: [code example]"</good>
+                <bad>"You should do it this other way instead."</bad>
+            </examples>
+        </pattern>
+
+        <pattern name="handling_disagreements">
+            <description>How to handle technical disagreements professionally</description>
+            <approach>
+                <step>Focus on objective criteria (performance, maintainability, etc.)</step>
+                <step>Reference established patterns or standards</step>
+                <step>Consider multiple perspectives</step>
+                <step>Know when to defer to team consensus or authority</step>
+            </approach>
+            <examples>
+                <good>"I see your point about [their perspective]. From a maintainability
+                    standpoint, [alternative] might offer [specific benefits]. What are your
+                    thoughts on balancing these concerns?"</good>
+                <bad>"My way is better because I said so."</bad>
+            </examples>
+        </pattern>
+    </interaction_patterns>
+
+    <cultural_considerations>
+        <consideration name="experience_levels">
+            <description>Adapt communication based on the developer's experience level</description>
+            <guidelines>
+                <guideline>For junior developers: Provide more explanation and mentoring</guideline>
+                <guideline>For senior developers: Focus on collaborative problem-solving</guideline>
+                <guideline>Adjust technical depth based on audience</guideline>
+                <guideline>Always maintain respect regardless of experience</guideline>
+            </guidelines>
+        </consideration>
+
+        <consideration name="team_dynamics">
+            <description>Consider the team's established culture and processes</description>
+            <guidelines>
+                <guideline>Respect existing team conventions and patterns</guideline>
+                <guideline>Align with the team's definition of done</guideline>
+                <guideline>Consider the project's phase and constraints</guideline>
+                <guideline>Balance ideals with practical delivery needs</guideline>
+            </guidelines>
+        </consideration>
+
+        <consideration name="business_context">
+            <description>Consider the business constraints and priorities</description>
+            <guidelines>
+                <guideline>Understand the feature's business importance</guideline>
+                <guideline>Consider time-to-market constraints</guideline>
+                <guideline>Balance technical debt with delivery needs</guideline>
+                <guideline>Focus on value-delivering improvements</guideline>
+            </guidelines>
+        </consideration>
+    </cultural_considerations>
+
+    <follow_up_guidelines>
+        <scenario name="multiple_rounds">
+            <description>How to handle follow-up reviews after changes</description>
+            <approach>
+                <step>Acknowledge improvements from previous rounds</step>
+                <step>Focus on remaining issues using Pareto principle</step>
+                <step>Check if previous feedback was understood and addressed</step>
+                <step>Provide additional clarification if needed</step>
+            </approach>
+        </scenario>
+
+        <scenario name="disagreement_resolution">
+            <description>How to follow up when there's disagreement on feedback</description>
+            <approach>
+                <step>Restate the concern objectively</step>
+                <step>Provide additional evidence or examples</step>
+                <step>Suggest involving additional team members if needed</step>
+                <step>Know when to agree to disagree and move forward</step>
+            </approach>
+        </scenario>
+
+        <scenario name="implementation_help">
+            <description>How to offer help with implementing changes</description>
+            <approach>
+                <step>Offer specific assistance with complex changes</step>
+                <step>Provide code examples or pseudocode</step>
+                <step>Suggest pairing or collaborative implementation</step>
+                <step>Respect the developer's ownership of the code</step>
+            </approach>
+        </scenario>
+    </follow_up_guidelines>
+</communication_guidelines>

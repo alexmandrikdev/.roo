@@ -1,0 +1,225 @@
+<tool_usage_guide>
+    <tool_priorities>
+        <priority level="1">
+            <tool>codebase_search</tool>
+            <when>Always use first to understand code relationships and find relevant
+                implementations</when>
+            <why>Semantic search finds functionally relevant code better than keyword matching</why>
+        </priority>
+        <priority level="2">
+            <tool>read_file</tool>
+            <when>After identifying relevant files with codebase_search</when>
+            <why>Get complete context of implementations to understand the full picture</why>
+        </priority>
+        <priority level="3">
+            <tool>execute_command</tool>
+            <when>For git operations, running tests, or system analysis</when>
+            <why>Essential for commit analysis, testing, and understanding project state</why>
+        </priority>
+        <priority level="4">
+            <tool>search_files</tool>
+            <when>For specific pattern matching after semantic understanding</when>
+            <why>Regex-based search for specific code patterns once context is established</why>
+        </priority>
+    </tool_priorities>
+
+    <tool_specific_guidance>
+        <tool name="codebase_search">
+            <best_practices>
+                <practice>Use natural language queries that describe the functionality you're
+                    looking for</practice>
+                <practice>Search for concepts, not just keywords (e.g., "authentication logic" vs
+                    "login")</practice>
+                <practice>Use multiple related searches to build comprehensive understanding</practice>
+                <practice>Combine with read_file to examine the most relevant results</practice>
+            </best_practices>
+            <example><![CDATA[
+<codebase_search>
+<query>authentication middleware and user validation</query>
+</codebase_search>
+
+<codebase_search>
+<query>database query patterns and performance optimization</query>
+</codebase_search>
+      ]]></example>
+        </tool>
+
+        <tool name="read_file">
+            <best_practices>
+                <practice>Read multiple related files together for context</practice>
+                <practice>Focus on understanding the architecture and patterns, not just syntax</practice>
+                <practice>Look for security vulnerabilities, performance issues, and maintainability
+                    concerns</practice>
+                <practice>Compare similar implementations across the codebase</practice>
+            </best_practices>
+            <example><![CDATA[
+<read_file>
+<args>
+  <file>
+    <path>src/auth/middleware.js</path>
+  </file>
+  <file>
+    <path>src/auth/validation.js</path>
+  </file>
+  <file>
+    <path>src/config/security.js</path>
+  </file>
+</args>
+</read_file>
+      ]]></example>
+        </tool>
+
+        <tool name="execute_command">
+            <best_practices>
+                <practice>Use git commands to analyze commit history and changes</practice>
+                <practice>Run tests to verify code functionality</practice>
+                <practice>Use system commands to check dependencies and configurations</practice>
+                <practice>Always understand what the command does before executing</practice>
+            </best_practices>
+            <example><![CDATA[
+<execute_command>
+<command>git log --oneline -10</command>
+</execute_command>
+
+<execute_command>
+<command>git show abc123 --stat</command>
+</execute_command>
+
+<execute_command>
+<command>npm test</command>
+</execute_command>
+
+<execute_command>
+<command>npm audit</command>
+</execute_command>
+      ]]></example>
+        </tool>
+
+        <tool name="search_files">
+            <best_practices>
+                <practice>Use after codebase_search for specific pattern matching</practice>
+                <practice>Craft precise regex patterns to find specific code patterns</practice>
+                <practice>Use file patterns to limit search scope when appropriate</practice>
+                <practice>Analyze context around matches to understand usage patterns</practice>
+            </best_practices>
+            <example><![CDATA[
+<search_files>
+<path>src</path>
+<regex>eval\(</regex>
+<file_pattern>*.js</file_pattern>
+</search_files>
+
+<search_files>
+<path>.</path>
+<regex>SELECT\s+\*</regex>
+<file_pattern>*.js</file_pattern>
+</search_files>
+      ]]></example>
+        </tool>
+
+        <tool name="apply_diff">
+            <best_practices>
+                <practice>Use sparingly in code-review mode - focus on analysis, not modification</practice>
+                <practice>Only modify review report files or instruction files, not source code</practice>
+                <practice>When suggesting fixes, provide code examples in comments, not direct
+                    modifications</practice>
+                <practice>Always read file first to ensure exact content match</practice>
+            </best_practices>
+            <example><![CDATA[
+<!-- Only for review report files, not source code -->
+<apply_diff>
+<path>code-reviews/review-2024-01-15.md</path>
+<diff>
+<<<<<<< SEARCH
+:start_line:5
+-------
+## Issues Found
+=======
+## Issues Found
+
+### Critical Issues
+- [ ] Security: SQL injection vulnerability in user query
+- [ ] Performance: N+1 query problem in user posts
+>>>>>>> REPLACE
+</diff>
+</apply_diff>
+      ]]></example>
+        </tool>
+
+        <tool name="ask_followup_question">
+            <best_practices>
+                <practice>Use when you need clarification on review scope or focus areas</practice>
+                <practice>Provide 2-4 specific, actionable suggestions for review focus</practice>
+                <practice>Ask about specific concerns like security, performance, or architecture</practice>
+                <practice>Use to understand business context or project constraints</practice>
+            </best_practices>
+            <example><![CDATA[
+<ask_followup_question>
+<question>What specific areas would you like me to focus on in this code review?</question>
+<follow_up>
+<suggest>Security vulnerabilities and authentication logic</suggest>
+<suggest>Performance optimization and database queries</suggest>
+<suggest>Code maintainability and architectural patterns</suggest>
+<suggest>Test coverage and error handling</suggest>
+</follow_up>
+</ask_followup_question>
+      ]]></example>
+        </tool>
+    </tool_specific_guidance>
+
+    <git_command_reference>
+        <command_group name="commit_analysis">
+            <command>git log --oneline -10</command>
+            <purpose>View recent commits to understand recent changes</purpose>
+
+            <command>git show <commit-hash> --stat</command>
+            <purpose>See which files changed in a specific commit</purpose>
+
+            <command>git show <commit-hash></command>
+            <purpose>View full details of a specific commit</purpose>
+
+            <command>git diff <commit1>
+                <commit2></command>
+            <purpose>Compare changes between two commits</purpose>
+
+            <command>git log -p --follow <filename></command>
+            <purpose>See history of changes to a specific file</purpose>
+        </command_group>
+
+        <command_group name="branch_analysis">
+            <command>git branch -a</command>
+            <purpose>List all branches</purpose>
+
+            <command>git log --oneline --graph --all -10</command>
+            <purpose>Visualize branch history and relationships</purpose>
+
+            <command>git diff <branch1>..<branch2></command>
+            <purpose>Compare changes between two branches</purpose>
+        </command_group>
+    </git_command_reference>
+
+    <review_workflow_tools>
+        <phase name="initial_analysis">
+            <tools>
+                <tool>codebase_search - Understand project structure and patterns</tool>
+                <tool>read_file - Examine key implementation files</tool>
+                <tool>execute_command - Analyze git history and current state</tool>
+            </tools>
+        </phase>
+
+        <phase name="detailed_review">
+            <tools>
+                <tool>search_files - Find specific patterns and anti-patterns</tool>
+                <tool>read_file - Deep dive into problematic areas</tool>
+                <tool>execute_command - Run tests and security scans</tool>
+            </tools>
+        </phase>
+
+        <phase name="reporting">
+            <tools>
+                <tool>apply_diff - Create or update review reports (in allowed files)</tool>
+                <tool>ask_followup_question - Clarify findings and get feedback</tool>
+            </tools>
+        </phase>
+    </review_workflow_tools>
+</tool_usage_guide>

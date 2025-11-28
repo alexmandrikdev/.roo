@@ -1,0 +1,198 @@
+<error_handling>
+    <common_review_scenarios>
+        <scenario name="incomplete_analysis">
+            <description>When the code review doesn't cover all important aspects</description>
+            <recovery>
+                <step>Identify missing review areas (security, performance, architecture, etc.)</step>
+                <step>Use codebase_search to find related code that might be affected</step>
+                <step>Check for patterns across the codebase that indicate systemic issues</step>
+                <step>Re-prioritize using Pareto principle to focus on high-impact areas</step>
+            </recovery>
+            <prevention>
+                <action>Follow the structured workflow from 1_workflow.xml</action>
+                <action>Use the quality checklist from 2_best_practices.xml</action>
+                <action>Apply common patterns from 3_common_patterns.xml</action>
+            </prevention>
+        </scenario>
+
+        <scenario name="misprioritized_issues">
+            <description>When issues are not properly prioritized by impact</description>
+            <recovery>
+                <step>Re-evaluate each issue using the Pareto principle (80/20 rule)</step>
+                <step>Focus on the 20% of issues that will deliver 80% of the benefit</step>
+                <step>Categorize issues as Critical, High, Medium, Low based on impact</step>
+                <step>Provide clear guidance on what to fix immediately vs. later</step>
+            </recovery>
+            <prevention>
+                <action>Always apply impact-based prioritization from the start</action>
+                <action>Use the feedback patterns from 3_common_patterns.xml</action>
+                <action>Consider both immediate and long-term implications</action>
+            </prevention>
+        </scenario>
+
+        <scenario name="unclear_feedback">
+            <description>When feedback is vague or not actionable</description>
+            <recovery>
+                <step>Reformulate feedback to be specific and concrete</step>
+                <step>Provide code examples showing the problem and solution</step>
+                <step>Explain the "why" behind each recommendation</step>
+                <step>Use the constructive criticism pattern from common patterns</step>
+            </recovery>
+            <prevention>
+                <action>Follow the constructive criticism template</action>
+                <action>Always include specific examples and alternatives</action>
+                <action>Explain the impact and reasoning for each issue</action>
+            </prevention>
+        </scenario>
+
+        <scenario name="missing_context">
+            <description>When the review doesn't consider the broader context</description>
+            <recovery>
+                <step>Analyze the project's architecture and existing patterns</step>
+                <step>Understand the business requirements and constraints</step>
+                <step>Review related code and dependencies</step>
+                <step>Consider the team's conventions and standards</step>
+            </recovery>
+            <prevention>
+                <action>Always start with codebase_search to understand context</action>
+                <action>Examine multiple related files together</action>
+                <action>Consider the project's history and evolution</action>
+            </prevention>
+        </scenario>
+    </common_review_scenarios>
+
+    <git_analysis_errors>
+        <error type="commit_not_found">
+            <description>Unable to find or access the specified commit</description>
+            <resolution>
+                <step>Verify the commit hash is correct</step>
+                <step>Check if you're in the right git repository</step>
+                <step>Use git log to see available commits</step>
+                <step>Ensure you have permission to access the repository</step>
+            </resolution>
+            <alternative_approach>
+                If specific commit analysis fails, focus on current code state and use search_files
+                to understand recent changes
+            </alternative_approach>
+        </error>
+
+        <error type="file_access_denied">
+            <description>Unable to read certain files due to permissions</description>
+            <resolution>
+                <step>Focus on files you can access</step>
+                <step>Use codebase_search to understand the overall structure</step>
+                <step>Look for similar patterns in accessible files</step>
+                <step>Note the limitation in your review report</step>
+            </resolution>
+            <alternative_approach>
+                Work with available information and make recommendations based on observable
+                patterns
+            </alternative_approach>
+        </error>
+    </git_analysis_errors>
+
+    <tool_usage_errors>
+        <error type="search_no_results">
+            <description>codebase_search or search_files returns no relevant results</description>
+            <resolution>
+                <step>Broaden your search query to be more general</step>
+                <step>Try different terminology or concepts</step>
+                <step>Use list_files to manually explore the project structure</step>
+                <step>Check if you're searching in the correct directory</step>
+            </resolution>
+            <alternative_approach>
+                If automated searches fail, use manual exploration with list_files and read_file on
+                key directories
+            </alternative_approach>
+        </error>
+
+        <error type="command_execution_failed">
+            <description>execute_command fails due to missing dependencies or permissions</description>
+            <resolution>
+                <step>Check if required tools (git, npm, etc.) are available</step>
+                <step>Verify you're in the correct working directory</step>
+                <step>Try alternative commands that provide similar information</step>
+                <step>Use file-based analysis instead of command-based when possible</step>
+            </resolution>
+            <alternative_approach>
+                Use file reading and analysis tools as alternatives to command execution
+            </alternative_approach>
+        </error>
+    </tool_usage_errors>
+
+    <review_quality_checks>
+        <check name="completeness">
+            <description>Ensure the review covers all critical aspects</description>
+            <verification_questions>
+                <question>Have security vulnerabilities been identified?</question>
+                <question>Are performance issues addressed?</question>
+                <question>Is code maintainability assessed?</question>
+                <question>Are architectural concerns considered?</question>
+                <question>Is test coverage evaluated?</question>
+                <question>Is documentation reviewed?</question>
+            </verification_questions>
+        </check>
+
+        <check name="prioritization">
+            <description>Ensure issues are properly prioritized by impact</description>
+            <verification_questions>
+                <question>Are critical security issues identified as top priority?</question>
+                <question>Is the Pareto principle applied (80/20 rule)?</question>
+                <question>Are recommendations clear about what to fix immediately vs. later?</question>
+                <question>Is the impact of each issue clearly explained?</question>
+            </verification_questions>
+        </check>
+
+        <check name="actionability">
+            <description>Ensure feedback is specific and actionable</description>
+            <verification_questions>
+                <question>Are specific code examples provided for issues?</question>
+                <question>Are alternative implementations suggested?</question>
+                <question>Is the reasoning behind each recommendation clear?</question>
+                <question>Can the developer understand exactly what to change?</question>
+            </verification_questions>
+        </check>
+
+        <check name="context_awareness">
+            <description>Ensure the review considers the broader context</description>
+            <verification_questions>
+                <question>Is the project's architecture considered?</question>
+                <question>Are existing patterns and conventions respected?</question>
+                <question>Are business constraints and requirements understood?</question>
+                <question>Is the review balanced between ideals and practicality?</question>
+            </verification_questions>
+        </check>
+    </review_quality_checks>
+
+    <escalation_procedures>
+        <procedure name="complex_architectural_issues">
+            <description>When encountering complex architectural problems beyond code review scope</description>
+            <steps>
+                <step>Document the architectural concerns clearly</step>
+                <step>Suggest switching to Architect mode for deeper analysis</step>
+                <step>Provide initial observations and impact assessment</step>
+                <step>Recommend involving senior developers or architects</step>
+            </steps>
+        </procedure>
+
+        <procedure name="security_concerns">
+            <description>When identifying serious security vulnerabilities</description>
+            <steps>
+                <step>Immediately flag as critical priority</step>
+                <step>Provide clear remediation steps</step>
+                <step>Suggest security-focused review if needed</step>
+                <step>Recommend immediate attention and testing</step>
+            </steps>
+        </procedure>
+
+        <procedure name="performance_bottlenecks">
+            <description>When identifying significant performance issues</description>
+            <steps>
+                <step>Quantify the potential impact if possible</step>
+                <step>Provide optimization strategies</step>
+                <step>Suggest performance testing and monitoring</step>
+                <step>Recommend profiling for complex cases</step>
+            </steps>
+        </procedure>
+    </escalation_procedures>
+</error_handling>

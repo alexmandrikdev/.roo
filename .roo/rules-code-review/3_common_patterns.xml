@@ -1,0 +1,219 @@
+<common_patterns>
+    <analysis_patterns>
+        <pattern name="commit_analysis">
+            <description>Systematic approach to analyzing commit changes</description>
+            <steps>
+                <step>Use git commands to examine commit history and changes</step>
+                <step>Analyze the context of changes (what problem is being solved)</step>
+                <step>Check for related changes in the same commit or related commits</step>
+                <step>Verify commit messages are clear and descriptive</step>
+            </steps>
+            <example><![CDATA[
+<execute_command>
+<command>git log --oneline -10</command>
+</execute_command>
+
+<execute_command>
+<command>git show <commit-hash> --stat</command>
+</execute_command>
+
+<execute_command>
+<command>git diff <commit-hash>~1 <commit-hash></command>
+</execute_command>
+      ]]></example>
+        </pattern>
+
+        <pattern name="security_analysis">
+            <description>Comprehensive security vulnerability assessment</description>
+            <steps>
+                <step>Check for common security anti-patterns (SQL injection, XSS, etc.)</step>
+                <step>Review authentication and authorization logic</step>
+                <step>Validate input sanitization and validation</step>
+                <step>Assess data exposure and privacy concerns</step>
+                <step>Review dependency security (if applicable)</step>
+            </steps>
+            <example><![CDATA[
+// Security issue example - SQL injection vulnerability
+const query = `SELECT * FROM users WHERE id = ${userInput}`; // BAD
+
+// Secure alternative
+const query = `SELECT * FROM users WHERE id = $1`;
+const values = [userInput];
+      ]]></example>
+        </pattern>
+
+        <pattern name="performance_assessment">
+            <description>Performance impact analysis and optimization opportunities</description>
+            <steps>
+                <step>Identify potential performance bottlenecks</step>
+                <step>Check for inefficient algorithms or data structures</step>
+                <step>Assess memory usage and potential leaks</step>
+                <step>Review database query patterns</step>
+                <step>Evaluate caching strategies</step>
+            </steps>
+            <example><![CDATA[
+// Performance issue - N+1 query problem
+users.forEach(user => {
+  const posts = db.query('SELECT * FROM posts WHERE user_id = ?', [user.id]);
+  // Process posts...
+});
+
+// Optimized solution - Single query with join
+const usersWithPosts = db.query(`
+  SELECT u.*, p.* 
+  FROM users u 
+  LEFT JOIN posts p ON u.id = p.user_id
+`);
+      ]]></example>
+        </pattern>
+    </analysis_patterns>
+
+    <feedback_patterns>
+        <pattern name="paretor_prioritized_feedback">
+            <description>Structure feedback using Pareto principle for impact-based prioritization</description>
+            <structure>
+                <section name="critical_issues">
+                    <description>Issues that must be fixed immediately (20% that deliver 80% impact)</description>
+                    <content>
+                        <issue>
+                            <description>Security vulnerability allowing data exposure</description>
+                            <impact>High - Could lead to data breach</impact>
+                            <recommendation>Implement proper input validation and use parameterized
+                                queries</recommendation>
+                            <priority>Fix immediately</priority>
+                        </issue>
+                    </content>
+                </section>
+
+                <section name="important_improvements">
+                    <description>Issues that should be addressed soon (significant impact)</description>
+                    <content>
+                        <issue>
+                            <description>Performance bottleneck affecting user experience</description>
+                            <impact>Medium - Degrades application performance</impact>
+                            <recommendation>Optimize database queries and implement caching</recommendation>
+                            <priority>Fix in next sprint</priority>
+                        </issue>
+                    </content>
+                </section>
+
+                <section name="nice_to_have">
+                    <description>Minor improvements (low impact, can be deferred)</description>
+                    <content>
+                        <issue>
+                            <description>Code style inconsistencies</description>
+                            <impact>Low - Does not affect functionality</impact>
+                            <recommendation>Follow project's code style guide</recommendation>
+                            <priority>Fix when convenient</priority>
+                        </issue>
+                    </content>
+                </section>
+            </structure>
+        </pattern>
+
+        <pattern name="constructive_criticism">
+            <description>Provide feedback that encourages improvement without discouraging the
+                developer</description>
+            <template>
+                <positive_aspect>Start with what's working well</positive_aspect>
+                <identified_issue>Clearly state the issue without blame</identified_issue>
+                <impact_explanation>Explain why this matters (security, performance,
+                    maintainability)</impact_explanation>
+                <specific_suggestion>Provide concrete, actionable improvement</specific_suggestion>
+                <alternative_approach>Show code example of better approach</alternative_approach>
+            </template>
+            <example><![CDATA[
+The authentication logic is well-structured and follows good patterns. 
+
+However, I noticed the password validation doesn't include complexity requirements, which could allow weak passwords and compromise security.
+
+Consider adding password strength validation:
+- Minimum 8 characters
+- Mix of uppercase, lowercase, numbers, and symbols
+- Common password blacklist
+
+Example implementation:
+function validatePassword(password) {
+  const minLength = 8;
+  const hasUpper = /[A-Z]/.test(password);
+  const hasLower = /[a-z]/.test(password);
+  const hasNumber = /\d/.test(password);
+  const hasSpecial = /[!@#$%^&*]/.test(password);
+  
+  return password.length >= minLength && hasUpper && hasLower && hasNumber && hasSpecial;
+}
+      ]]></example>
+        </pattern>
+    </feedback_patterns>
+
+    <tool_usage_patterns>
+        <pattern name="git_analysis">
+            <description>Use git commands to understand changes and context</description>
+            <commands>
+                <command purpose="view_recent_commits">git log --oneline -10</command>
+                <command purpose="see_changes_in_commit">git show <commit-hash></command>
+                <command purpose="compare_changes">git diff <commit1>
+                    <commit2></command>
+                <command purpose="see_file_history">git log -p --follow <filename></command>
+                <command purpose="check_current_changes">git status</command>
+            </commands>
+        </pattern>
+
+        <pattern name="code_search">
+            <description>Systematic code analysis using search tools</description>
+            <workflow>
+                <step>Use codebase_search for semantic understanding of code relationships</step>
+                <step>Use search_files for pattern matching and specific code patterns</step>
+                <step>Use read_file for detailed analysis of specific implementations</step>
+                <step>Use list_code_definition_names to understand project structure</step>
+            </workflow>
+        </pattern>
+    </tool_usage_patterns>
+
+    <language_specific_patterns>
+        <language name="javascript_typescript">
+            <common_issues>
+                <issue>Missing type definitions in TypeScript</issue>
+                <issue>Callback hell or promise handling issues</issue>
+                <issue>Memory leaks from event listeners</issue>
+                <issue>Inconsistent error handling</issue>
+                <issue>Security issues with eval or dynamic code execution</issue>
+                <issue>Unhandled promise rejections</issue>
+                <issue>Inconsistent module imports (require vs import)</issue>
+            </common_issues>
+        </language>
+
+        <language name="php">
+            <common_issues>
+                <issue>SQL injection vulnerabilities (missing prepared statements)</issue>
+                <issue>Cross-site scripting (XSS) vulnerabilities</issue>
+                <issue>Insecure file upload handling</issue>
+                <issue>Missing input validation and sanitization</issue>
+                <issue>Inconsistent error reporting levels</issue>
+                <issue>Security issues with eval() or unserialize()</issue>
+            </common_issues>
+        </language>
+
+        <language name="css_scss">
+            <common_issues>
+                <issue>Specificity wars and overly complex selectors</issue>
+                <issue>Missing responsive design considerations</issue>
+                <issue>Inconsistent naming conventions (BEM, etc.)</issue>
+                <issue>Performance issues with expensive CSS properties</issue>
+                <issue>Accessibility issues (color contrast, focus states)</issue>
+                <issue>Browser compatibility issues</issue>
+            </common_issues>
+        </language>
+
+        <language name="shell">
+            <common_issues>
+                <issue>Unquoted variables leading to word splitting</issue>
+                <issue>Missing error handling and exit code checking</issue>
+                <issue>Security issues with unsanitized user input</issue>
+                <issue>Portability issues (bashisms in sh scripts)</issue>
+                <issue>Race conditions in file operations</issue>
+                <issue>Insecure temporary file creation</issue>
+            </common_issues>
+        </language>
+    </language_specific_patterns>
+</common_patterns>
