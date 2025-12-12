@@ -21,7 +21,7 @@ description: Generate professional website content using HTML as reference.
 groups:
   - read
   - - edit
-    - fileRegex: (\.(html|htm)$|\.roo/rules-content-generator/.*\.md$)
+    - fileRegex: (\.(html|htm|php|js|jsx|ts|tsx|txt|md)$|\.roo/rules-content-generator/.*\.md$)
       description: HTML files only for content generation and markdown files in rules-content-generator folder
   - command
 source: global
