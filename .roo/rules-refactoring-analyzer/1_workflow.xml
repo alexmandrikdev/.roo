@@ -1,0 +1,215 @@
+<workflow_instructions>
+    <mode_overview>
+        The Refactoring Analyzer mode systematically analyzes entire codebases to identify
+        refactorable code patterns, categorize issues by impact, and prioritize improvements using
+        the Pareto principle (80/20 rule). The mode focuses on code smells, duplicated code, long
+        methods, and complex functions to deliver maximum refactoring value.
+    </mode_overview>
+
+    <initialization_steps>
+        <step number="1">
+            <title>Understand Analysis Scope</title>
+            <description>
+                Determine the scope and focus of the refactoring analysis
+            </description>
+            <actions>
+                <action>Identify the target codebase directory</action>
+                <action>Confirm programming languages and frameworks used</action>
+                <action>Understand any specific areas of concern or focus</action>
+            </actions>
+        </step>
+
+        <step number="2">
+            <title>Discover Codebase Structure</title>
+            <description>
+                Map the codebase structure and identify source files
+            </description>
+            <tools>
+                <tool>list_files - Get recursive file structure</tool>
+                <tool>codebase_search - Find main application files</tool>
+                <tool>read_file - Examine configuration files</tool>
+            </tools>
+        </step>
+    </initialization_steps>
+
+    <main_workflow>
+        <phase name="discovery">
+            <title>Code Discovery and Classification</title>
+            <description>
+                Systematically discover and classify all source files
+            </description>
+            <steps>
+                <step number="1">
+                    <title>Identify Source Files</title>
+                    <description>
+                        Locate all source code files in the codebase
+                    </description>
+                    <actions>
+                        <action>Use list_files to get complete file tree</action>
+                        <action>Filter for source files based on extensions</action>
+                        <action>Categorize files by type (frontend, backend, tests, configs)</action>
+                    </actions>
+                </step>
+
+                <step number="2">
+                    <title>Analyze Project Structure</title>
+                    <description>
+                        Understand the overall architecture and organization
+                    </description>
+                    <actions>
+                        <action>Examine package.json, requirements.txt, or similar files</action>
+                        <action>Identify main entry points and core modules</action>
+                        <action>Map dependencies and relationships</action>
+                    </actions>
+                </step>
+            </steps>
+        </phase>
+
+        <phase name="analysis">
+            <title>Refactoring Pattern Detection</title>
+            <description>
+                Scan for common refactoring opportunities and code smells
+            </description>
+            <steps>
+                <step number="1">
+                    <title>Code Smell Detection</title>
+                    <description>
+                        Identify various code smells and anti-patterns
+                    </description>
+                    <patterns>
+                        <pattern name="Long Methods">
+                            <description>Methods/functions exceeding 20-30 lines</description>
+                            <impact>High - reduces readability and maintainability</impact>
+                        </pattern>
+                        <pattern name="Large Classes">
+                            <description>Classes with too many responsibilities</description>
+                            <impact>High - violates Single Responsibility Principle</impact>
+                        </pattern>
+                        <pattern name="Duplicated Code">
+                            <description>Similar or identical code blocks</description>
+                            <impact>Medium - increases maintenance burden</impact>
+                        </pattern>
+                        <pattern name="Complex Conditional Logic">
+                            <description>Nested if-else, complex boolean expressions</description>
+                            <impact>High - reduces code clarity</impact>
+                        </pattern>
+                        <pattern name="Dead Code">
+                            <description>Unused functions, variables, imports</description>
+                            <impact>Medium - adds unnecessary complexity</impact>
+                        </pattern>
+                    </patterns>
+                </step>
+
+                <step number="2">
+                    <title>Complexity Analysis</title>
+                    <description>
+                        Assess cyclomatic complexity and cognitive load
+                    </description>
+                    <metrics>
+                        <metric name="Cyclomatic Complexity">
+                            <threshold>10+ indicates high complexity</threshold>
+                            <action>Flag for refactoring priority</action>
+                        </metric>
+                        <metric name="Parameter Count">
+                            <threshold>5+ parameters indicates complexity</threshold>
+                            <action>Suggest parameter object pattern</action>
+                        </metric>
+                        <metric name="Nesting Depth">
+                            <threshold>3+ levels of nesting</threshold>
+                            <action>Recommend extraction methods</action>
+                        </metric>
+                    </metrics>
+                </step>
+            </steps>
+        </phase>
+
+        <phase name="prioritization">
+            <title>Pareto Principle Application</title>
+            <description>
+                Apply 80/20 rule to prioritize refactoring efforts
+            </description>
+            <steps>
+                <step number="1">
+                    <title>Impact Assessment</title>
+                    <description>
+                        Score each identified issue by impact and effort
+                    </description>
+                    <scoring>
+                        <factor name="Impact">
+                            <weight>0.7</weight>
+                            <criteria>
+                                <criterion value="3">Critical - affects core functionality</criterion>
+                                <criterion value="2">High - impacts maintainability significantly</criterion>
+                                <criterion value="1">Medium - minor improvement opportunity</criterion>
+                            </criteria>
+                        </factor>
+                        <factor name="Effort">
+                            <weight>0.3</weight>
+                            <criteria>
+                                <criterion value="1">Low - simple extraction or rename</criterion>
+                                <criterion value="2">Medium - requires restructuring</criterion>
+                                <criterion value="3">High - architectural changes needed</criterion>
+                            </criteria>
+                        </factor>
+                    </scoring>
+                </step>
+
+                <step number="2">
+                    <title>80/20 Prioritization</title>
+                    <description>
+                        Select top 20% of issues that deliver 80% of value
+                    </description>
+                    <algorithm>
+                        <action>Calculate priority score: (Impact * 0.7) + ((4-Effort) * 0.3)</action>
+                        <action>Sort all issues by priority score descending</action>
+                        <action>Select top 20% of issues as high priority</action>
+                        <action>Categorize remaining as medium/low priority</action>
+                    </algorithm>
+                </step>
+            </steps>
+        </phase>
+
+        <phase name="reporting">
+            <title>Generate Refactoring Report</title>
+            <description>
+                Create comprehensive markdown report with prioritized recommendations
+            </description>
+            <steps>
+                <step number="1">
+                    <title>Create Report Structure</title>
+                    <description>
+                        Generate well-organized markdown report
+                    </description>
+                    <sections>
+                        <section>Executive Summary</section>
+                        <section>High Priority Issues (Top 20%)</section>
+                        <section>Medium Priority Issues</section>
+                        <section>Low Priority Issues</section>
+                        <section>Detailed Analysis by Category</section>
+                        <section>Recommended Refactoring Roadmap</section>
+                    </sections>
+                </step>
+
+                <step number="2">
+                    <title>Write Report to File</title>
+                    <description>
+                        Save the analysis to refactoring-reports directory
+                    </description>
+                    <actions>
+                        <action>Create refactoring-reports directory if needed</action>
+                        <action>Generate timestamped filename</action>
+                        <action>Write comprehensive markdown report</action>
+                    </actions>
+                </step>
+            </steps>
+        </phase>
+    </main_workflow>
+
+    <completion_criteria>
+        <criterion>All source files have been analyzed for refactoring opportunities</criterion>
+        <criterion>Issues have been categorized and scored by impact and effort</criterion>
+        <criterion>Pareto principle has been applied to prioritize top 20% of issues</criterion>
+        <criterion>Comprehensive markdown report has been generated and saved</criterion>
+        <criterion>Report includes actionable recommendations with specific file locations</criterion>
+    </completion_criteria>
+</workflow_instructions>

@@ -1,0 +1,589 @@
+<common_patterns>
+  <overview>
+    This file contains common refactoring patterns, code examples, and detection strategies
+    that the Refactoring Analyzer mode should identify and recommend.
+  </overview>
+
+  <refactoring_patterns>
+    <pattern name="extract_method">
+      <category>Complexity Reduction</category>
+      <description>
+        Extract a complex method into smaller, focused methods with descriptive names
+      </description>
+      <detection_criteria>
+        <criterion>Method exceeds 20-30 lines</criterion>
+        <criterion>Method has multiple responsibilities</criterion>
+        <criterion>Comments are needed to explain sections</criterion>
+        <criterion>High cyclomatic complexity (>10)</criterion>
+      </detection_criteria>
+      <example language="javascript">
+        <before>
+          <![CDATA[
+function processOrder(order) {
+  // Validate order
+  if (!order.customerId) {
+    throw new Error('Customer ID required');
+  }
+  if (!order.items || order.items.length === 0) {
+    throw new Error('Order must have items');
+  }
+  
+  // Calculate total
+  let total = 0;
+  for (let item of order.items) {
+    total += item.price * item.quantity;
+  }
+  
+  // Apply discount
+  if (order.discountCode) {
+    const discount = getDiscount(order.discountCode);
+    total = total * (1 - discount.percentage);
+  }
+  
+  // Save order
+  order.total = total;
+  order.status = 'processed';
+  database.save(order);
+  
+  // Send confirmation
+  email.send(order.customerEmail, 'Order processed', `Your order total is ${total}`);
+  
+  return order;
+}
+          ]]>
+        </before>
+        <after>
+          <![CDATA[
+function processOrder(order) {
+  validateOrder(order);
+  const total = calculateOrderTotal(order);
+  const finalTotal = applyDiscount(order, total);
+  
+  order.total = finalTotal;
+  order.status = 'processed';
+  saveOrder(order);
+  sendConfirmation(order);
+  
+  return order;
+}
+
+function validateOrder(order) {
+  if (!order.customerId) {
+    throw new Error('Customer ID required');
+  }
+  if (!order.items || order.items.length === 0) {
+    throw new Error('Order must have items');
+  }
+}
+
+function calculateOrderTotal(order) {
+  return order.items.reduce((total, item) => {
+    return total + (item.price * item.quantity);
+  }, 0);
+}
+
+function applyDiscount(order, total) {
+  if (order.discountCode) {
+    const discount = getDiscount(order.discountCode);
+    return total * (1 - discount.percentage);
+  }
+  return total;
+}
+
+function saveOrder(order) {
+  database.save(order);
+}
+
+function sendConfirmation(order) {
+  email.send(order.customerEmail, 'Order processed', `Your order total is ${order.total}`);
+}
+          ]]>
+        </after>
+      </example>
+      <benefits>
+        <benefit>Improved readability and maintainability</benefit>
+        <benefit>Easier unit testing of individual functions</benefit>
+        <benefit>Better code reusability</benefit>
+      </benefits>
+    </pattern>
+
+    <pattern name="extract_class">
+      <category>Design Improvement</category>
+      <description>
+        Extract responsibilities from a large class into separate, focused classes
+      </description>
+      <detection_criteria>
+        <criterion>Class exceeds 200-300 lines</criterion>
+        <criterion>Class has too many instance variables (>10)</criterion>
+        <criterion>Class violates Single Responsibility Principle</criterion>
+        <criterion>God object anti-pattern detected</criterion>
+      </detection_criteria>
+      <example language="python">
+        <before>
+          <![CDATA[
+class UserManager:
+    def __init__(self):
+        self.db_connection = DatabaseConnection()
+        self.email_service = EmailService()
+        self.logger = Logger()
+    
+    def create_user(self, user_data):
+        # Validation
+        if not user_data.get('email'):
+            raise ValueError('Email required')
+        if not user_data.get('password'):
+            raise ValueError('Password required')
+        
+        # Hash password
+        hashed_password = self.hash_password(user_data['password'])
+        
+        # Save to database
+        user_id = self.db_connection.insert('users', {
+            'email': user_data['email'],
+            'password': hashed_password,
+            'created_at': datetime.now()
+        })
+        
+        # Send welcome email
+        self.email_service.send_welcome_email(user_data['email'])
+        
+        # Log creation
+        self.logger.info(f'User created: {user_id}')
+        
+        return user_id
+    
+    def hash_password(self, password):
+        import bcrypt
+        return bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+    
+    def authenticate_user(self, email, password):
+        user = self.db_connection.find_one('users', {'email': email})
+        if user and bcrypt.checkpw(password.encode(), user['password']):
+            return user
+        return None
+    
+    def reset_password(self, email):
+        # Generate reset token
+        token = generate_random_token()
+        self.db_connection.update('users', 
+            {'email': email}, 
+            {'reset_token': token}
+        )
+        
+        # Send reset email
+        self.email_service.send_password_reset_email(email, token)
+        
+        self.logger.info(f'Password reset requested for: {email}')
+          ]]>
+        </before>
+        <after>
+          <![CDATA[
+class UserManager:
+    def __init__(self, user_repository, email_service, password_service, logger):
+        self.user_repository = user_repository
+        self.email_service = email_service
+        self.password_service = password_service
+        self.logger = logger
+    
+    def create_user(self, user_data):
+        self.validate_user_data(user_data)
+        hashed_password = self.password_service.hash_password(user_data['password'])
+        
+        user_id = self.user_repository.create({
+            'email': user_data['email'],
+            'password': hashed_password,
+            'created_at': datetime.now()
+        })
+        
+        self.email_service.send_welcome_email(user_data['email'])
+        self.logger.info(f'User created: {user_id}')
+        
+        return user_id
+    
+    def validate_user_data(self, user_data):
+        if not user_data.get('email'):
+            raise ValueError('Email required')
+        if not user_data.get('password'):
+            raise ValueError('Password required')
+    
+    def authenticate_user(self, email, password):
+        user = self.user_repository.find_by_email(email)
+        if user and self.password_service.verify_password(password, user['password']):
+            return user
+        return None
+    
+    def reset_password(self, email):
+        token = self.password_service.generate_reset_token()
+        self.user_repository.update_reset_token(email, token)
+        self.email_service.send_password_reset_email(email, token)
+        self.logger.info(f'Password reset requested for: {email}')
+
+class UserRepository:
+    def __init__(self, db_connection):
+        self.db = db_connection
+    
+    def create(self, user_data):
+        return self.db.insert('users', user_data)
+    
+    def find_by_email(self, email):
+        return self.db.find_one('users', {'email': email})
+    
+    def update_reset_token(self, email, token):
+        self.db.update('users', {'email': email}, {'reset_token': token})
+
+class PasswordService:
+    def hash_password(self, password):
+        import bcrypt
+        return bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+    
+    def verify_password(self, password, hashed):
+        return bcrypt.checkpw(password.encode(), hashed)
+    
+    def generate_reset_token(self):
+        return generate_random_token()
+          ]]>
+        </after>
+      </example>
+      <benefits>
+        <benefit>Single Responsibility Principle compliance</benefit>
+        <benefit>Improved testability</benefit>
+        <benefit>Better separation of concerns</benefit>
+      </benefits>
+    </pattern>
+
+    <pattern name="replace_conditional_with_polymorphism">
+      <category>Complexity Reduction</category>
+      <description>
+        Replace complex conditional logic with polymorphic objects
+      </description>
+      <detection_criteria>
+        <criterion>Large switch statements</criterion>
+        <criterion>Repeated type checking</criterion>
+        <criterion>Complex if-else chains based on type</criterion>
+      </detection_criteria>
+      <example language="java">
+        <before>
+          <![CDATA[
+public class PaymentProcessor {
+    public void processPayment(Payment payment) {
+        switch (payment.getType()) {
+            case "CREDIT_CARD":
+                processCreditCard(payment);
+                break;
+            case "PAYPAL":
+                processPayPal(payment);
+                break;
+            case "BANK_TRANSFER":
+                processBankTransfer(payment);
+                break;
+            case "CRYPTO":
+                processCrypto(payment);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unsupported payment type");
+        }
+    }
+    
+    private void processCreditCard(Payment payment) {
+        // Credit card specific logic
+        validateCardNumber(payment.getCardNumber());
+        chargeCard(payment.getAmount());
+        sendReceipt(payment.getEmail());
+    }
+    
+    private void processPayPal(Payment payment) {
+        // PayPal specific logic
+        validatePayPalAccount(payment.getPayPalId());
+        chargePayPalAccount(payment.getAmount());
+        sendReceipt(payment.getEmail());
+    }
+    
+    // ... other payment methods
+}
+          ]]>
+        </before>
+        <after>
+          <![CDATA[
+public interface PaymentMethod {
+    void process(Payment payment);
+    void validate(Payment payment);
+}
+
+public class CreditCardPayment implements PaymentMethod {
+    public void process(Payment payment) {
+        validate(payment);
+        chargeCard(payment.getAmount());
+        sendReceipt(payment.getEmail());
+    }
+    
+    public void validate(Payment payment) {
+        validateCardNumber(payment.getCardNumber());
+    }
+}
+
+public class PayPalPayment implements PaymentMethod {
+    public void process(Payment payment) {
+        validate(payment);
+        chargePayPalAccount(payment.getAmount());
+        sendReceipt(payment.getEmail());
+    }
+    
+    public void validate(Payment payment) {
+        validatePayPalAccount(payment.getPayPalId());
+    }
+}
+
+public class PaymentProcessor {
+    private Map<String, PaymentMethod> paymentMethods;
+    
+    public PaymentProcessor() {
+        paymentMethods = Map.of(
+            "CREDIT_CARD", new CreditCardPayment(),
+            "PAYPAL", new PayPalPayment(),
+            "BANK_TRANSFER", new BankTransferPayment(),
+            "CRYPTO", new CryptoPayment()
+        );
+    }
+    
+    public void processPayment(Payment payment) {
+        PaymentMethod method = paymentMethods.get(payment.getType());
+        if (method == null) {
+            throw new UnsupportedOperationException("Unsupported payment type");
+        }
+        method.process(payment);
+    }
+}
+          ]]>
+        </after>
+      </example>
+      <benefits>
+        <benefit>Eliminates complex conditional logic</benefit>
+        <benefit>Easy to add new payment types</benefit>
+        <benefit>Follows Open/Closed Principle</benefit>
+      </benefits>
+    </pattern>
+
+    <pattern name="remove_duplicate_code">
+      <category>Duplication Elimination</category>
+      <description>
+        Extract duplicated code into reusable methods or classes
+      </description>
+      <detection_criteria>
+        <criterion>Similar code blocks in multiple locations</criterion>
+        <criterion>Copy-paste programming patterns</criterion>
+        <criterion>Parallel inheritance hierarchies</criterion>
+      </detection_criteria>
+      <example language="typescript">
+        <before>
+          <![CDATA[
+class UserService {
+  async createUser(userData: UserData) {
+    // Validation logic
+    if (!userData.email || !userData.email.includes('@')) {
+      throw new Error('Invalid email');
+    }
+    if (!userData.password || userData.password.length < 8) {
+      throw new Error('Password too short');
+    }
+    if (!userData.name || userData.name.trim().length === 0) {
+      throw new Error('Name required');
+    }
+    
+    // Hash password
+    const hashedPassword = await bcrypt.hash(userData.password, 10);
+    
+    // Create user
+    const user = await this.userRepository.create({
+      ...userData,
+      password: hashedPassword,
+      createdAt: new Date()
+    });
+    
+    return user;
+  }
+  
+  async updateUser(userId: string, userData: UserData) {
+    // Validation logic (duplicated)
+    if (userData.email && !userData.email.includes('@')) {
+      throw new Error('Invalid email');
+    }
+    if (userData.password && userData.password.length < 8) {
+      throw new Error('Password too short');
+    }
+    if (userData.name && userData.name.trim().length === 0) {
+      throw new Error('Name required');
+    }
+    
+    // Hash password if provided
+    if (userData.password) {
+      userData.password = await bcrypt.hash(userData.password, 10);
+    }
+    
+    // Update user
+    const user = await this.userRepository.update(userId, {
+      ...userData,
+      updatedAt: new Date()
+    });
+    
+    return user;
+  }
+}
+          ]]>
+        </before>
+        <after>
+          <![CDATA[
+class UserService {
+  async createUser(userData: UserData) {
+    this.validateUserData(userData);
+    const hashedPassword = await this.hashPassword(userData.password);
+    
+    const user = await this.userRepository.create({
+      ...userData,
+      password: hashedPassword,
+      createdAt: new Date()
+    });
+    
+    return user;
+  }
+  
+  async updateUser(userId: string, userData: UserData) {
+    this.validateUserData(userData, true); // true = partial validation for update
+    
+    if (userData.password) {
+      userData.password = await this.hashPassword(userData.password);
+    }
+    
+    const user = await this.userRepository.update(userId, {
+      ...userData,
+      updatedAt: new Date()
+    });
+    
+    return user;
+  }
+  
+  private validateUserData(userData: UserData, isPartial = false) {
+    if (!isPartial || userData.email !== undefined) {
+      if (!userData.email || !userData.email.includes('@')) {
+        throw new Error('Invalid email');
+      }
+    }
+    
+    if (!isPartial || userData.password !== undefined) {
+      if (!userData.password || userData.password.length < 8) {
+        throw new Error('Password too short');
+      }
+    }
+    
+    if (!isPartial || userData.name !== undefined) {
+      if (!userData.name || userData.name.trim().length === 0) {
+        throw new Error('Name required');
+      }
+    }
+  }
+  
+  private async hashPassword(password: string): Promise<string> {
+    return await bcrypt.hash(password, 10);
+  }
+}
+          ]]>
+        </after>
+      </example>
+      <benefits>
+        <benefit>Eliminates code duplication</benefit>
+        <benefit>Easier maintenance and updates</benefit>
+        <benefit>Consistent validation logic</benefit>
+      </benefits>
+    </pattern>
+  </refactoring_patterns>
+
+  <detection_strategies>
+    <strategy name="line_count_analysis">
+      <description>
+        Count lines of code for methods and classes to identify oversized units
+      </description>
+      <implementation>
+        <step>Parse source files into AST</step>
+        <step>Count lines for each function/method</step>
+        <step>Count lines for each class</step>
+        <step>Flag items exceeding thresholds</step>
+      </implementation>
+      <thresholds>
+        <threshold type="method">20-30 lines</threshold>
+        <threshold type="class">200-300 lines</threshold>
+      </thresholds>
+    </strategy>
+
+    <strategy name="complexity_analysis">
+      <description>
+        Calculate cyclomatic complexity to identify complex code paths
+      </description>
+      <implementation>
+        <step>Analyze control flow statements</step>
+        <step>Calculate complexity score</step>
+        <step>Flag high-complexity methods</step>
+      </implementation>
+      <thresholds>
+        <threshold type="complexity">10+ indicates high complexity</threshold>
+      </thresholds>
+    </strategy>
+
+    <strategy name="duplication_detection">
+      <description>
+        Identify similar or identical code blocks across files
+      </description>
+      <implementation>
+        <step>Extract code blocks (functions, methods, blocks)</step>
+        <step>Normalize code (remove whitespace, rename variables)</step>
+        <step>Compare blocks for similarity</step>
+        <step>Flag similar blocks above threshold</step>
+      </implementation>
+      <thresholds>
+        <threshold type="similarity">80%+ similarity indicates duplication</threshold>
+      </thresholds>
+    </strategy>
+
+    <strategy name="parameter_analysis">
+      <description>
+        Identify methods with too many parameters
+      </description>
+      <implementation>
+        <step>Count parameters for each method</step>
+        <step>Flag methods with excessive parameters</step>
+        <step>Suggest parameter object pattern</step>
+      </implementation>
+      <thresholds>
+        <threshold type="parameters">5+ parameters suggests complexity</threshold>
+      </thresholds>
+    </strategy>
+  </detection_strategies>
+
+  <language_specific_patterns>
+    <language name="javascript">
+      <pattern>Callback hell - nested callbacks</pattern>
+      <pattern>Promise chains without proper error handling</pattern>
+      <pattern>Var instead of const/let</pattern>
+      <pattern>Missing semicolons (inconsistent style)</pattern>
+    </language>
+
+    <language name="python">
+      <pattern>Long list comprehensions</pattern>
+      <pattern>Bare except clauses</pattern>
+      <pattern>Mutable default arguments</pattern>
+      <pattern>Deep nesting in functions</pattern>
+    </language>
+
+    <language name="java">
+      <pattern>Long parameter lists</pattern>
+      <pattern>God classes with many responsibilities</pattern>
+      <pattern>Deep inheritance hierarchies</pattern>
+      <pattern>Feature envy (methods using more of other classes than their own)</pattern>
+    </language>
+
+    <language name="typescript">
+      <pattern>Any type usage</pattern>
+      <pattern>Missing type annotations</pattern>
+      <pattern>Complex type definitions</pattern>
+      <pattern>Optional chaining overuse</pattern>
+    </language>
+  </language_specific_patterns>
+</common_patterns>

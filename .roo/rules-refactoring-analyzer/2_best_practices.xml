@@ -1,0 +1,227 @@
+<best_practices>
+    <general_principles>
+        <principle priority="high">
+            <name>Pareto Principle Focus</name>
+            <description>
+                Always prioritize the 20% of refactoring opportunities that will deliver 80% of the
+                value.
+                Focus on high-impact, low-effort changes first.
+            </description>
+            <rationale>
+                Development resources are limited. By focusing on the most valuable improvements,
+                we maximize the return on refactoring investment and deliver meaningful improvements
+                quickly.
+            </rationale>
+            <example>
+                <scenario>Found 50 refactoring opportunities</scenario>
+                <good>Prioritize top 10 issues with highest impact/effort ratio</good>
+                <bad>Try to fix all 50 issues at once</bad>
+            </example>
+        </principle>
+
+        <principle priority="high">
+            <name>Systematic Analysis</name>
+            <description>
+                Follow a consistent, methodical approach to analyzing the entire codebase.
+                Don't skip files or make assumptions about code quality.
+            </description>
+            <rationale>
+                Comprehensive analysis ensures no critical issues are missed and provides
+                a complete picture of the codebase's refactoring needs.
+            </rationale>
+            <example>
+                <scenario>Analyzing a large codebase</scenario>
+                <good>Process files systematically by directory, analyze each file completely</good>
+                <bad>Randomly sample files or skip "unimportant" directories</bad>
+            </example>
+        </principle>
+
+        <principle priority="medium">
+            <name>Context-Aware Recommendations</name>
+            <description>
+                Consider the project's context, team size, and business constraints when
+                making refactoring recommendations.
+            </description>
+            <rationale>
+                Refactoring recommendations must be practical and achievable within the
+                project's real-world constraints to be valuable.
+            </rationale>
+            <example>
+                <scenario>Legacy system with tight deadlines</scenario>
+                <good>Recommend incremental improvements that can be done alongside feature work</good>
+                <bad>Suggest complete architectural rewrite</bad>
+            </example>
+        </principle>
+    </general_principles>
+
+    <code_smell_detection>
+        <smell category="complexity">
+            <name>Long Method</name>
+            <threshold>20-30 lines per method</threshold>
+            <indicators>
+                <indicator>Method does multiple things</indicator>
+                <indicator>High cyclomatic complexity</indicator>
+                <indicator>Deep nesting levels</indicator>
+            </indicators>
+            <refactoring>
+                <technique>Extract Method</technique>
+                <technique>Extract Class</technique>
+                <technique>Replace Conditional with Polymorphism</technique>
+            </refactoring>
+        </smell>
+
+        <smell category="design">
+            <name>Large Class</name>
+            <threshold>200+ lines or too many responsibilities</threshold>
+            <indicators>
+                <indicator>Class has many instance variables</indicator>
+                <indicator>God object anti-pattern</indicator>
+                <indicator>Violates Single Responsibility Principle</indicator>
+            </indicators>
+            <refactoring>
+                <technique>Extract Class</technique>
+                <technique>Extract Subclass</technique>
+                <technique>Extract Interface</technique>
+            </refactoring>
+        </smell>
+
+        <smell category="duplication">
+            <name>Duplicated Code</name>
+            <threshold>3+ similar code blocks</threshold>
+            <indicators>
+                <indicator>Copy-paste programming</indicator>
+                <indicator>Similar logic in multiple places</indicator>
+                <indicator>Parallel inheritance hierarchies</indicator>
+            </indicators>
+            <refactoring>
+                <technique>Extract Method</technique>
+                <technique>Extract Class</technique>
+                <technique>Form Template Method</technique>
+            </refactoring>
+        </smell>
+
+        <smell category="clarity">
+            <name>Complex Conditional Logic</name>
+            <threshold>3+ nested levels or complex boolean expressions</threshold>
+            <indicators>
+                <indicator>Deep if-else nesting</indicator>
+                <indicator>Complex boolean conditions</indicator>
+                <indicator>Switch statements with many cases</indicator>
+            </indicators>
+            <refactoring>
+                <technique>Decompose Conditional</technique>
+                <technique>Replace Conditional with Polymorphism</technique>
+                <technique>Replace Nested Conditional with Guard Clauses</technique>
+            </refactoring>
+        </smell>
+    </code_smell_detection>
+
+    <impact_assessment>
+        <scoring_methodology>
+            <factor name="Business Impact">
+                <weight>0.4</weight>
+                <levels>
+                    <level value="3">Critical - affects core functionality or user experience</level>
+                    <level value="2">High - impacts performance, security, or maintainability</level>
+                    <level value="1">Medium - minor quality or readability improvements</level>
+                </levels>
+            </factor>
+
+            <factor name="Technical Debt">
+                <weight>0.3</weight>
+                <levels>
+                    <level value="3">High - significant barrier to future development</level>
+                    <level value="2">Medium - causes occasional development friction</level>
+                    <level value="1">Low - minor inconvenience</level>
+                </levels>
+            </factor>
+
+            <factor name="Effort Required">
+                <weight>0.3</weight>
+                <levels>
+                    <level value="1">Low - simple extraction or rename (1-2 hours)</level>
+                    <level value="2">Medium - requires restructuring (4-8 hours)</level>
+                    <level value="3">High - architectural changes (1+ days)</level>
+                </levels>
+            </factor>
+        </scoring_methodology>
+
+        <priority_calculation>
+            <formula>
+                Priority Score = (Business Impact * 0.4) + (Technical Debt * 0.3) + ((4 - Effort) *
+                0.3)
+            </formula>
+            <range>Score range: 1.0 - 3.0</range>
+            <categories>
+                <category name="High Priority" range="2.5-3.0">Top 20% of issues</category>
+                <category name="Medium Priority" range="1.8-2.4">Next 30% of issues</category>
+                <category name="Low Priority" range="1.0-1.7">Remaining 50% of issues</category>
+            </categories>
+        </priority_calculation>
+    </impact_assessment>
+
+    <common_pitfalls>
+        <pitfall>
+            <name>Analysis Paralysis</name>
+            <description>
+                Spending too much time analyzing minor issues instead of focusing on high-impact
+                problems
+            </description>
+            <why_problematic>
+                Delivers diminishing returns and prevents actionable recommendations
+            </why_problematic>
+            <correct_approach>
+                Focus on the big picture first, then drill down into high-priority areas
+            </correct_approach>
+        </pitfall>
+
+        <pitfall>
+            <name>Ignoring Context</name>
+            <description>
+                Making refactoring recommendations without considering project constraints
+            </description>
+            <why_problematic>
+                Recommendations become unrealistic and are unlikely to be implemented
+            </why_problematic>
+            <correct_approach>
+                Always consider team size, deadlines, and business constraints when prioritizing
+            </correct_approach>
+        </pitfall>
+
+        <pitfall>
+            <name>Over-Engineering</name>
+            <description>
+                Suggesting complex architectural changes for simple problems
+            </description>
+            <why_problematic>
+                Introduces unnecessary complexity and risk
+            </why_problematic>
+            <correct_approach>
+                Prefer simple, incremental improvements over wholesale rewrites
+            </correct_approach>
+        </pitfall>
+    </common_pitfalls>
+
+    <quality_checklist>
+        <category name="before_analysis">
+            <item>Understand the codebase structure and main components</item>
+            <item>Identify programming languages and frameworks used</item>
+            <item>Confirm analysis scope and any areas of focus</item>
+            <item>Set up proper file organization for reports</item>
+        </category>
+
+        <category name="during_analysis">
+            <item>Systematically process all source files</item>
+            <item>Apply consistent criteria for issue detection</item>
+            <item>Score each issue using the standardized methodology</item>
+            <item>Document specific file locations and line numbers</item>
+        </category>
+
+        <category name="before_reporting">
+            <item>Apply Pareto principle to prioritize findings</item>
+            <item>Verify all high-priority issues have actionable recommendations</item>
+            <item>Ensure report structure is clear and comprehensive</item>
+            <item>Double-check that all findings are properly categorized</item>
+        </category>
+    </quality_checklist>
+</best_practices>

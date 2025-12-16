@@ -1,0 +1,415 @@
+<examples>
+    <overview>
+        This file contains complete workflow examples demonstrating how the Refactoring Analyzer
+        mode should analyze different types of codebases and generate prioritized refactoring
+        reports.
+    </overview>
+
+    <example name="javascript_web_application">
+        <description>
+            Analyzing a typical JavaScript web application with React components and utility
+            functions
+        </description>
+        <context>
+            <project_type>React web application</project_type>
+            <languages>JavaScript, JSX</languages>
+            <frameworks>React, Redux</frameworks>
+            <file_structure>
+                <directory>src/</directory>
+                <directory>src/components/</directory>
+                <directory>src/utils/</directory>
+                <directory>src/services/</directory>
+                <directory>src/store/</directory>
+            </file_structure>
+        </context>
+
+        <workflow_steps>
+            <step number="1">
+                <title>Discover Codebase Structure</title>
+                <actions>
+                    <action>Use list_files to get complete file tree</action>
+                    <action>Identify main source directories and file types</action>
+                    <action>Count total files and estimate analysis scope</action>
+                </actions>
+                <expected_output>
+                    <file_count>45 source files</file_count>
+                    <main_directories>components, utils, services, store</main_directories>
+                    <file_types>.js, .jsx, .json</file_types>
+                </expected_output>
+            </step>
+
+            <step number="2">
+                <title>Detect Code Smells</title>
+                <actions>
+                    <action>Use search_files to find long methods</action>
+                    <action>Use codebase_search to find complex components</action>
+                    <action>Use read_file to analyze flagged files in detail</action>
+                </actions>
+                <findings>
+                    <issue type="long_method">
+                        <file>src/components/UserProfile.jsx</file>
+                        <lines>45-89</lines>
+                        <description>Component render method with complex conditional logic</description>
+                        <complexity_score>15</complexity_score>
+                    </issue>
+                    <issue type="duplicated_code">
+                        <file>src/utils/validation.js</file>
+                        <file>src/utils/formValidation.js</file>
+                        <description>Similar email validation logic in two files</description>
+                        <similarity>85%</similarity>
+                    </issue>
+                    <issue type="large_class">
+                        <file>src/services/api.js</file>
+                        <lines>1-234</lines>
+                        <description>API service handling multiple responsibilities</description>
+                        <responsibilities>Authentication, data fetching, error handling</responsibilities>
+                    </issue>
+                </findings>
+            </step>
+
+            <step number="3">
+                <title>Apply Pareto Prioritization</title>
+                <actions>
+                    <action>Score each issue using impact/effort methodology</action>
+                    <action>Sort by priority score</action>
+                    <action>Select top 20% as high priority</action>
+                </actions>
+                <scoring_results>
+                    <high_priority count="3">
+                        <issue>API service refactoring (Score: 2.8)</issue>
+                        <issue>UserProfile component extraction (Score: 2.6)</issue>
+                        <issue>Validation code consolidation (Score: 2.4)</issue>
+                    </high_priority>
+                    <medium_priority count="5">
+                        <issue>Form component simplification (Score: 2.1)</issue>
+                        <issue>Redux store optimization (Score: 1.9)</issue>
+                    </medium_priority>
+                    <low_priority count="8">
+                        <issue>Minor utility function improvements (Score: 1.3)</issue>
+                    </low_priority>
+                </scoring_results>
+            </step>
+
+            <step number="4">
+                <title>Generate Report</title>
+                <actions>
+                    <action>Create comprehensive markdown report</action>
+                    <action>Include specific file locations and recommendations</action>
+                    <action>Save to refactoring-reports directory</action>
+                </actions>
+                <output_file>refactoring-reports/webapp-analysis-2024-01-15.md</output_file>
+            </step>
+        </workflow_steps>
+    </example>
+
+    <example name="python_backend_service">
+        <description>
+            Analyzing a Python backend service with Django models and business logic
+        </description>
+        <context>
+            <project_type>Django REST API</project_type>
+            <languages>Python</languages>
+            <frameworks>Django, Django REST Framework</frameworks>
+            <file_structure>
+                <directory>myapp/</directory>
+                <directory>myapp/models/</directory>
+                <directory>myapp/views/</directory>
+                <directory>myapp/services/</directory>
+                <directory>myapp/utils/</directory>
+            </file_structure>
+        </context>
+
+        <workflow_steps>
+            <step number="1">
+                <title>Discover Codebase Structure</title>
+                <actions>
+                    <action>Use list_files with recursive=true</action>
+                    <action>Identify Python files and Django structure</action>
+                    <action>Map models, views, and services</action>
+                </actions>
+                <expected_output>
+                    <file_count>32 Python files</file_count>
+                    <main_directories>models, views, services, utils</main_directories>
+                    <file_types>.py</file_types>
+                </expected_output>
+            </step>
+
+            <step number="2">
+                <title>Detect Code Smells</title>
+                <actions>
+                    <action>Use search_files for long Python functions</action>
+                    <action>Use codebase_search for complex business logic</action>
+                    <action>Analyze Django models for fat models</action>
+                </actions>
+                <findings>
+                    <issue type="fat_model">
+                        <file>myapp/models/user.py</file>
+                        <lines>1-156</lines>
+                        <description>User model with business logic mixed in</description>
+                        <methods>12 methods including validation and email sending</methods>
+                    </issue>
+                    <issue type="complex_view">
+                        <file>myapp/views/order.py</file>
+                        <function>process_order</function>
+                        <lines>45-123</lines>
+                        <description>View function handling multiple responsibilities</description>
+                        <complexity_score>18</complexity_score>
+                    </issue>
+                    <issue type="duplicated_validation">
+                        <file>myapp/services/payment.py</file>
+                        <file>myapp/services/subscription.py</file>
+                        <description>Similar credit card validation logic</description>
+                        <similarity>78%</similarity>
+                    </issue>
+                </findings>
+            </step>
+
+            <step number="3">
+                <title>Apply Pareto Prioritization</title>
+                <actions>
+                    <action>Score issues based on business impact</action>
+                    <action>Consider Django best practices violations</action>
+                    <action>Prioritize architectural improvements</action>
+                </actions>
+                <scoring_results>
+                    <high_priority count="2">
+                        <issue>Order view refactoring (Score: 2.9)</issue>
+                        <issue>User model business logic extraction (Score: 2.7)</issue>
+                    </high_priority>
+                    <medium_priority count="4">
+                        <issue>Payment validation consolidation (Score: 2.2)</issue>
+                        <issue>Service layer organization (Score: 2.0)</issue>
+                    </medium_priority>
+                </scoring_results>
+            </step>
+
+            <step number="4">
+                <title>Generate Report</title>
+                <actions>
+                    <action>Create Django-specific recommendations</action>
+                    <action>Include migration strategies</action>
+                    <action>Save comprehensive analysis</action>
+                </actions>
+                <output_file>refactoring-reports/django-api-analysis-2024-01-15.md</output_file>
+            </step>
+        </workflow_steps>
+    </example>
+
+    <example name="java_enterprise_application">
+        <description>
+            Analyzing a Java enterprise application with Spring Boot and complex business logic
+        </description>
+        <context>
+            <project_type>Spring Boot enterprise application</project_type>
+            <languages>Java</languages>
+            <frameworks>Spring Boot, Spring Data JPA</frameworks>
+            <file_structure>
+                <directory>src/main/java/com/company/app/</directory>
+                <directory>src/main/java/com/company/app/controller/</directory>
+                <directory>src/main/java/com/company/app/service/</directory>
+                <directory>src/main/java/com/company/app/repository/</directory>
+                <directory>src/main/java/com/company/app/model/</directory>
+            </file_structure>
+        </context>
+
+        <workflow_steps>
+            <step number="1">
+                <title>Discover Codebase Structure</title>
+                <actions>
+                    <action>Use list_files to map Java package structure</action>
+                    <action>Identify Spring Boot components</action>
+                    <action>Analyze Maven/Gradle configuration</action>
+                </actions>
+                <expected_output>
+                    <file_count>58 Java files</file_count>
+                    <main_packages>controller, service, repository, model</main_packages>
+                    <file_types>.java</file_types>
+                </expected_output>
+            </step>
+
+            <step number="2">
+                <title>Detect Code Smells</title>
+                <actions>
+                    <action>Use search_files for large Java classes</action>
+                    <action>Find methods with many parameters</action>
+                    <action>Identify Spring anti-patterns</action>
+                </actions>
+                <findings>
+                    <issue type="god_class">
+                        <file>src/main/java/com/company/app/service/OrderService.java</file>
+                        <lines>1-445</lines>
+                        <description>Service class handling too many responsibilities</description>
+                        <methods>25 methods, 15 dependencies</methods>
+                    </issue>
+                    <issue type="long_parameter_list">
+                        <file>src/main/java/com/company/app/controller/OrderController.java</file>
+                        <method>createOrder</method>
+                        <parameters>12 parameters</parameters>
+                        <description>Controller method with excessive parameters</description>
+                    </issue>
+                    <issue type="feature_envy">
+                        <file>src/main/java/com/company/app/model/Order.java</file>
+                        <method>calculateShippingCost</method>
+                        <description>Model method using multiple other services</description>
+                        <dependencies>ShippingService, TaxService, DiscountService</dependencies>
+                    </issue>
+                </findings>
+            </step>
+
+            <step number="3">
+                <title>Apply Pareto Prioritization</title>
+                <actions>
+                    <action>Score based on SOLID principle violations</action>
+                    <action>Consider Spring Boot best practices</action>
+                    <action>Prioritize maintainability improvements</action>
+                </actions>
+                <scoring_results>
+                    <high_priority count="3">
+                        <issue>OrderService decomposition (Score: 2.9)</issue>
+                        <issue>OrderController parameter object (Score: 2.5)</issue>
+                        <issue>Order model responsibility cleanup (Score: 2.3)</issue>
+                    </high_priority>
+                    <medium_priority count="6">
+                        <issue>Repository layer optimization (Score: 2.1)</issue>
+                        <issue>Exception handling standardization (Score: 1.8)</issue>
+                    </medium_priority>
+                </scoring_results>
+            </step>
+
+            <step number="4">
+                <title>Generate Report</title>
+                <actions>
+                    <action>Create Spring-specific recommendations</action>
+                    <action>Include refactoring patterns for enterprise Java</action>
+                    <action>Save detailed analysis report</action>
+                </actions>
+                <output_file>refactoring-reports/spring-app-analysis-2024-01-15.md</output_file>
+            </step>
+        </workflow_steps>
+    </example>
+
+    <report_templates>
+        <template name="executive_summary">
+            <content>
+        <![CDATA[
+# Refactoring Analysis Report - Executive Summary
+
+## Overview
+- **Total Files Analyzed**: {total_files}
+- **Issues Found**: {total_issues}
+- **High Priority Issues**: {high_priority_count} (Top 20%)
+- **Estimated Refactoring Effort**: {estimated_effort}
+
+## Key Findings
+1. **Most Critical Issue**: {most_critical_issue}
+2. **Highest Impact Area**: {highest_impact_area}
+3. **Quick Wins**: {quick_wins_count} issues with low effort, high impact
+
+## Recommended Immediate Actions
+1. {action_1}
+2. {action_2}
+3. {action_3}
+
+## Business Impact
+- **Maintainability Improvement**: {maintainability_impact}%
+- **Development Velocity Increase**: {velocity_increase}%
+- **Bug Reduction Potential**: {bug_reduction}%
+        ]]>
+      </content>
+        </template>
+
+        <template name="detailed_issue">
+            <content>
+        <![CDATA[
+## {issue_title}
+
+**File**: `{file_path}`  
+**Lines**: {line_range}  
+**Priority**: {priority}  
+**Impact Score**: {impact_score}
+
+### Description
+{issue_description}
+
+### Current Code
+```{language}
+{code_snippet}
+```
+
+### Recommended Refactoring
+{refactoring_recommendation}
+
+### Expected Benefits
+- {benefit_1}
+- {benefit_2}
+- {benefit_3}
+
+### Implementation Effort
+- **Complexity**: {complexity}
+- **Estimated Time**: {estimated_time}
+- **Risk Level**: {risk_level}
+        ]]>
+      </content>
+        </template>
+
+        <template name="roadmap">
+            <content>
+        <![CDATA[
+## Refactoring Roadmap
+
+### Phase 1: High Priority (Weeks 1-2)
+{high_priority_items}
+
+### Phase 2: Medium Priority (Weeks 3-4)
+{medium_priority_items}
+
+### Phase 3: Low Priority (Weeks 5-6)
+{low_priority_items}
+
+### Success Metrics
+- {metric_1}
+- {metric_2}
+- {metric_3}
+
+### Resource Requirements
+- **Developer Time**: {developer_time}
+- **Code Review Time**: {review_time}
+- **Testing Time**: {testing_time}
+        ]]>
+      </content>
+        </template>
+    </report_templates>
+
+    <best_practice_examples>
+        <example name="effective_prioritization">
+            <scenario>Found 25 refactoring opportunities</scenario>
+            <approach>
+                <step>Score all issues using impact/effort matrix</step>
+                <step>Sort by priority score (descending)</step>
+                <step>Select top 5 issues (20%) as high priority</step>
+                <step>Next 8 issues as medium priority</step>
+                <step>Remaining 12 issues as low priority</step>
+            </approach>
+            <result>
+                <high_priority>5 issues delivering 80% of value</high_priority>
+                <medium_priority>8 issues with moderate value</medium_priority>
+                <low_priority>12 issues with minimal immediate impact</low_priority>
+            </result>
+        </example>
+
+        <example name="comprehensive_analysis">
+            <scenario>Analyzing large codebase with multiple languages</scenario>
+            <approach>
+                <step>Process files by language/type systematically</step>
+                <step>Apply language-specific detection patterns</step>
+                <step>Maintain consistent scoring across all languages</step>
+                <step>Generate unified prioritized report</step>
+            </approach>
+            <result>
+                <coverage>100% of source files analyzed</coverage>
+                <consistency>Uniform scoring methodology applied</consistency>
+                <actionability>All recommendations have specific file locations</actionability>
+            </result>
+        </example>
+    </best_practice_examples>
+</examples>

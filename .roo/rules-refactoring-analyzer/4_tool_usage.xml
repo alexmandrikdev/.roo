@@ -1,0 +1,272 @@
+<tool_usage_guide>
+    <tool_priorities>
+        <priority level="1">
+            <tool>list_files</tool>
+            <when>Always use first to understand codebase structure</when>
+            <why>Provides complete file tree for systematic analysis</why>
+        </priority>
+        <priority level="2">
+            <tool>codebase_search</tool>
+            <when>After understanding structure, find specific patterns</when>
+            <why>Semantic search finds code patterns better than keywords</why>
+        </priority>
+        <priority level="3">
+            <tool>read_file</tool>
+            <when>After identifying files with potential issues</when>
+            <why>Get full context for detailed analysis</why>
+        </priority>
+        <priority level="4">
+            <tool>search_files</tool>
+            <when>For pattern-based detection across multiple files</when>
+            <why>Efficient for finding specific code smells</why>
+        </priority>
+        <priority level="5">
+            <tool>write_to_file</tool>
+            <when>Final step to create refactoring report</when>
+            <why>Save comprehensive analysis results</why>
+        </priority>
+    </tool_priorities>
+
+    <tool_specific_guidance>
+        <tool name="list_files">
+            <purpose>Discover complete codebase structure</purpose>
+            <when_to_use>Always start analysis with this tool</when_to_use>
+            <syntax>
+                <command>list_files with recursive=true</command>
+                <parameters>
+                    <parameter name="path" required="true">
+                        <description>Root directory to analyze</description>
+                        <type>string</type>
+                        <example>"."</example>
+                    </parameter>
+                    <parameter name="recursive" required="true">
+                        <description>Get all files recursively</description>
+                        <type>boolean</type>
+                        <example>true</example>
+                    </parameter>
+                </parameters>
+            </syntax>
+            <best_practices>
+                <practice>Use recursive=true to get complete file tree</practice>
+                <practice>Analyze the output to identify source file types</practice>
+                <practice>Group files by language and directory structure</practice>
+            </best_practices>
+        </tool>
+
+        <tool name="codebase_search">
+            <purpose>Find code patterns and functionality</purpose>
+            <when_to_use>After understanding file structure</when_to_use>
+            <syntax>
+                <command>codebase_search with semantic queries</command>
+                <parameters>
+                    <parameter name="query" required="true">
+                        <description>Semantic search query</description>
+                        <type>string</type>
+                        <example>"long methods with complex logic"</example>
+                    </parameter>
+                    <parameter name="path" required="false">
+                        <description>Limit search to specific directory</description>
+                        <type>string</type>
+                        <example>"src/"</example>
+                    </parameter>
+                </parameters>
+            </syntax>
+            <examples>
+                <example scenario="finding complex methods">
+                    <query>methods with high cyclomatic complexity</query>
+                    <expected>Files with complex conditional logic</expected>
+                </example>
+                <example scenario="finding duplicated code">
+                    <query>similar validation logic across files</query>
+                    <expected>Files with repeated validation patterns</expected>
+                </example>
+            </examples>
+        </tool>
+
+        <tool name="read_file">
+            <purpose>Analyze specific files in detail</purpose>
+            <when_to_use>After identifying potential issues</when_to_use>
+            <syntax>
+                <command>read_file with file paths</command>
+                <parameters>
+                    <parameter name="files" required="true">
+                        <description>Array of file paths to read</description>
+                        <type>array</type>
+                        <example>[{"path": "src/user.js"}, {"path": "src/auth.js"}]</example>
+                    </parameter>
+                </parameters>
+            </syntax>
+            <analysis_focus>
+                <focus>Method length and complexity</focus>
+                <focus>Class size and responsibilities</focus>
+                <focus>Duplicated code patterns</focus>
+                <focus>Conditional logic complexity</focus>
+            </analysis_focus>
+        </tool>
+
+        <tool name="search_files">
+            <purpose>Pattern-based code detection</purpose>
+            <when_to_use>For systematic detection of code smells</when_to_use>
+            <syntax>
+                <command>search_files with regex patterns</command>
+                <parameters>
+                    <parameter name="path" required="true">
+                        <description>Directory to search</description>
+                        <type>string</type>
+                        <example>"src/"</example>
+                    </parameter>
+                    <parameter name="regex" required="true">
+                        <description>Regex pattern to match</description>
+                        <type>string</type>
+                        <example>"function\s+\w+.{200,}"</example>
+                    </parameter>
+                    <parameter name="file_pattern" required="true">
+                        <description>File types to search</description>
+                        <type>string</type>
+                        <example>"*.js"</example>
+                    </parameter>
+                </parameters>
+            </syntax>
+            <common_patterns>
+                <pattern name="long_methods">
+                    <regex>function\s+\w+[\s\S]{200,}</regex>
+                    <description>Functions with 200+ characters</description>
+                </pattern>
+                <pattern name="deep_nesting">
+                    <regex>(\s{12,}if|\s{12,}for|\s{12,}while)</regex>
+                    <description>Deep nesting (3+ levels)</description>
+                </pattern>
+                <pattern name="many_parameters">
+                    <regex>function\s+\w+\([^)]{50,}</regex>
+                    <description>Functions with many parameters</description>
+                </pattern>
+            </common_patterns>
+        </tool>
+
+        <tool name="write_to_file">
+            <purpose>Create refactoring analysis report</purpose>
+            <when_to_use>Final step of analysis workflow</when_to_use>
+            <syntax>
+                <command>write_to_file with report content</command>
+                <parameters>
+                    <parameter name="path" required="true">
+                        <description>Output file path</description>
+                        <type>string</type>
+                        <example>"refactoring-reports/analysis-2024-01-15.md"</example>
+                    </parameter>
+                    <parameter name="content" required="true">
+                        <description>Complete markdown report content</description>
+                        <type>string</type>
+                        <example>Full markdown report with sections</example>
+                    </parameter>
+                </parameters>
+            </syntax>
+            <report_structure>
+                <section>Executive Summary</section>
+                <section>High Priority Issues (Top 20%)</section>
+                <section>Medium Priority Issues</section>
+                <section>Low Priority Issues</section>
+                <section>Detailed Analysis by Category</section>
+                <section>Recommended Refactoring Roadmap</section>
+            </report_structure>
+        </tool>
+    </tool_specific_guidance>
+
+    <analysis_workflow>
+        <phase name="discovery">
+            <tools>
+                <tool order="1">list_files - Get complete file structure</tool>
+                <tool order="2">codebase_search - Find main application files</tool>
+            </tools>
+            <output>File inventory and project understanding</output>
+        </phase>
+
+        <phase name="pattern_detection">
+            <tools>
+                <tool order="1">search_files - Detect code smells with regex</tool>
+                <tool order="2">codebase_search - Find semantic patterns</tool>
+                <tool order="3">read_file - Detailed analysis of flagged files</tool>
+            </tools>
+            <output>List of refactorable code with locations</output>
+        </phase>
+
+        <phase name="prioritization">
+            <tools>
+                <tool order="1">read_file - Get context for scoring</tool>
+                <tool order="2">Internal scoring logic</tool>
+            </tools>
+            <output>Prioritized list of refactoring opportunities</output>
+        </phase>
+
+        <phase name="reporting">
+            <tools>
+                <tool order="1">write_to_file - Generate comprehensive report</tool>
+            </tools>
+            <output>Markdown report with actionable recommendations</output>
+        </phase>
+    </analysis_workflow>
+
+    <detection_techniques>
+        <technique name="line_count_analysis">
+            <tools_used>
+                <tool>read_file - Get file content</tool>
+                <tool>Internal logic - Count lines per method</tool>
+            </tools_used>
+            <implementation>
+                <step>Parse file content into methods/functions</step>
+                <step>Count lines for each method</step>
+                <step>Flag methods exceeding 20-30 lines</step>
+                <step>Record file path and line numbers</step>
+            </implementation>
+        </technique>
+
+        <technique name="complexity_scoring">
+            <tools_used>
+                <tool>read_file - Get file content</tool>
+                <tool>search_files - Find control flow statements</tool>
+            </tools_used>
+            <implementation>
+                <step>Count if/else, switch, for, while statements</step>
+                <step>Calculate cyclomatic complexity</step>
+                <step>Flag methods with complexity > 10</step>
+                <step>Score based on complexity level</step>
+            </implementation>
+        </technique>
+
+        <technique name="duplication_detection">
+            <tools_used>
+                <tool>codebase_search - Find similar patterns</tool>
+                <tool>read_file - Compare specific files</tool>
+            </tools_used>
+            <implementation>
+                <step>Search for common patterns across files</step>
+                <step>Analyze similarity of code blocks</step>
+                <step>Flag duplications above 80% similarity</step>
+                <step>Group by functionality for refactoring</step>
+            </implementation>
+        </technique>
+    </detection_techniques>
+
+    <quality_assurance>
+        <checklist name="before_analysis">
+            <item>Use list_files to understand complete structure</item>
+            <item>Identify all source file types and languages</item>
+            <item>Plan systematic approach to file processing</item>
+            <item>Set up scoring criteria and thresholds</item>
+        </checklist>
+
+        <checklist name="during_analysis">
+            <item>Apply consistent detection criteria across all files</item>
+            <item>Document specific file locations and line numbers</item>
+            <item>Score each issue using standardized methodology</item>
+            <item>Maintain comprehensive list of all findings</item>
+        </checklist>
+
+        <checklist name="before_reporting">
+            <item>Apply Pareto principle to prioritize findings</item>
+            <item>Verify all high-priority issues have actionable recommendations</item>
+            <item>Ensure report follows standard structure</item>
+            <item>Double-check that all findings are properly categorized</item>
+        </checklist>
+    </quality_assurance>
+</tool_usage_guide>
