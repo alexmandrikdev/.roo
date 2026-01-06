@@ -1,0 +1,751 @@
+<common_patterns>
+    <component_library>
+        <component name="navigation_header">
+            <description>Responsive navigation header with logo and menu</description>
+            <html_template><![CDATA[
+<header class="site-header">
+  <div class="container">
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+      <div class="navbar__brand">
+        <a href="/" class="brand-logo">
+          <img src="assets/logo.svg" alt="Company Logo" class="brand-logo__image">
+          <span class="brand-logo__text"><?php echo $siteName; ?></span>
+        </a>
+      </div>
+      
+      <button class="navbar__toggle" aria-expanded="false" aria-controls="navbar-menu">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="navbar__toggle-icon"></span>
+      </button>
+      
+      <div class="navbar__menu" id="navbar-menu">
+        <ul class="navbar__list">
+          <?php foreach ($navItems as $item): ?>
+            <li class="navbar__item">
+              <a href="<?php echo $item['url']; ?>" class="navbar__link <?php echo $item['active'] ? 'navbar__link--active' : ''; ?>">
+                <?php echo htmlspecialchars($item['label']); ?>
+              </a>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+      </div>
+    </nav>
+  </div>
+</header>
+      ]]></html_template>
+
+            <css_styles><![CDATA[
+.site-header {
+  background: var(--color-white);
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md) 0;
+}
+
+.navbar__brand {
+  flex-shrink: 0;
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--color-text);
+  font-weight: 600;
+  font-size: var(--font-size-lg);
+}
+
+.brand-logo__image {
+  width: 2rem;
+  height: 2rem;
+  margin-right: var(--spacing-sm);
+}
+
+.navbar__toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-sm);
+}
+
+.navbar__menu {
+  display: flex;
+}
+
+.navbar__list {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: var(--spacing-lg);
+}
+
+.navbar__link {
+  text-decoration: none;
+  color: var(--color-text);
+  font-weight: 500;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  transition: all 0.2s ease;
+}
+
+.navbar__link:hover {
+  background: var(--color-gray-100);
+  color: var(--color-primary);
+}
+
+.navbar__link--active {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+/* Mobile styles */
+@media (max-width: 767px) {
+  .navbar__toggle {
+    display: block;
+  }
+  
+  .navbar__menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--color-white);
+    box-shadow: var(--shadow-md);
+    display: none;
+  }
+  
+  .navbar__menu--open {
+    display: block;
+  }
+  
+  .navbar__list {
+    flex-direction: column;
+    gap: 0;
+    padding: var(--spacing-md);
+  }
+  
+  .navbar__link {
+    display: block;
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-sm);
+  }
+}
+      ]]></css_styles>
+        </component>
+
+        <component name="hero_section">
+            <description>Hero section with headline, subheading, and call-to-action</description>
+            <html_template><![CDATA[
+<section class="hero" style="background-image: url('<?php echo $heroImage; ?>');">
+  <div class="hero__overlay">
+    <div class="container">
+      <div class="hero__content">
+        <h1 class="hero__title"><?php echo htmlspecialchars($heroTitle); ?></h1>
+        <p class="hero__subtitle"><?php echo htmlspecialchars($heroSubtitle); ?></p>
+        <div class="hero__actions">
+          <?php if (!empty($primaryCta)): ?>
+            <a href="<?php echo $primaryCta['url']; ?>" class="btn btn--primary btn--large">
+              <?php echo htmlspecialchars($primaryCta['text']); ?>
+            </a>
+          <?php endif; ?>
+          
+          <?php if (!empty($secondaryCta)): ?>
+            <a href="<?php echo $secondaryCta['url']; ?>" class="btn btn--secondary btn--large">
+              <?php echo htmlspecialchars($secondaryCta['text']); ?>
+            </a>
+          <?php endif; ?>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+      ]]></html_template>
+
+            <css_styles><![CDATA[
+.hero {
+  position: relative;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.hero__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.hero__content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  color: var(--color-white);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero__title {
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: var(--spacing-lg);
+}
+
+.hero__subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  line-height: 1.6;
+  margin-bottom: var(--spacing-xl);
+  opacity: 0.9;
+}
+
+.hero__actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 767px) {
+  .hero__actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .hero__actions .btn {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+      ]]></css_styles>
+        </component>
+
+        <component name="card_component">
+            <description>Reusable card component for content display</description>
+            <html_template><![CDATA[
+<div class="card <?php echo !empty($modifier) ? 'card--' . $modifier : ''; ?>">
+  <?php if (!empty($image)): ?>
+    <div class="card__image">
+      <img src="<?php echo $image['src']; ?>" alt="<?php echo htmlspecialchars($image['alt']); ?>" class="card__img">
+    </div>
+  <?php endif; ?>
+  
+  <div class="card__content">
+    <?php if (!empty($category)): ?>
+      <span class="card__category"><?php echo htmlspecialchars($category); ?></span>
+    <?php endif; ?>
+    
+    <?php if (!empty($title)): ?>
+      <h3 class="card__title">
+        <?php if (!empty($link)): ?>
+          <a href="<?php echo $link; ?>"><?php echo htmlspecialchars($title); ?></a>
+        <?php else: ?>
+          <?php echo htmlspecialchars($title); ?>
+        <?php endif; ?>
+      </h3>
+    <?php endif; ?>
+    
+    <?php if (!empty($description)): ?>
+      <p class="card__description"><?php echo htmlspecialchars($description); ?></p>
+    <?php endif; ?>
+    
+    <?php if (!empty($meta)): ?>
+      <div class="card__meta">
+        <?php foreach ($meta as $item): ?>
+          <span class="card__meta-item"><?php echo htmlspecialchars($item); ?></span>
+        <?php endforeach; ?>
+      </div>
+    <?php endif; ?>
+  </div>
+</div>
+      ]]></html_template>
+
+            <css_styles><![CDATA[
+.card {
+  background: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.card__image {
+  position: relative;
+  padding-top: 56.25%; /* 16:9 aspect ratio */
+  overflow: hidden;
+}
+
+.card__img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card__content {
+  padding: var(--spacing-lg);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.card__category {
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--spacing-sm);
+}
+
+.card__title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  line-height: 1.3;
+  margin-bottom: var(--spacing-md);
+}
+
+.card__title a {
+  text-decoration: none;
+  color: var(--color-text);
+}
+
+.card__title a:hover {
+  color: var(--color-primary);
+}
+
+.card__description {
+  color: var(--color-text-light);
+  line-height: 1.6;
+  margin-bottom: var(--spacing-md);
+  flex: 1;
+}
+
+.card__meta {
+  display: flex;
+  gap: var(--spacing-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+}
+
+.card__meta-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+/* Card variations */
+.card--horizontal {
+  flex-direction: row;
+  max-width: 600px;
+}
+
+.card--horizontal .card__image {
+  width: 200px;
+  padding-top: 0;
+  flex-shrink: 0;
+}
+
+.card--horizontal .card__img {
+  position: static;
+}
+
+@media (max-width: 767px) {
+  .card--horizontal {
+    flex-direction: column;
+  }
+  
+  .card--horizontal .card__image {
+    width: 100%;
+    padding-top: 56.25%;
+  }
+  
+  .card--horizontal .card__img {
+    position: absolute;
+  }
+}
+      ]]></css_styles>
+        </component>
+
+        <component name="button_variants">
+            <description>Comprehensive button system with multiple styles and states</description>
+            <css_styles><![CDATA[
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  text-decoration: none;
+  border: 2px solid transparent;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  min-height: 44px; /* Touch target size */
+  gap: var(--spacing-xs);
+}
+
+.btn:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Button sizes */
+.btn--small {
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: var(--font-size-sm);
+  min-height: 36px;
+}
+
+.btn--large {
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: var(--font-size-lg);
+  min-height: 52px;
+}
+
+/* Primary button */
+.btn--primary {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-primary);
+}
+
+.btn--primary:hover {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  color: var(--color-white);
+}
+
+/* Secondary button */
+.btn--secondary {
+  background: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.btn--secondary:hover {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+/* Outline button */
+.btn--outline {
+  background: transparent;
+  color: var(--color-text);
+  border-color: var(--color-gray-300);
+}
+
+.btn--outline:hover {
+  background: var(--color-gray-100);
+  border-color: var(--color-gray-400);
+}
+
+/* Ghost button */
+.btn--ghost {
+  background: transparent;
+  color: var(--color-text);
+  border-color: transparent;
+}
+
+.btn--ghost:hover {
+  background: var(--color-gray-100);
+}
+
+/* Full width button */
+.btn--full {
+  width: 100%;
+}
+
+/* Disabled state */
+.btn:disabled,
+.btn--disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Button with icon */
+.btn__icon {
+  width: 1em;
+  height: 1em;
+}
+
+.btn__icon--left {
+  order: -1;
+}
+
+.btn__icon--right {
+  order: 1;
+}
+      ]]></css_styles>
+        </component>
+
+        <component name="form_elements">
+            <description>Consistent form styling with accessibility features</description>
+            <css_styles><![CDATA[
+.form-group {
+  margin-bottom: var(--spacing-lg);
+}
+
+.form-label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: var(--spacing-xs);
+  color: var(--color-text);
+}
+
+.form-label--required::after {
+  content: ' *';
+  color: var(--color-error);
+}
+
+.form-input,
+.form-textarea,
+.form-select {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--color-gray-300);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-base);
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+  min-height: 44px;
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-input--error,
+.form-textarea--error,
+.form-select--error {
+  border-color: var(--color-error);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.form-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--spacing-md) center;
+  background-size: 12px;
+  padding-right: calc(var(--spacing-md) + 20px);
+  appearance: none;
+}
+
+.form-error {
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+  margin-top: var(--spacing-xs);
+}
+
+.form-help {
+  color: var(--color-text-light);
+  font-size: var(--font-size-sm);
+  margin-top: var(--spacing-xs);
+}
+
+.form-checkbox,
+.form-radio {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.form-checkbox input,
+.form-radio input {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.form-checkbox label,
+.form-radio label {
+  font-weight: normal;
+  margin-bottom: 0;
+}
+
+.form-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: flex-end;
+  margin-top: var(--spacing-xl);
+}
+
+@media (max-width: 767px) {
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .form-actions .btn {
+    width: 100%;
+  }
+}
+      ]]></css_styles>
+        </component>
+    </component_library>
+
+    <layout_patterns>
+        <pattern name="grid_system">
+            <description>Flexible grid system for responsive layouts</description>
+            <css_styles><![CDATA[
+.grid {
+  display: grid;
+  gap: var(--spacing-lg);
+}
+
+.grid--2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid--4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.grid--auto {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.grid--auto-sm {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+@media (max-width: 767px) {
+  .grid--2,
+  .grid--3,
+  .grid--4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .grid--3,
+  .grid--4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+      ]]></css_styles>
+        </pattern>
+
+        <pattern name="container_system">
+            <description>Responsive container with max-widths</description>
+            <css_styles><![CDATA[
+.container {
+  width: 100%;
+  padding: 0 var(--spacing-md);
+  margin: 0 auto;
+}
+
+.container--sm {
+  max-width: 640px;
+}
+
+.container--md {
+  max-width: 768px;
+}
+
+.container--lg {
+  max-width: 1024px;
+}
+
+.container--xl {
+  max-width: 1280px;
+}
+
+.container--full {
+  max-width: none;
+  padding: 0;
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 0 var(--spacing-lg);
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding: 0 var(--spacing-xl);
+  }
+}
+      ]]></css_styles>
+        </pattern>
+    </layout_patterns>
+
+    <utility_classes>
+        <category name="spacing">
+            <classes>
+                <class name="p-0">padding: 0;</class>
+                <class name="p-sm">padding: var(--spacing-sm);</class>
+                <class name="p-md">padding: var(--spacing-md);</class>
+                <class name="p-lg">padding: var(--spacing-lg);</class>
+                <class name="p-xl">padding: var(--spacing-xl);</class>
+                <class name="m-0">margin: 0;</class>
+                <class name="m-sm">margin: var(--spacing-sm);</class>
+                <class name="m-md">margin: var(--spacing-md);</class>
+                <class name="m-lg">margin: var(--spacing-lg);</class>
+                <class name="m-xl">margin: var(--spacing-xl);</class>
+            </classes>
+        </category>
+
+        <category name="text">
+            <classes>
+                <class name="text-center">text-align: center;</class>
+                <class name="text-left">text-align: left;</class>
+                <class name="text-right">text-align: right;</class>
+                <class name="text-sm">font-size: var(--font-size-sm);</class>
+                <class name="text-lg">font-size: var(--font-size-lg);</class>
+                <class name="font-bold">font-weight: 700;</class>
+                <class name="font-medium">font-weight: 500;</class>
+            </classes>
+        </category>
+
+        <category name="display">
+            <classes>
+                <class name="hidden">display: none;</class>
+                <class name="block">display: block;</class>
+                <class name="flex">display: flex;</class>
+                <class name="grid">display: grid;</class>
+                <class name="flex-center">display: flex; align-items: center; justify-content:
+                    center;</class>
+            </classes>
+        </category>
+    </utility_classes>
+</common_patterns>

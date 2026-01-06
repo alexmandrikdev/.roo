@@ -1,0 +1,280 @@
+<best_practices>
+    <general_principles>
+        <principle priority="high">
+            <name>Mobile-First Design</name>
+            <description>Always design for mobile devices first, then progressively enhance for
+                larger screens</description>
+            <rationale>Ensures optimal performance and user experience on the most constrained
+                devices</rationale>
+            <example>
+                <scenario>Creating a responsive layout</scenario>
+                <good>Start with mobile layout, add min-width media queries for tablets and desktops</good>
+                <bad>Create desktop layout first, then try to cram it into mobile screens</bad>
+            </example>
+        </principle>
+
+        <principle priority="high">
+            <name>Semantic HTML</name>
+            <description>Use HTML elements for their intended purpose and meaning</description>
+            <rationale>Improves accessibility, SEO, and code maintainability</rationale>
+            <example>
+                <scenario>Creating a navigation menu</scenario>
+                <good>Use <nav> with <ul> and <li> elements for navigation structure</good>
+                <bad>Use <div> elements with custom classes for navigation</bad>
+            </example>
+        </principle>
+
+        <principle priority="high">
+            <name>Progressive Enhancement</name>
+            <description>Build core functionality first, then add enhancements</description>
+            <rationale>Ensures the site works for all users regardless of browser capabilities</rationale>
+            <example>
+                <scenario>Adding interactive features</scenario>
+                <good>Start with basic HTML/CSS, add JavaScript enhancements progressively</good>
+                <bad>Require JavaScript for basic functionality</bad>
+            </example>
+        </principle>
+
+        <principle priority="medium">
+            <name>Consistent Design System</name>
+            <description>Maintain consistent spacing, colors, typography, and components</description>
+            <rationale>Creates cohesive user experience and easier maintenance</rationale>
+            <example>
+                <scenario>Defining spacing</scenario>
+                <good>Use CSS custom properties for consistent spacing scale (8px, 16px, 24px, etc.)</good>
+                <bad>Use arbitrary pixel values throughout the design</bad>
+            </example>
+        </principle>
+    </general_principles>
+
+    <accessibility_guidelines>
+        <guideline category="color_contrast">
+            <rule>Ensure text meets WCAG AA contrast ratios (4.5:1 for normal text, 3:1 for large
+                text)</rule>
+            <tools>
+                <tool>Use contrast checker tools during development</tool>
+                <tool>Test with grayscale to ensure readability without color</tool>
+            </tools>
+            <examples>
+                <good>Dark text on light backgrounds with sufficient contrast</good>
+                <bad>Light gray text on white backgrounds</bad>
+            </examples>
+        </guideline>
+
+        <guideline category="keyboard_navigation">
+            <rule>Ensure all interactive elements are keyboard accessible</rule>
+            <implementation>
+                <item>Include visible focus states for all interactive elements</item>
+                <item>Ensure logical tab order</item>
+                <item>Provide skip links for navigation</item>
+                <item>Test navigation using only keyboard</item>
+            </implementation>
+        </guideline>
+
+        <guideline category="screen_reader_support">
+            <rule>Provide appropriate ARIA labels and semantic markup</rule>
+            <implementation>
+                <item>Use proper heading hierarchy (h1, h2, h3, etc.)</item>
+                <item>Add aria-label for icon-only buttons</item>
+                <item>Use aria-describedby for form field descriptions</item>
+                <item>Announce dynamic content changes</item>
+            </implementation>
+        </guideline>
+    </accessibility_guidelines>
+
+    <css_architecture>
+        <convention category="organization">
+            <rule>Organize CSS with a clear methodology (BEM, SMACSS, or similar)</rule>
+            <structure>
+                <section>1. CSS Custom Properties (variables)</section>
+                <section>2. Base styles (reset, typography)</section>
+                <section>3. Layout components (grid, containers)</section>
+                <section>4. UI components (buttons, cards, forms)</section>
+                <section>5. Utilities (spacing, colors, display)</section>
+                <section>6. Responsive media queries</section>
+            </structure>
+        </convention>
+
+        <convention category="naming">
+            <rule>Use consistent, descriptive naming conventions</rule>
+            <examples>
+                <good>component-name, component-name--modifier, component-name__element</good>
+                <bad>btn, btn-blue, btn-large, btn-text</bad>
+            </examples>
+        </convention>
+
+        <convention category="custom_properties">
+            <rule>Use CSS custom properties for design tokens</rule>
+            <template><![CDATA[
+:root {
+  /* Colors */
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-text: #1f2937;
+  --color-text-light: #6b7280;
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  
+  /* Typography */
+  --font-family-sans: 'Inter', system-ui, sans-serif;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+      ]]></template>
+        </convention>
+    </css_architecture>
+
+    <php_template_patterns>
+        <pattern name="partial_includes">
+            <description>Use PHP includes for reusable template parts</description>
+            <example><![CDATA[
+<?php include 'partials/header.php'; ?>
+<main>
+  <h1><?php echo $pageTitle; ?></h1>
+  <?php include 'partials/hero.php'; ?>
+</main>
+<?php include 'partials/footer.php'; ?>
+      ]]></example>
+        </pattern>
+
+        <pattern name="conditional_rendering">
+            <description>Use PHP for conditional content rendering</description>
+            <example><![CDATA[
+<?php if ($user->isLoggedIn()): ?>
+  <div class="user-menu">
+    <span>Welcome, <?php echo htmlspecialchars($user->getName()); ?></span>
+    <a href="/logout">Logout</a>
+  </div>
+<?php else: ?>
+  <div class="auth-buttons">
+    <a href="/login" class="btn btn-secondary">Login</a>
+    <a href="/register" class="btn btn-primary">Sign Up</a>
+  </div>
+<?php endif; ?>
+      ]]></example>
+        </pattern>
+
+        <pattern name="data_output">
+            <description>Always escape output to prevent XSS</description>
+            <example><![CDATA[
+<!-- Good: Escaped output -->
+<p><?php echo htmlspecialchars($userInput); ?></p>
+
+<!-- Bad: Unescaped output -->
+<p><?php echo $userInput; ?></p>
+      ]]></example>
+        </pattern>
+    </php_template_patterns>
+
+    <responsive_design>
+        <breakpoint_system>
+            <breakpoint name="mobile" min="0" max="767px">Mobile devices</breakpoint>
+            <breakpoint name="tablet" min="768px" max="1023px">Tablet devices</breakpoint>
+            <breakpoint name="desktop" min="1024px" max="1439px">Desktop computers</breakpoint>
+            <breakpoint name="large" min="1440px">Large screens</breakpoint>
+        </breakpoint_system>
+
+        <media_query_strategy>
+            <rule>Use min-width media queries for mobile-first approach</rule>
+            <example><![CDATA[
+/* Mobile first - base styles */
+.container {
+  padding: 1rem;
+  max-width: 100%;
+}
+
+/* Tablet and up */
+@media (min-width: 768px) {
+  .container {
+    padding: 2rem;
+    max-width: 768px;
+    margin: 0 auto;
+  }
+}
+
+/* Desktop and up */
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+      ]]></example>
+        </media_query_strategy>
+    </responsive_design>
+
+    <performance_optimization>
+        <technique name="css_optimization">
+            <description>Optimize CSS for better performance</description>
+            <practices>
+                <practice>Minimize CSS file size through efficient selectors</practice>
+                <practice>Avoid @import in CSS files</practice>
+                <practice>Use CSS containment for complex components</practice>
+                <practice>Optimize animations with transform and opacity</practice>
+                <practice>Use will-change property sparingly</practice>
+            </practices>
+        </technique>
+
+        <technique name="image_optimization">
+            <description>Optimize images for web performance</description>
+            <practices>
+                <practice>Use appropriate image formats (WebP, AVIF when supported)</practice>
+                <practice>Implement responsive images with srcset</practice>
+                <practice>Lazy load images below the fold</practice>
+                <practice>Compress images without quality loss</practice>
+            </practices>
+        </technique>
+    </performance_optimization>
+
+    <common_pitfalls>
+        <pitfall>
+            <description>Using fixed units for responsive design</description>
+            <why_problematic>Fixed pixels don't adapt to different screen sizes and user preferences</why_problematic>
+            <correct_approach>Use relative units (rem, em, %, vw, vh) and flexible layouts</correct_approach>
+        </pitfall>
+
+        <pitfall>
+            <description>Ignoring accessibility in favor of aesthetics</description>
+            <why_problematic>Excludes users with disabilities and can cause legal issues</why_problematic>
+            <correct_approach>Design with accessibility as a core requirement, not an afterthought</correct_approach>
+        </pitfall>
+
+        <pitfall>
+            <description>Over-engineering CSS with excessive specificity</description>
+            <why_problematic>Makes maintenance difficult and styles hard to override</why_problematic>
+            <correct_approach>Keep selectors simple and use consistent naming conventions</correct_approach>
+        </pitfall>
+    </common_pitfalls>
+
+    <quality_checklist>
+        <category name="before_starting">
+            <item>Understand project requirements and target audience</item>
+            <item>Review existing brand guidelines or design systems</item>
+            <item>Plan component hierarchy and reusability</item>
+            <item>Define responsive breakpoints</item>
+        </category>
+        <category name="during_implementation">
+            <item>Use semantic HTML5 elements appropriately</item>
+            <item>Follow consistent naming conventions</item>
+            <item>Implement mobile-first responsive design</item>
+            <item>Ensure accessibility standards are met</item>
+            <item>Test cross-browser compatibility</item>
+        </category>
+        <category name="before_completion">
+            <item>Validate HTML and CSS</item>
+            <item>Test keyboard navigation</item>
+            <item>Check color contrast ratios</item>
+            <item>Verify responsive behavior</item>
+            <item>Optimize for performance</item>
+        </category>
+    </quality_checklist>
+</best_practices>

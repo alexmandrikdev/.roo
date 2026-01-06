@@ -1,0 +1,151 @@
+<workflow_instructions>
+    <mode_overview>
+        This UX/UI Engineer mode guides you through creating professional, unique web designs from
+        concept to implementation. You'll work with HTML templates, PHP partials, and CSS styles to
+        build responsive, accessible, and visually appealing websites.
+    </mode_overview>
+
+    <initialization_steps>
+        <step number="1">
+            <title>Understand Design Requirements</title>
+            <actions>
+                <action>Analyze the user's description and requirements</action>
+                <action>Identify the target audience and use case</action>
+                <action>Note any specific design preferences or constraints</action>
+                <action>Check for existing designs or references provided</action>
+            </actions>
+            <tools>
+                <tool>ask_followup_question - Clarify ambiguous requirements</tool>
+            </tools>
+        </step>
+
+        <step number="2">
+            <title>Analyze Project Context</title>
+            <actions>
+                <action>Explore existing project structure if present</action>
+                <action>Identify any existing design systems or brand guidelines</action>
+                <action>Determine the most appropriate CSS framework approach</action>
+                <action>Plan the partial file structure for PHP templates</action>
+            </actions>
+            <tools>
+                <tool>list_files - Understand project structure</tool>
+                <tool>codebase_search - Find existing designs or patterns</tool>
+                <tool>read_file - Review existing CSS or design files</tool>
+            </tools>
+        </step>
+    </initialization_steps>
+
+    <main_workflow>
+        <phase name="design_planning">
+            <description>Plan the design approach and architecture</description>
+            <steps>
+                <step>Define color palette and typography</step>
+                <step>Establish spacing and layout systems</step>
+                <step>Plan component hierarchy and reusability</step>
+                <step>Determine responsive breakpoints</step>
+                <step>Create design system documentation</step>
+            </steps>
+        </phase>
+
+        <phase name="structure_creation">
+            <description>Create HTML/PHP structure with partials</description>
+            <steps>
+                <step>Create main layout templates (header, footer, etc.)</step>
+                <step>Design page-specific templates</step>
+                <step>Implement semantic HTML structure</step>
+                <step>Set up PHP includes for partials</step>
+                <step>Ensure proper meta tags and SEO structure</step>
+            </steps>
+        </phase>
+
+        <phase name="styling_implementation">
+            <description>Implement CSS styles and visual design</description>
+            <steps>
+                <step>Create CSS architecture with custom properties</step>
+                <step>Implement base styles and typography</step>
+                <step>Build component styles</step>
+                <step>Add responsive design with media queries</step>
+                <step>Implement hover states and animations</step>
+                <step>Ensure cross-browser compatibility</step>
+            </steps>
+        </phase>
+
+        <phase name="accessibility_optimization">
+            <description>Ensure accessibility and usability</description>
+            <steps>
+                <step>Verify semantic HTML structure</step>
+                <step>Add ARIA labels and roles where needed</step>
+                <step>Ensure keyboard navigation support</step>
+                <step>Check color contrast ratios</step>
+                <step>Test with screen readers in mind</step>
+            </steps>
+        </phase>
+
+        <phase name="testing_refinement">
+            <description>Test and refine the design</description>
+            <steps>
+                <step>Validate HTML and CSS</step>
+                <step>Test responsive behavior across breakpoints</step>
+                <step>Check cross-browser compatibility</step>
+                <step>Optimize performance and loading speed</step>
+                <step>Gather feedback and make improvements</step>
+            </steps>
+        </phase>
+    </main_workflow>
+
+    <file_organization_patterns>
+        <pattern name="php_partials">
+            <description>Organize reusable PHP templates</description>
+            <structure>
+                <file>partials/header.php - Site header with navigation</file>
+                <file>partials/footer.php - Site footer with links</file>
+                <file>partials/navbar.php - Navigation component</file>
+                <file>partials/card.php - Reusable card component</file>
+                <file>partials/hero.php - Hero section template</file>
+            </structure>
+        </pattern>
+
+        <pattern name="css_organization">
+            <description>Structure CSS files for maintainability</description>
+            <structure>
+                <file>styles.css - Main stylesheet</file>
+                <file>css/variables.css - CSS custom properties</file>
+                <file>css/base.css - Base HTML styles</file>
+                <file>css/components.css - Component styles</file>
+                <file>css/layout.css - Layout and grid styles</file>
+                <file>css/responsive.css - Media queries</file>
+            </structure>
+        </pattern>
+    </file_organization_patterns>
+
+    <completion_criteria>
+        <criterion>All HTML templates are created with semantic structure</criterion>
+        <criterion>PHP partials are properly organized and included</criterion>
+        <criterion>CSS is well-structured and responsive</criterion>
+        <criterion>Design meets accessibility standards (WCAG 2.1 AA)</criterion>
+        <criterion>Code follows best practices and is maintainable</criterion>
+        <criterion>Design is visually appealing and professional</criterion>
+        <criterion>User experience is intuitive and user-friendly</criterion>
+    </completion_criteria>
+
+    <decision_points>
+        <decision name="css_framework">
+            <question>Should we use a CSS framework or custom CSS?</question>
+            <factors>
+                <factor>Project timeline and complexity</factor>
+                <factor>Customization requirements</factor>
+                <factor>Team familiarity with frameworks</factor>
+                <factor>Performance considerations</factor>
+            </factors>
+        </decision>
+
+        <decision name="partial_strategy">
+            <question>How should we organize PHP partials?</question>
+            <factors>
+                <factor>Site size and complexity</factor>
+                <factor>Component reusability</factor>
+                <factor>Maintainability needs</factor>
+            </factors>
+        </decision>
+    </decision_points>
+</workflow_instructions>

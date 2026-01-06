@@ -1,0 +1,309 @@
+<tool_usage_guide>
+    <tool_priorities>
+        <priority level="1">
+            <tool>codebase_search</tool>
+            <when>Always use first to find existing designs, patterns, or similar components</when>
+            <why>Semantic search finds relevant design patterns and existing implementations better
+                than keyword searches</why>
+        </priority>
+
+        <priority level="2">
+            <tool>list_files</tool>
+            <when>After initial search to understand project structure and identify design assets</when>
+            <why>Helps understand the overall project organization and existing file structure</why>
+        </priority>
+
+        <priority level="3">
+            <tool>read_file</tool>
+            <when>After identifying relevant files to examine existing designs, CSS, or templates</when>
+            <why>Provides full context of existing implementations and design systems</why>
+        </priority>
+
+        <priority level="4">
+            <tool>write_to_file</tool>
+            <when>Creating new PHP templates, CSS files, or design assets</when>
+            <why>Primary tool for generating new design files and templates</why>
+        </priority>
+
+        <priority level="5">
+            <tool>apply_diff</tool>
+            <when>Modifying existing files with precise changes</when>
+            <why>Best for targeted updates to existing CSS or template files</why>
+        </priority>
+    </tool_priorities>
+
+    <tool_specific_guidance>
+        <tool name="codebase_search">
+            <best_practices>
+                <practice>Search for design-related terms like "component", "template", "layout",
+                    "style"</practice>
+                <practice>Look for existing color schemes, typography, or design patterns</practice>
+                <practice>Search for specific component types you need to create</practice>
+                <practice>Use semantic queries to find similar design implementations</practice>
+            </best_practices>
+
+            <example_queries>
+                <query>navigation header component design</query>
+                <query>card layout CSS styles</query>
+                <query>responsive grid system</query>
+                <query>form styling patterns</query>
+                <query>hero section template</query>
+            </example_queries>
+        </tool>
+
+        <tool name="list_files">
+            <best_practices>
+                <practice>Use recursive listing to understand full project structure</practice>
+                <practice>Look for existing CSS directories, template folders, or asset organization</practice>
+                <practice>Identify naming conventions and file organization patterns</practice>
+                <practice>Check for existing partials or component directories</practice>
+            </best_practices>
+
+            <common_directories>
+                <directory>assets/ - Static assets like images, fonts, icons</directory>
+                <directory>css/ - Stylesheet files</directory>
+                <directory>scss/ - Sass/SCSS source files</directory>
+                <directory>templates/ - PHP template files</directory>
+                <directory>partials/ - Reusable template components</directory>
+                <directory>components/ - UI component files</directory>
+                <directory>layouts/ - Page layout templates</directory>
+            </common_directories>
+        </tool>
+
+        <tool name="read_file">
+            <best_practices>
+                <practice>Read existing CSS files to understand current design system</practice>
+                <practice>Examine PHP templates to understand current structure and patterns</practice>
+                <practice>Look for CSS custom properties or design tokens</practice>
+                <practice>Check for existing component libraries or frameworks</practice>
+                <practice>Review existing accessibility implementations</practice>
+            </best_practices>
+
+            <key_files_to_examine>
+                <file>style.css or main.css - Main stylesheet</file>
+                <file>variables.css or _variables.scss - Design tokens</file>
+                <file>header.php or layout.php - Base template structure</file>
+                <file>package.json - Dependencies and build tools</file>
+                <file>README.md - Project documentation and setup</file>
+            </key_files_to_examine>
+        </tool>
+
+        <tool name="write_to_file">
+            <best_practices>
+                <practice>Create PHP templates with proper escaping for security</practice>
+                <practice>Organize CSS with clear sections and comments</practice>
+                <practice>Use semantic HTML5 elements in templates</practice>
+                <practice>Include proper meta tags and accessibility attributes</practice>
+                <practice>Follow established naming conventions</practice>
+                <practice>Create responsive, mobile-first designs</practice>
+            </best_practices>
+
+            <file_creation_patterns>
+                <pattern>PHP Templates</pattern>
+                <example><![CDATA[
+<?php
+// Template file with proper structure and security
+$pageTitle = 'Page Title';
+$pageDescription = 'Page description for SEO';
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo htmlspecialchars($pageTitle); ?></title>
+    <meta name="description" content="<?php echo htmlspecialchars($pageDescription); ?>">
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+    <?php include 'partials/header.php'; ?>
+    
+    <main>
+        <!-- Page content here -->
+    </main>
+    
+    <?php include 'partials/footer.php'; ?>
+</body>
+</html>
+                ]]></example>
+
+                <pattern>CSS Files</pattern>
+                <example><![CDATA[
+/* ==========================================================================
+   Component Name - Brief description
+   ========================================================================== */
+
+/* Base styles */
+.component-name {
+  /* Base component styles */
+}
+
+/* Modifiers */
+.component-name--modifier {
+  /* Modifier styles */
+}
+
+/* Elements */
+.component-name__element {
+  /* Element styles */
+}
+
+/* Responsive styles */
+@media (min-width: 768px) {
+  .component-name {
+    /* Tablet styles */
+  }
+}
+
+@media (min-width: 1024px) {
+  .component-name {
+    /* Desktop styles */
+  }
+}
+                ]]></example>
+            </file_creation_patterns>
+        </tool>
+
+        <tool name="apply_diff">
+            <best_practices>
+                <practice>Always read the file first to ensure exact content matching</practice>
+                <practice>Make multiple related changes in a single diff operation</practice>
+                <practice>Include line numbers for precise targeting</practice>
+                <practice>Use for updating existing CSS classes or PHP templates</practice>
+                <practice>Test changes don't break existing functionality</practice>
+            </best_practices>
+
+            <example_usage>
+                <scenario>Updating CSS variables</scenario>
+                <example><![CDATA[
+<apply_diff>
+<path>css/variables.css</path>
+<diff>
+<<<<<<< SEARCH
+:start_line:10
+-------
+--color-primary: #007bff;
+--color-secondary: #6c757d;
+=======
+--color-primary: #3b82f6;
+--color-secondary: #6b7280;
+>>>>>>> REPLACE
+</diff>
+</apply_diff>
+                ]]></example>
+            </example_usage>
+        </tool>
+
+        <tool name="ask_followup_question">
+            <best_practices>
+                <practice>Use when design requirements are unclear or ambiguous</practice>
+                <practice>Provide specific, actionable suggestions (2-4 options)</practice>
+                <practice>Order suggestions by likelihood or preference</practice>
+                <practice>Include mode switches when appropriate</practice>
+                <practice>Ask about target audience, brand guidelines, or technical constraints</practice>
+            </best_practices>
+
+            <common_questions>
+                <question>What is the primary purpose of this design?</question>
+                <suggestions>
+                    <suggest>E-commerce product showcase</suggest>
+                    <suggest>Corporate landing page</suggest>
+                    <suggest>Blog or content platform</suggest>
+                    <suggest>Web application dashboard</suggest>
+                </suggestions>
+                </question>
+
+                <question>What design style or aesthetic do you prefer?</question>
+                <suggestions>
+                    <suggest>Modern and minimalist with clean lines</suggest>
+                    <suggest>Corporate and professional with traditional elements</suggest>
+                    <suggest>Playful and creative with bold colors</suggest>
+                    <suggest>Dark theme with high contrast</suggest>
+                </suggestions>
+            </common_questions>
+        </tool>
+    </tool_specific_guidance>
+
+    <workflow_integration>
+        <phase name="discovery">
+            <tools>
+                <tool>codebase_search - Find existing design patterns</tool>
+                <tool>list_files - Understand project structure</tool>
+                <tool>read_file - Examine existing designs</tool>
+            </tools>
+            <purpose>Gather context and understand existing design system</purpose>
+        </phase>
+
+        <phase name="planning">
+            <tools>
+                <tool>ask_followup_question - Clarify requirements</tool>
+            </tools>
+            <purpose>Define design approach and gather specific requirements</purpose>
+        </phase>
+
+        <phase name="implementation">
+            <tools>
+                <tool>write_to_file - Create new templates and styles</tool>
+                <tool>apply_diff - Modify existing files</tool>
+            </tools>
+            <purpose>Build the design components and templates</purpose>
+        </phase>
+
+        <phase name="refinement">
+            <tools>
+                <tool>apply_diff - Make targeted improvements</tool>
+                <tool>read_file - Review changes</tool>
+            </tools>
+            <purpose>Refine and polish the design implementation</purpose>
+        </phase>
+    </workflow_integration>
+
+    <quality_assurance>
+        <validation_steps>
+            <step>Validate HTML structure and semantic markup</step>
+            <step>Check CSS syntax and organization</step>
+            <step>Verify PHP template security (output escaping)</step>
+            <step>Test responsive design breakpoints</step>
+            <step>Ensure accessibility compliance</step>
+            <step>Review cross-browser compatibility</step>
+        </validation_steps>
+
+        <tools_for_validation>
+            <tool>read_file - Review generated code for quality</tool>
+            <tool>apply_diff - Fix any identified issues</tool>
+        </tools_for_validation>
+    </quality_assurance>
+
+    <common_scenarios>
+        <scenario name="creating_new_component">
+            <workflow>
+                <step>Search for similar existing components</step>
+                <step>Examine existing CSS patterns and naming conventions</step>
+                <step>Create component template with proper structure</step>
+                <step>Implement responsive styles</step>
+                <step>Add accessibility features</step>
+                <step>Test and refine</step>
+            </workflow>
+        </scenario>
+
+        <scenario name="updating_existing_design">
+            <workflow>
+                <step>Read current implementation</step>
+                <step>Identify areas needing updates</step>
+                <step>Apply targeted changes with apply_diff</step>
+                <step>Ensure consistency with design system</step>
+                <step>Test responsive behavior</step>
+            </workflow>
+        </scenario>
+
+        <scenario name="creating_page_template">
+            <workflow>
+                <step>Examine existing page templates</step>
+                <step>Identify reusable components needed</step>
+                <step>Create PHP template with proper includes</step>
+                <step>Add page-specific styles</step>
+                <step>Ensure SEO and accessibility</step>
+            </workflow>
+        </scenario>
+    </common_scenarios>
+</tool_usage_guide>

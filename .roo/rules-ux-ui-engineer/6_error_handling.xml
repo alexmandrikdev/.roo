@@ -1,0 +1,271 @@
+<error_handling>
+    <common_design_issues>
+        <issue name="responsive_breakdown">
+            <description>Layout breaks on different screen sizes</description>
+            <symptoms>
+                <symptom>Elements overlap on mobile devices</symptom>
+                <symptom>Horizontal scrolling on small screens</symptom>
+                <symptom>Too much whitespace on large screens</symptom>
+                <symptom>Navigation menu becomes unusable</symptom>
+            </symptoms>
+
+            <diagnostic_steps>
+                <step>Test design at common breakpoints (320px, 768px, 1024px, 1440px)</step>
+                <step>Check for fixed widths that don't adapt</step>
+                <step>Verify flexible units (rem, %, vw) are used</step>
+                <step>Inspect media query logic and breakpoints</step>
+                <step>Test touch targets on mobile (minimum 44px)</step>
+            </diagnostic_steps>
+
+            <solutions>
+                <solution name="mobile_first_approach">
+                    <description>Start with mobile layout, then enhance for larger screens</description>
+                    <implementation>
+                        <item>Use min-width media queries only</item>
+                        <item>Design single-column mobile layout first</item>
+                        <item>Add complexity progressively for larger screens</item>
+                        <item>Test extensively on actual devices</item>
+                    </implementation>
+                </solution>
+
+                <solution name="flexible_grid_system">
+                    <description>Implement flexible grid that adapts to content</description>
+                    <implementation>
+                        <item>Use CSS Grid with auto-fit and minmax</item>
+                        <item>Implement flexible container queries</item>
+                        <item>Use relative units for spacing</item>
+                        <item>Add container max-widths for readability</item>
+                    </implementation>
+                </solution>
+            </solutions>
+        </issue>
+
+        <issue name="accessibility_violations">
+            <description>Design doesn't meet accessibility standards</description>
+            <symptoms>
+                <symptom>Poor color contrast ratios</symptom>
+                <symptom>No keyboard navigation support</symptom>
+                <symptom>Missing ARIA labels and roles</symptom>
+                <symptom>Screen reader incompatibility</symptom>
+                <symptom>No focus indicators</symptom>
+            </symptoms>
+
+            <diagnostic_steps>
+                <step>Run color contrast checker (WCAG AA: 4.5:1 normal, 3:1 large)</step>
+                <step>Test keyboard-only navigation</step>
+                <step>Use screen reader to test content flow</step>
+                <step>Validate HTML with accessibility checker</step>
+                <step>Check semantic HTML structure</step>
+            </diagnostic_steps>
+
+            <solutions>
+                <solution name="color_contrast_fix">
+                    <description>Ensure sufficient color contrast for readability</description>
+                    <implementation>
+                        <item>Use contrast checking tools during design</item>
+                        <item>Adjust colors to meet WCAG standards</item>
+                        <item>Provide high contrast mode option</item>
+                        <item>Test with grayscale to ensure readability</item>
+                    </implementation>
+                </solution>
+
+                <solution name="keyboard_navigation">
+                    <description>Make all interactive elements keyboard accessible</description>
+                    <implementation>
+                        <item>Add visible focus states for all interactive elements</item>
+                        <item>Ensure logical tab order</item>
+                        <item>Provide skip links for navigation</item>
+                        <item>Test all functionality with keyboard only</item>
+                    </implementation>
+                </solution>
+
+                <solution name="aria_implementation">
+                    <description>Add proper ARIA labels and roles</description>
+                    <implementation>
+                        <item>Use semantic HTML5 elements</item>
+                        <item>Add aria-label for icon-only buttons</item>
+                        <item>Use aria-describedby for form field help</item>
+                        <item>Implement aria-live for dynamic content</item>
+                    </implementation>
+                </solution>
+            </solutions>
+        </issue>
+
+        <issue name="typography_problems">
+            <description>Text is difficult to read or inconsistent</description>
+            <symptoms>
+                <symptom>Poor line height and readability</symptom>
+                <symptom>Inconsistent font sizes and weights</symptom>
+                <symptom>Text overflow or wrapping issues</symptom>
+                <symptom>Poor hierarchy and emphasis</symptom>
+                <symptom>Font loading performance issues</symptom>
+            </symptoms>
+
+            <diagnostic_steps>
+                <step>Check line height (1.4-1.6 for body text)</step>
+                <step>Verify font size scale and consistency</step>
+                <step>Test text overflow in containers</step>
+                <step>Check font loading strategy</step>
+                <step>Validate heading hierarchy</step>
+            </diagnostic_steps>
+
+            <solutions>
+                <solution name="typographic_system">
+                    <description>Implement consistent typographic scale</description>
+                    <implementation>
+                        <item>Define modular scale for font sizes</item>
+                        <item>Set appropriate line heights for each size</item>
+                        <item>Use relative units for scalability</item>
+                        <item>Implement font loading strategy</item>
+                        <item>Ensure proper text contrast</item>
+                    </implementation>
+                </solution>
+
+                <solution name="responsive_typography">
+                    <description>Make typography adapt to screen size</description>
+                    <implementation>
+                        <item>Use clamp() for fluid font sizes</item>
+                        <item>Adjust line height for different screens</item>
+                        <item>Optimize reading width (45-75 characters)</item>
+                        <item>Test text scaling preferences</item>
+                    </implementation>
+                </solution>
+            </solutions>
+        </issue>
+
+        <issue name="layout_inconsistencies">
+            <description>Visual design lacks consistency across pages</description>
+            <symptoms>
+                <symptom>Inconsistent spacing and margins</symptom>
+                <symptom>Mismatched color usage</symptom>
+                <symptom>Uneven component alignment</symptom>
+                <symptom>Inconsistent border radius and shadows</symptom>
+                <symptom>Variable font weights and sizes</symptom>
+            </symptoms>
+
+            <diagnostic_steps>
+                <step>Review spacing scale across components</step>
+                <step>Check color palette consistency</step>
+                <step>Verify alignment patterns</step>
+                <step>Test component variations</step>
+                <step>Validate design system adherence</step>
+            </diagnostic_steps>
+
+            <solutions>
+                <solution name="design_system_implementation">
+                    <description>Create and maintain consistent design system</description>
+                    <implementation>
+                        <item>Define CSS custom properties for colors, spacing, typography</item>
+                        <item>Create component variants with consistent modifiers</item>
+                        <item>Use utility classes for common patterns</item>
+                        <item>Document design decisions and patterns</item>
+                        <item>Regular design audits for consistency</item>
+                    </implementation>
+                </solution>
+            </solutions>
+        </issue>
+    </common_design_issues>
+
+    <debugging_workflow>
+        <phase name="identification">
+            <description>Identify and categorize the design issue</description>
+            <steps>
+                <step>Reproduce the issue consistently</step>
+                <step>Gather browser and device information</step>
+                <step>Document symptoms and error messages</step>
+                <step>Check browser console for errors</step>
+                <step>Isolate the problematic component</step>
+            </steps>
+        </phase>
+
+        <phase name="analysis">
+            <description>Analyze root cause and contributing factors</description>
+            <steps>
+                <step>Review recent changes that might have caused the issue</step>
+                <step>Check for CSS conflicts or specificity issues</step>
+                <step>Validate HTML structure and syntax</step>
+                <step>Test with different data/content scenarios</step>
+                <step>Consider environmental factors (viewport, content)</step>
+            </steps>
+        </phase>
+
+        <phase name="resolution">
+            <description>Implement and test the fix</description>
+            <steps>
+                <step>Develop minimal fix for the root cause</step>
+                <step>Test fix in isolation</step>
+                <step>Verify fix doesn't break other functionality</step>
+                <step>Test across browsers and viewports</step>
+                <step>Document the solution for future reference</step>
+            </steps>
+        </phase>
+    </debugging_workflow>
+
+    <testing_strategies>
+        <strategy name="responsive_testing">
+            <description>Comprehensive responsive design testing</description>
+            <methods>
+                <method>Browser dev tools device simulation</method>
+                <method>Viewport resizing and testing</method>
+                <method>Online responsive testing tools</method>
+                <method>Touch interaction testing</method>
+            </methods>
+        </strategy>
+
+        <strategy name="accessibility_testing">
+            <description>Thorough accessibility validation</description>
+            <methods>
+                <method>Automated accessibility checkers (axe, WAVE)</method>
+                <method>Screen reader testing simulation</method>
+                <method>Keyboard-only navigation testing</method>
+                <method>Color contrast analysis tools</method>
+                <method>Zoom and text scaling testing</method>
+            </methods>
+        </strategy>
+
+        <strategy name="cross_browser_testing">
+            <description>Ensure design works across browsers</description>
+            <methods>
+                <method>Test in major browsers (Chrome, Firefox, Safari, Edge)</method>
+                <method>Check browser support for used CSS features</method>
+                <method>Validate HTML and CSS syntax</method>
+                <method>Test with browser developer tools</method>
+            </methods>
+        </strategy>
+    </testing_strategies>
+
+    <prevention_measures>
+        <measure name="design_system">
+            <description>Maintain consistent design system</description>
+            <practices>
+                <practice>Use CSS custom properties for design tokens</practice>
+                <practice>Follow consistent naming conventions</practice>
+                <practice>Document design patterns and components</practice>
+                <practice>Regular design audits and reviews</practice>
+                <practice>Maintain component library</practice>
+            </practices>
+        </measure>
+
+        <measure name="testing_automation">
+            <description>Automate testing to catch issues early</description>
+            <practices>
+                <practice>Set up automated visual regression testing</practice>
+                <practice>Use accessibility testing in design process</practice>
+                <practice>Test responsive designs systematically</practice>
+                <practice>Validate HTML structure automatically</practice>
+                <practice>Check color contrast during design</practice>
+            </practices>
+        </measure>
+
+        <measure name="documentation">
+            <description>Maintain comprehensive documentation</description>
+            <practices>
+                <practice>Document design system and patterns</practice>
+                <practice>Create troubleshooting guides</practice>
+                <practice>Maintain component usage examples</practice>
+                <practice>Document browser support and fallbacks</practice>
+                <practice>Keep accessibility guidelines updated</practice>
+            </practices>
+        </measure>
+    </prevention_measures>
+</error_handling>

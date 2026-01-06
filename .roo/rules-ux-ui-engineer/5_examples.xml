@@ -1,0 +1,209 @@
+<examples>
+    <example name="landing_page_creation">
+        <description>Creating a complete landing page with hero, features, and contact sections</description>
+        <workflow>
+            <step>Understand requirements and target audience</step>
+            <step>Design color palette and typography</step>
+            <step>Create header and navigation partial</step>
+            <step>Build hero section component</step>
+            <step>Design features grid layout</step>
+            <step>Create contact form section</step>
+            <step>Build footer component</step>
+            <step>Assemble main page template</step>
+            <step>Create responsive CSS styles</step>
+            <step>Test and refine</step>
+        </workflow>
+
+        <files_created>
+            <file>partials/header.php</file>
+            <file>partials/footer.php</file>
+            <file>partials/hero.php</file>
+            <file>partials/navigation.php</file>
+            <file>index.php</file>
+            <file>assets/css/styles.css</file>
+            <file>assets/css/variables.css</file>
+        </files_created>
+    </example>
+
+    <example name="ecommerce_product_page">
+        <description>Building an e-commerce product page with image gallery and purchase options</description>
+        <workflow>
+            <step>Analyze product display requirements</step>
+            <step>Design product image gallery component</step>
+            <step>Create product information layout</step>
+            <step>Build variant selection interface</step>
+            <step>Design add to cart functionality</step>
+            <step>Create related products section</step>
+            <step>Implement responsive product grid</step>
+            <step>Add accessibility features</step>
+        </workflow>
+
+        <components_used>
+            <component>product-gallery.php - Image carousel with thumbnails</component>
+            <component>product-info.php - Product details and specifications</component>
+            <component>variant-selector.php - Size/color/options selector</component>
+            <component>add-to-cart.php - Purchase button and quantity</component>
+            <component>related-products.php - Product recommendations grid</component>
+        </components_used>
+    </example>
+
+    <example name="blog_layout_design">
+        <description>Creating a responsive blog layout with sidebar and article styling</description>
+        <workflow>
+            <step>Design blog post article component</step>
+            <step>Create sidebar with categories and recent posts</step>
+            <step>Build comment section component</step>
+            <step>Design pagination component</step>
+            <step>Create blog listing grid layout</step>
+            <step>Implement search functionality</step>
+            <step>Add author bio component</step>
+        </workflow>
+
+        <key_features>
+            <feature>Responsive article layout with proper typography</feature>
+            <feature>SEO-friendly heading structure</feature>
+            <feature>Comment system with threading</feature>
+            <feature>Category filtering and search</feature>
+            <feature>Social sharing buttons</feature>
+            <feature>Author information and bio</feature>
+        </key_features>
+    </example>
+
+    <example name="dashboard_interface">
+        <description>Building a web application dashboard with charts and data tables</description>
+        <workflow>
+            <step>Design dashboard layout structure</step>
+            <step>Create sidebar navigation component</step>
+            <step>Build data table component</step>
+            <step>Design chart containers</step>
+            <step>Create metric cards component</step>
+            <step>Build user profile dropdown</step>
+            <step>Implement notification system</step>
+            <step>Add responsive mobile menu</step>
+        </workflow>
+
+        <design_considerations>
+            <consideration>Data visualization best practices</consideration>
+            <consideration>Accessibility for complex interfaces</consideration>
+            <consideration>Performance optimization for large datasets</consideration>
+            <consideration>Keyboard navigation for dashboard</consideration>
+            <consideration>Mobile-responsive data tables</consideration>
+        </design_considerations>
+    </example>
+
+    <example name="portfolio_website">
+        <description>Creating a personal portfolio with project showcase</description>
+        <workflow>
+            <step>Design portfolio grid layout</step>
+            <step>Create project card component</step>
+            <step>Build project detail modal/page</step>
+            <step>Design skills section</step>
+            <step>Create about section with timeline</step>
+            <step>Build contact form</step>
+            <step>Add smooth scrolling and animations</step>
+        </workflow>
+
+        <technical_implementation>
+            <technique>CSS Grid for portfolio layout</technique>
+            <technique>Modal overlays for project details</technique>
+            <technique>Intersection Observer for scroll animations</technique>
+            <technique>Form validation with visual feedback</technique>
+            <technique>Lazy loading for project images</technique>
+        </technical_implementation>
+    </example>
+
+    <example name="mobile_first_responsive_design">
+        <description>Implementing mobile-first responsive design principles</description>
+        <workflow>
+            <step>Start with mobile layout design</step>
+            <step>Define tablet breakpoint styles</step>
+            <step>Add desktop enhancements</step>
+            <step>Test across all screen sizes</step>
+            <step>Optimize touch interactions</step>
+        </workflow>
+
+        <breakpoint_strategy>
+            <breakpoint min="0" max="767px">Mobile - Single column, stacked layout</breakpoint>
+            <breakpoint min="768px" max="1023px">Tablet - Two columns, larger touch targets</breakpoint>
+            <breakpoint min="1024px">Desktop - Multi-column, hover states</breakpoint>
+        </breakpoint_strategy>
+    </example>
+
+    <example name="accessibility_focused_design">
+        <description>Creating an accessible interface with WCAG 2.1 AA compliance</description>
+        <workflow>
+            <step>Implement semantic HTML structure</step>
+            <step>Add proper ARIA labels and roles</step>
+            <step>Ensure keyboard navigation</step>
+            <step>Check color contrast ratios</step>
+            <step>Add focus indicators</step>
+            <step>Test with screen readers</step>
+            <step>Validate with accessibility tools</step>
+        </workflow>
+
+        <accessibility_features>
+            <feature>Skip links for navigation</feature>
+            <feature>Focus management for modals</feature>
+            <feature>Alt text for all images</feature>
+            <feature>Form labels and error messages</feature>
+            <feature>Resizable text without breaking layout</feature>
+            <feature>High contrast mode support</feature>
+        </accessibility_features>
+    </example>
+
+    <example name="css_framework_integration">
+        <description>Integrating a CSS framework (Bootstrap/Tailwind) with custom styles</description>
+        <workflow>
+            <step>Choose appropriate framework for project</step>
+            <step>Set up framework configuration</step>
+            <step>Create custom utility classes</step>
+            <step>Override framework defaults</step>
+            <step>Build custom components</step>
+            <step>Optimize final CSS bundle</step>
+        </workflow>
+
+        <integration_approaches>
+            <approach name="bootstrap_customization">
+                <description>Customizing Bootstrap with Sass variables and custom CSS</description>
+                <steps>
+                    <step>Import Bootstrap Sass files</step>
+                    <step>Override Bootstrap variables</step>
+                    <step>Add custom component styles</step>
+                    <step>Remove unused Bootstrap components</step>
+                </steps>
+            </approach>
+
+            <approach name="tailwind_customization">
+                <description>Extending Tailwind with custom configuration and utilities</description>
+                <steps>
+                    <step>Configure tailwind.config.js</step>
+                    <step>Add custom CSS utilities</step>
+                    <step>Create component classes with @apply</step>
+                    <step>Purge unused styles in production</step>
+                </steps>
+            </approach>
+        </integration_approaches>
+    </example>
+
+    <example name="form_design_system">
+        <description>Creating a comprehensive form design system with validation</description>
+        <workflow>
+            <step>Design form field components</step>
+            <step>Create validation states</step>
+            <step>Build error handling system</step>
+            <step>Add success feedback</step>
+            <step>Implement accessibility features</step>
+            <step>Create form layout patterns</step>
+        </workflow>
+
+        <form_components>
+            <component>text-input.php - Text and email fields</component>
+            <component>textarea.php - Multi-line text input</component>
+            <component>select-dropdown.php - Single and multi-select</component>
+            <component>checkbox-group.php - Multiple choice options</component>
+            <component>radio-group.php - Single choice options</component>
+            <component>file-upload.php - File input with preview</component>
+            <component>form-validation.php - Client-side validation</component>
+        </form_components>
+    </example>
+</examples>
