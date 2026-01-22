@@ -1,0 +1,340 @@
+<tool_usage_guide>
+    <overview>
+        Specific guidance on using execute_command, read_file, and ask_followup_question tools for
+        the PR Creator mode.
+    </overview>
+
+    <tool_priorities>
+        <priority level="1">
+            <tool>execute_command</tool>
+            <when>Primary tool for all git and gh CLI operations</when>
+            <why>All PR creation workflows rely on git commands to analyze commits and gh commands
+                to create PRs</why>
+        </priority>
+        <priority level="2">
+            <tool>ask_followup_question</tool>
+            <when>For review and approval of generated PR content</when>
+            <why>User must approve title and description before PR creation</why>
+        </priority>
+        <priority level="3">
+            <tool>read_file</tool>
+            <when>Only if git commands don't provide sufficient context</when>
+            <why>Git diff usually provides all needed context; only use for edge cases</why>
+        </priority>
+    </tool_priorities>
+
+    <execute_command_guidance>
+        <best_practices>
+            <practice priority="high">
+                <name>Always check command output</name>
+                <description>Parse and validate command output before proceeding</description>
+                <example>
+                    After running git branch --show-current, check if output is "main" or "master"
+                </example>
+            </practice>
+
+            <practice priority="high">
+                <name>Handle command failures gracefully</name>
+                <description>Detect when commands fail and provide helpful error messages</description>
+                <approach>
+                    Check exit codes and error output from commands.
+                    Provide clear guidance on how to resolve issues.
+                </approach>
+            </practice>
+
+            <practice priority="medium">
+                <name>Use appropriate working directory</name>
+                <description>Commands must run in the git repository root</description>
+                <note>The cwd parameter is usually not needed since workspace is the repo</note>
+            </practice>
+
+            <practice priority="low">
+                <name>Combine related git commands when possible</name>
+                <description>Use git command options to get formatted output in one call</description>
+                <example>
+                    Use: git log origin/main..HEAD --pretty=format:"%H|%s|%b"
+                    Instead of: Multiple git show commands for each commit
+                </example>
+            </practice>
+        </best_practices>
+
+        <command_sequence>
+            <phase name="validation">
+                <step number="1">
+                    <command>git branch --show-current</command>
+                    <purpose>Verify not on main/master branch</purpose>
+                    <validation>Exit if output is "main" or "master"</validation>
+                </step>
+            </phase>
+
+            <phase name="commit_analysis">
+                <step number="1">
+                    <command>git log origin/main..HEAD --oneline</command>
+                    <purpose>List all unmerged commits</purpose>
+                    <validation>Exit if no output (no commits to PR)</validation>
+                </step>
+
+                <step number="2">
+                    <command>git log origin/main..HEAD --pretty=format:"%H|%s|%b"</command>
+                    <purpose>Get detailed commit information</purpose>
+                    <parsing>Split by pipe to get hash, subject, and body</parsing>
+                </step>
+
+                <step number="3">
+                    <command>git diff origin/main..HEAD</command>
+                    <purpose>See all code changes</purpose>
+                    <note>This is the PRIMARY source for understanding changes</note>
+                </step>
+
+                <step number="4">
+                    <command>git diff origin/main..HEAD --name-status</command>
+                    <purpose>Get list of changed files with change types</purpose>
+                    <output_format>M=modified, A=added, D=deleted</output_format>
+                </step>
+            </phase>
+
+            <phase name="dependency_detection">
+                <step number="1">
+                    <command>git diff origin/main..HEAD --name-only | grep -E
+                        "(package\.json|requirements\.txt|go\.mod|Gemfile)"</command>
+                    <purpose>Check if dependency files changed</purpose>
+                    <conditional>Only if grep finds matches</conditional>
+                </step>
+
+                <step number="2">
+                    <command>git diff origin/main..HEAD -- package.json</command>
+                    <purpose>See specific dependency changes</purpose>
+                    <conditional>Only if package.json was modified</conditional>
+                </step>
+            </phase>
+
+            <phase name="pr_creation">
+                <step number="1">
+                    <command>gh --version</command>
+                    <purpose>Verify gh CLI is installed</purpose>
+                    <error_handling>Provide installation instructions if not found</error_handling>
+                </step>
+
+                <step number="2">
+                    <command>gh auth status</command>
+                    <purpose>Verify authentication</purpose>
+                    <error_handling>Instruct to run gh auth login if not authenticated</error_handling>
+                </step>
+
+                <step number="3">
+                    <command>gh pr create --title "TITLE" --body-file /tmp/pr-description.md --base
+                        main</command>
+                    <purpose>Create the pull request</purpose>
+                    <note>Using --body-file is recommended over --body for complex descriptions</note>
+                    <prerequisite>Write description to /tmp/pr-description.md first</prerequisite>
+                </step>
+            </phase>
+        </command_sequence>
+
+        <error_handling>
+            <error scenario="Command not found">
+                <detection>Error message contains "command not found" or similar</detection>
+                <response>Provide installation instructions for the missing tool (git or gh)</response>
+            </error>
+
+            <error scenario="Not a git repository">
+                <detection>Error message contains "not a git repository"</detection>
+                <response>Inform user they must run this from within a git repository</response>
+            </error>
+
+            <error scenario="Remote branch not found">
+                <detection>Error message contains "unknown revision" or "does not exist"</detection>
+                <response>Try alternative branch name (master instead of main, or vice versa)</response>
+            </error>
+
+            <error scenario="Authentication required">
+                <detection>gh command fails with authentication error</detection>
+                <response>Instruct user to run: gh auth login</response>
+            </error>
+        </error_handling>
+    </execute_command_guidance>
+
+    <ask_followup_question_guidance>
+        <when_to_use>
+            <scenario name="present_pr_content">
+                <timing>After generating title and description, before creating PR</timing>
+                <purpose>Get user approval or modification requests</purpose>
+                <required>true</required>
+            </scenario>
+
+            <scenario name="handle_ambiguity">
+                <timing>When unable to determine PR type or scope automatically</timing>
+                <purpose>Get clarification from user</purpose>
+                <required>false</required>
+            </scenario>
+
+            <scenario name="multiple_conventional_types">
+                <timing>When commits use different conventional types equally</timing>
+                <purpose>Ask user which type best represents the PR</purpose>
+                <required>false</required>
+            </scenario>
+        </when_to_use>
+
+        <approval_workflow>
+            <step number="1">
+                <action>Present generated PR title and description</action>
+                <format>
+                    Display in clear, readable markdown format showing exactly what will be used for
+                    the PR.
+                </format>
+            </step>
+
+            <step number="2">
+                <action>Ask for approval</action>
+                <question_template>
+                    Is this PR title and description acceptable?
+                </question_template>
+                <suggestions>
+                    <suggestion>Yes, create the PR with this content</suggestion>
+                    <suggestion>Modify the title</suggestion>
+                    <suggestion>Modify the description</suggestion>
+                    <suggestion>Cancel PR creation</suggestion>
+                </suggestions>
+            </step>
+
+            <step number="3">
+                <action>Handle response</action>
+                <if_approved>Proceed to PR creation with gh CLI</if_approved>
+                <if_modify>Ask what changes to make, regenerate, and present again</if_modify>
+                <if_cancel>Exit gracefully, acknowledge cancellation</if_cancel>
+            </step>
+        </approval_workflow>
+
+        <example_questions>
+            <example scenario="standard_approval">
+                <question>Review the PR content below. Should I proceed with creating the PR?</question>
+                <suggestions>
+                    <suggestion>Yes, create the PR</suggestion>
+                    <suggestion>Modify the title to be more specific</suggestion>
+                    <suggestion>Add more detail to the description</suggestion>
+                    <suggestion>Cancel, I'll create the PR manually</suggestion>
+                </suggestions>
+            </example>
+
+            <example scenario="type_ambiguity">
+                <question>This PR contains both new features and bug fixes. Which should be the
+                    primary type?</question>
+                <suggestions>
+                    <suggestion>feat: (primary focus is new features)</suggestion>
+                    <suggestion>fix: (primary focus is bug fixes)</suggestion>
+                    <suggestion>refactor: (primary focus is code improvements)</suggestion>
+                </suggestions>
+            </example>
+        </example_questions>
+    </ask_followup_question_guidance>
+
+    <read_file_guidance>
+        <when_to_use>
+            <scenario name="insufficient_diff_context">
+                <description>When git diff doesn't show enough context to understand changes</description>
+                <example>Complex logic changes where diff shows changes but not full context</example>
+                <preference>This should be rare - usually git show or git diff provides enough</preference>
+            </scenario>
+
+            <scenario name="configuration_inspection">
+                <description>When need to see full configuration file structure</description>
+                <example>Understanding how a new dependency fits into existing package.json</example>
+                <alternative>Use git diff to see just the changes rather than full file</alternative>
+            </scenario>
+        </when_to_use>
+
+        <when_not_to_use>
+            <scenario>Understanding what changed - use git diff instead</scenario>
+            <scenario>Viewing commit messages - use git log instead</scenario>
+            <scenario>Seeing file list - use git diff --name-only instead</scenario>
+        </when_not_to_use>
+
+        <best_practices>
+            <practice>Always prefer git commands over read_file for analyzing changes</practice>
+            <practice>Only use read_file as a last resort for additional context</practice>
+            <practice>Document in comment why read_file is needed if you use it</practice>
+        </best_practices>
+    </read_file_guidance>
+
+    <workflow_example>
+        <complete_workflow>
+            <description>Step-by-step tool usage for typical PR creation</description>
+
+            <step number="1">
+                <tool>execute_command</tool>
+                <command>git branch --show-current</command>
+                <purpose>Validate not on main branch</purpose>
+            </step>
+
+            <step number="2">
+                <tool>execute_command</tool>
+                <command>git log origin/main..HEAD --oneline</command>
+                <purpose>Count and list unmerged commits</purpose>
+            </step>
+
+            <step number="3">
+                <tool>execute_command</tool>
+                <command>git log origin/main..HEAD --pretty=format:"%H|%s|%b"</command>
+                <purpose>Get detailed commit info</purpose>
+            </step>
+
+            <step number="4">
+                <tool>execute_command</tool>
+                <command>git diff origin/main..HEAD --name-status</command>
+                <purpose>List changed files</purpose>
+            </step>
+
+            <step number="5">
+                <tool>execute_command</tool>
+                <command>git diff origin/main..HEAD</command>
+                <purpose>Analyze all code changes</purpose>
+            </step>
+
+            <step number="6">
+                <action>Analyze output and generate PR title and description</action>
+                <note>This is processing, not a tool call</note>
+            </step>
+
+            <step number="7">
+                <tool>ask_followup_question</tool>
+                <purpose>Present PR content for user approval</purpose>
+                <display>Show formatted PR title and description</display>
+            </step>
+
+            <step number="8">
+                <conditional>If user approves</conditional>
+                <tool>execute_command</tool>
+                <command>gh --version</command>
+                <purpose>Verify gh CLI available</purpose>
+            </step>
+
+            <step number="9">
+                <tool>execute_command</tool>
+                <command>gh auth status</command>
+                <purpose>Verify authenticated</purpose>
+            </step>
+
+            <step number="10">
+                <tool>execute_command</tool>
+                <command>echo "DESCRIPTION" > /tmp/pr-description.md</command>
+                <purpose>Write description to temp file</purpose>
+            </step>
+
+            <step number="11">
+                <tool>execute_command</tool>
+                <command>gh pr create --title "TITLE" --body-file /tmp/pr-description.md --base main</command>
+                <purpose>Create the PR</purpose>
+            </step>
+
+            <step number="12">
+                <tool>execute_command</tool>
+                <command>rm /tmp/pr-description.md</command>
+                <purpose>Clean up temp file</purpose>
+            </step>
+
+            <step number="13">
+                <action>Present PR URL to user and confirm success</action>
+            </step>
+        </complete_workflow>
+    </workflow_example>
+</tool_usage_guide>

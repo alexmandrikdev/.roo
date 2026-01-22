@@ -1,0 +1,437 @@
+<examples>
+    <overview>
+        Complete end-to-end examples demonstrating the PR Creator mode workflow for various
+        scenarios.
+    </overview>
+
+    <example name="feature_pr">
+        <scenario>Creating a PR for a new authentication feature</scenario>
+        <context>
+            - Current branch: feature/user-authentication
+            - 3 commits on branch
+            - Changes include new auth service, login component, and tests
+            - Added dependencies: jsonwebtoken and bcrypt
+        </context>
+
+        <workflow>
+            <step number="1">
+                <description>Validate branch</description>
+                <command>git branch --show-current</command>
+                <output>feature/user-authentication</output>
+                <action>Branch is not main/master, proceed</action>
+            </step>
+
+            <step number="2">
+                <description>List unmerged commits</description>
+                <command>git log origin/main..HEAD --oneline</command>
+                <output>
+                    c3d4e5f Add login tests
+                    b2c3d4e Implement login component
+                    a1b2c3d Add JWT authentication service
+                </output>
+                <action>Found 3 commits, proceed with analysis</action>
+            </step>
+
+            <step number="3">
+                <description>Get detailed commit info</description>
+                <command>git log origin/main..HEAD --pretty=format:"%H|%s|%b"</command>
+                <output>
+                    c3d4e5f12...|Add login tests|Added comprehensive test coverage for login flow
+                    b2c3d4e45...|Implement login component|Created React component for user login
+                    with form validation
+                    a1b2c3d89...|Add JWT authentication service|Implemented JWT-based authentication
+                    with bcrypt password hashing
+                </output>
+            </step>
+
+            <step number="4">
+                <description>Analyze code changes</description>
+                <command>git diff origin/main..HEAD --name-status</command>
+                <output>
+                    A src/services/AuthService.ts
+                    A src/components/Login.tsx
+                    A src/components/Login.test.tsx
+                    M package.json
+                    M package-lock.json
+                </output>
+            </step>
+
+            <step number="5">
+                <description>Check dependency changes</description>
+                <command>git diff origin/main..HEAD -- package.json</command>
+                <output>
+                    + "jsonwebtoken": "^9.0.0",
+                    + "bcrypt": "^5.1.0"
+                </output>
+            </step>
+
+            <step number="6">
+                <description>Analyze full diff</description>
+                <command>git diff origin/main..HEAD</command>
+                <output>[Shows implementation of AuthService.ts, Login.tsx, tests, and package.json
+                    changes]</output>
+            </step>
+
+            <step number="7">
+                <description>Generate PR content</description>
+                <generated_title>feat: add JWT-based user authentication</generated_title>
+                <generated_description>
+                    ### Summary
+                    This PR adds user authentication to the platform, allowing users to securely
+                    create accounts and log in. This change is necessary to protect user data and
+                    ensure only authorized access to the application. Users will now be able to
+                    register, log in, and maintain secure sessions.
+
+                    ### Technical Changes
+                    - **Modified Components:**
+                    - Created `src/services/AuthService.ts` - JWT token generation and validation
+                    service
+                    - Created `src/components/Login.tsx` - Login form component with validation
+                    - Created `src/components/Login.test.tsx` - Comprehensive test suite for login
+                    flow
+                    - Modified `package.json` and `package-lock.json` - Added authentication
+                    dependencies
+
+                    - **Logic Alterations:**
+                    - Implemented `AuthService.generateToken()` for JWT token creation
+                    - Implemented `AuthService.validateToken()` for token verification
+                    - Implemented `AuthService.hashPassword()` using bcrypt with 10 salt rounds
+                    - Created login form with email/password validation
+                    - Added form state management and error handling in Login component
+
+                    - **Dependencies:**
+                    - Added `jsonwebtoken@9.0.0` for JWT token handling
+                    - Added `bcrypt@5.1.0` for secure password hashing
+
+                    - **Testing:**
+                    - Added unit tests for AuthService token generation and validation
+                    - Added component tests for Login form rendering and submission
+                    - Achieved 95% code coverage on authentication modules
+
+                    ### Commit Messages Reference
+                    - Add JWT authentication service
+                    - Implement login component
+                    - Add login tests
+                </generated_description>
+            </step>
+
+            <step number="8">
+                <description>Present for review</description>
+                <tool>ask_followup_question</tool>
+                <question>Review the PR content below. Should I proceed with creating the PR?</question>
+                <display_title>feat: add JWT-based user authentication</display_title>
+                <display_description>[Full description from step 7]</display_description>
+                <user_response>Yes, create the PR</user_response>
+            </step>
+
+            <step number="9">
+                <description>Verify gh CLI</description>
+                <command>gh --version</command>
+                <output>gh version 2.40.0 (2024-01-15)</output>
+                <action>gh is installed, proceed</action>
+            </step>
+
+            <step number="10">
+                <description>Check authentication</description>
+                <command>gh auth status</command>
+                <output>✓ Logged in to github.com as developer123</output>
+                <action>Authenticated, proceed</action>
+            </step>
+
+            <step number="11">
+                <description>Write description to file</description>
+                <command>echo "[DESCRIPTION]" > /tmp/pr-description.md</command>
+                <note>Using temp file to avoid shell escaping issues</note>
+            </step>
+
+            <step number="12">
+                <description>Create PR</description>
+                <command>gh pr create --title "feat: add JWT-based user authentication" --body-file
+                    /tmp/pr-description.md --base main</command>
+                <output>
+                    Creating pull request for feature/user-authentication into main in owner/repo
+                    https://github.com/owner/repo/pull/123
+                </output>
+            </step>
+
+            <step number="13">
+                <description>Clean up</description>
+                <command>rm /tmp/pr-description.md</command>
+            </step>
+
+            <step number="14">
+                <description>Confirm to user</description>
+                <message>
+                    Pull request created successfully!
+                    URL: https://github.com/owner/repo/pull/123
+                </message>
+            </step>
+        </workflow>
+    </example>
+
+    <example name="bugfix_pr">
+        <scenario>Creating a PR for a bug fix</scenario>
+        <context>
+            - Current branch: fix/payment-race-condition
+            - 2 commits on branch
+            - Fixes race condition in payment processing
+            - No new dependencies
+        </context>
+
+        <workflow>
+            <step number="1">
+                <command>git branch --show-current</command>
+                <output>fix/payment-race-condition</output>
+            </step>
+
+            <step number="2">
+                <command>git log origin/main..HEAD --oneline</command>
+                <output>
+                    b5c6d7e Add test for concurrent payment processing
+                    a4b5c6d Fix race condition in payment processor
+                </output>
+            </step>
+
+            <step number="3">
+                <command>git diff origin/main..HEAD --name-status</command>
+                <output>
+                    M src/services/PaymentProcessor.ts
+                    A src/services/PaymentProcessor.test.ts
+                </output>
+            </step>
+
+            <step number="4">
+                <command>git diff origin/main..HEAD</command>
+                <output>[Shows addition of mutex lock in payment processing logic]</output>
+            </step>
+
+            <generated_content>
+                <title>fix: resolve race condition in payment processing</title>
+                <description>
+                    ### Summary
+                    This PR fixes a critical bug where concurrent payment requests could result in
+                    duplicate charges. The issue occurred when multiple payment requests for the
+                    same order were processed simultaneously. This fix ensures payment processing is
+                    properly serialized to prevent duplicate charges.
+
+                    ### Technical Changes
+                    - **Modified Components:**
+                    - Modified `src/services/PaymentProcessor.ts` - Added mutex locking mechanism
+                    - Created `src/services/PaymentProcessor.test.ts` - Tests for concurrent payment
+                    scenarios
+
+                    - **Logic Alterations:**
+                    - Implemented mutex lock in `PaymentProcessor.processPayment()` to serialize
+                    payment operations
+                    - Added payment processing state tracking to prevent duplicate processing
+                    - Enhanced error handling for concurrent payment attempts
+
+                    - **Bug Fixes:**
+                    - **Root Cause:** Payment processing lacked synchronization, allowing multiple
+                    threads to process the same payment simultaneously
+                    - **Solution:** Implemented mutex-based locking to ensure only one payment
+                    operation per order can execute at a time
+                    - **Impact:** Eliminates duplicate charge risk and ensures payment idempotency
+
+                    - **Testing:**
+                    - Added test suite for concurrent payment scenarios
+                    - Verified mutex correctly prevents race conditions
+                    - Tested payment retry logic with proper locking
+
+                    ### Commit Messages Reference
+                    - Fix race condition in payment processor
+                    - Add test for concurrent payment processing
+                </description>
+            </generated_content>
+        </workflow>
+    </example>
+
+    <example name="refactor_pr">
+        <scenario>Creating a PR for a refactoring change</scenario>
+        <context>
+            - Current branch: refactor/migrate-to-hooks
+            - 5 commits on branch
+            - Converts class components to functional components with hooks
+            - No new dependencies
+        </context>
+
+        <generated_content>
+            <title>refactor: migrate class components to React hooks</title>
+            <description>
+                ### Summary
+                This PR modernizes the codebase by converting class-based React components to
+                functional components using hooks. This change improves code maintainability,
+                reduces boilerplate, and aligns with current React best practices. The user
+                experience remains unchanged.
+
+                ### Technical Changes
+                - **Modified Components:**
+                - Refactored `src/components/UserProfile.tsx` - Converted to functional component
+                - Refactored `src/components/Dashboard.tsx` - Converted to functional component
+                - Refactored `src/components/Settings.tsx` - Converted to functional component
+                - Updated corresponding test files for all refactored components
+
+                - **Logic Alterations:**
+                - Replaced `componentDidMount` lifecycle with `useEffect` hook
+                - Replaced `componentDidUpdate` lifecycle with `useEffect` dependencies
+                - Converted class state to `useState` hooks
+                - Replaced `this.props` references with direct props destructuring
+                - Updated event handlers from class methods to arrow functions
+
+                - **Architectural Shifts:**
+                - Moved from class-based to functional component architecture
+                - Simplified component logic by removing lifecycle boilerplate
+                - Improved code reusability with custom hooks
+
+                - **Performance Impacts:**
+                - Slightly improved render performance due to reduced overhead
+                - Better optimization opportunities with React.memo
+
+                - **Testing:**
+                - Updated all component tests to work with functional components
+                - Maintained 100% test coverage
+                - All existing tests pass without behavioral changes
+
+                ### Commit Messages Reference
+                - Refactor UserProfile to use hooks
+                - Refactor Dashboard to use hooks
+                - Refactor Settings to use hooks
+                - Update tests for functional components
+                - Remove unused lifecycle methods
+            </description>
+        </generated_content>
+    </example>
+
+    <example name="docs_pr">
+        <scenario>Creating a PR for documentation updates</scenario>
+        <context>
+            - Current branch: docs/api-documentation
+            - 2 commits on branch
+            - Updates API documentation and adds examples
+        </context>
+
+        <generated_content>
+            <title>docs: update API documentation with usage examples</title>
+            <description>
+                ### Summary
+                This PR improves the API documentation by adding comprehensive usage examples and
+                clarifying endpoint descriptions. This change helps developers integrate with our
+                API more easily by providing clear, copy-paste ready examples for common use cases.
+                ### Technical Changes
+                - **Modified Components:**
+                - Updated `docs/api/authentication.md` - Added JWT authentication examples
+                - Updated `docs/api/users.md` - Added CRUD operation examples
+                - Created `docs/api/examples/` - Directory with code samples in multiple languages
+
+                - **Logic Alterations:**
+                - Added curl examples for each endpoint
+                - Added JavaScript/Node.js SDK examples
+                - Added Python SDK examples
+                - Clarified request/response formats with JSON schemas
+
+                - **Documentation:**
+                - Improved endpoint descriptions with use case context
+                - Added error response examples
+                - Included rate limiting information
+                - Added authentication flow diagrams
+
+                ### Commit Messages Reference
+                - Add authentication examples to API docs
+                - Update user endpoint documentation with examples
+            </description>
+        </generated_content>
+    </example>
+
+    <example name="mixed_type_pr">
+        <scenario>PR with multiple conventional types - prioritizing fix over feat</scenario>
+        <context>
+            - Current branch: feature/user-settings
+            - Commits include both new feature and bug fix
+            - Bug fix is critical security issue
+        </context>
+
+        <commit_analysis>
+            <commits>
+                <commit>feat: add user preferences page</commit>
+                <commit>fix: resolve XSS vulnerability in settings form</commit>
+                <commit>feat: add theme selection</commit>
+            </commits>
+            <type_counts>
+                <feat_count>2</feat_count>
+                <fix_count>1</fix_count>
+            </type_counts>
+            <decision>
+                Use "fix:" because security fix is most significant change
+                Priority: fix > feat > refactor > other
+            </decision>
+        </commit_analysis>
+
+        <generated_content>
+            <title>fix: resolve XSS vulnerability in user settings</title>
+            <description>
+                ### Summary
+                This PR addresses a critical security vulnerability in the user settings form while
+                also introducing new user preference features. The security fix prevents potential
+                XSS attacks by properly sanitizing user input. Additionally, users can now customize
+                their preferences and select themes.
+
+                ### Technical Changes
+                - **Modified Components:**
+                - Created `src/pages/UserSettings.tsx` - New user settings page
+                - Modified `src/components/SettingsForm.tsx` - Added input sanitization
+                - Created `src/components/ThemeSelector.tsx` - Theme selection component
+
+                - **Logic Alterations:**
+                - Implemented DOMPurify sanitization for all user input fields
+                - Added theme selection logic with localStorage persistence
+                - Created user preferences API endpoints
+
+                - **Bug Fixes:**
+                - **Root Cause:** User input in settings form was not properly sanitized, allowing
+                XSS injection
+                - **Solution:** Implemented DOMPurify to sanitize all user-provided content before
+                rendering
+                - **Impact:** Eliminates XSS vulnerability and protects users from malicious scripts
+                - **Breaking Changes:**
+                - Settings form now requires sanitized input; any direct DOM manipulation will be
+                blocked
+
+                ### Commit Messages Reference
+                - feat: add user preferences page
+                - fix: resolve XSS vulnerability in settings form
+                - feat: add theme selection
+            </description>
+        </generated_content>
+    </example>
+
+    <key_learnings>
+        <learning name="prioritize_significance">
+            When commits contain multiple types, choose the type representing the most significant
+            change.
+            For mixed PRs, prioritize: fix > feat > perf > refactor > other
+        </learning>
+
+        <learning name="technical_vs_non_technical">
+            Summary section explains business value in plain language.
+            Technical Changes section provides implementation details for reviewers.
+            Both sections are essential for different audiences.
+        </learning>
+
+        <learning name="always_use_git_diff">
+            Commit messages alone are insufficient - always analyze actual code changes with git
+            diff.
+            The diff reveals the true nature and scope of changes.
+        </learning>
+
+        <learning name="body_file_for_complex">
+            Use --body-file instead of --body for complex PR descriptions to avoid shell escaping
+            issues.
+            This is more reliable and easier to manage.
+        </learning>
+
+        <learning name="user_approval_required">
+            Always present generated content for user review before creating PR.
+            Users may want to adjust title, add context, or modify descriptions.
+        </learning>
+    </key_learnings>
+</examples>

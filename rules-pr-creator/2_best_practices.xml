@@ -1,0 +1,293 @@
+<best_practices>
+    <general_principles>
+        <principle priority="high">
+            <name>Conventional Commits Standard</name>
+            <description>Follow the conventional commits specification for PR titles</description>
+            <rationale>Provides consistency, enables automated changelog generation, and makes PR
+                purpose immediately clear</rationale>
+            <types>
+                <type>feat: A new feature for the user</type>
+                <type>fix: A bug fix</type>
+                <type>docs: Documentation only changes</type>
+                <type>style: Changes that don't affect code meaning (formatting, white-space)</type>
+                <type>refactor: Code change that neither fixes a bug nor adds a feature</type>
+                <type>perf: Code change that improves performance</type>
+                <type>test: Adding or correcting tests</type>
+                <type>chore: Changes to build process or auxiliary tools</type>
+                <type>ci: Changes to CI configuration files and scripts</type>
+                <type>build: Changes that affect the build system or dependencies</type>
+            </types>
+            <example>
+                <scenario>Adding user authentication</scenario>
+                <good>feat: add JWT authentication for user login</good>
+                <bad>Add authentication</bad>
+            </example>
+        </principle>
+
+        <principle priority="high">
+            <name>Title Length Constraint</name>
+            <description>Keep PR titles under 70 characters</description>
+            <rationale>GitHub truncates long titles in many UI views; concise titles are easier to
+                scan</rationale>
+            <example>
+                <good>fix: resolve race condition in payment processing</good>
+                <bad>fix: resolve the race condition that was occurring in the payment processing
+                    module when multiple requests were made simultaneously</bad>
+            </example>
+        </principle>
+
+        <principle priority="high">
+            <name>Imperative Mood</name>
+            <description>Use imperative mood in titles (command form)</description>
+            <rationale>Matches git's own built-in conventions and reads as "This commit will
+                [title]"</rationale>
+            <example>
+                <good>feat: add user authentication</good>
+                <bad>feat: adds user authentication</bad>
+                <bad>feat: added user authentication</bad>
+            </example>
+        </principle>
+
+        <principle priority="medium">
+            <name>Summary for Non-Technical Stakeholders</name>
+            <description>Write the Summary section in plain language</description>
+            <rationale>Product managers and stakeholders need to understand changes without
+                technical knowledge</rationale>
+            <guidelines>
+                <guideline>Avoid technical jargon and implementation details</guideline>
+                <guideline>Focus on user impact and business value</guideline>
+                <guideline>Explain the "why" not just the "what"</guideline>
+                <guideline>Keep it to 2-4 sentences</guideline>
+            </guidelines>
+            <example>
+                <good>
+                    This PR adds user authentication to the platform. This change is necessary to
+                    secure user accounts and protect sensitive data. Users will now be able to
+                    create accounts and log in securely.
+                </good>
+                <bad>
+                    This PR implements JWT-based authentication using bcrypt for password hashing
+                    and express-session for session management. The AuthController class handles
+                    login/logout routes.
+                </bad>
+            </example>
+        </principle>
+
+        <principle priority="high">
+            <name>Technical Details for Reviewers</name>
+            <description>Provide comprehensive technical information in the Technical Changes
+                section</description>
+            <rationale>Reviewers need detailed context to conduct effective code reviews</rationale>
+            <guidelines>
+                <guideline>List all modified files and components</guideline>
+                <guideline>Explain logic changes with specificity</guideline>
+                <guideline>Note any new dependencies or version updates</guideline>
+                <guideline>Highlight architectural or API changes</guideline>
+                <guideline>Explain bug fixes with root cause analysis</guideline>
+                <guideline>Mention performance implications</guideline>
+                <guideline>Include testing information</guideline>
+            </guidelines>
+        </principle>
+
+        <principle priority="medium">
+            <name>Commit Traceability</name>
+            <description>Include original commit messages for reference</description>
+            <rationale>Provides traceability and additional context for reviewers</rationale>
+            <format>
+                List commit messages in chronological order without modification
+            </format>
+        </principle>
+    </general_principles>
+
+    <pr_title_conventions>
+        <convention category="scope">
+            <rule>Optionally include scope in parentheses after type</rule>
+            <examples>
+                <example>feat(auth): add JWT authentication</example>
+                <example>fix(api): resolve race condition in payment endpoint</example>
+                <example>docs(readme): update installation instructions</example>
+            </examples>
+            <when_to_use>When the change is clearly scoped to a specific module or area</when_to_use>
+        </convention>
+
+        <convention category="breaking_changes">
+            <rule>Indicate breaking changes with ! after type/scope</rule>
+            <examples>
+                <example>feat!: change API response format to JSON:API spec</example>
+                <example>refactor(api)!: remove deprecated /v1/users endpoint</example>
+            </examples>
+            <when_to_use>When the change includes breaking changes that affect consumers</when_to_use>
+        </convention>
+
+        <convention category="multi_type">
+            <rule>When multiple types apply, choose the most significant</rule>
+            <priority_order>
+                <item>fix - Bug fixes take priority as they solve immediate problems</item>
+                <item>feat - New features are next most important</item>
+                <item>perf - Performance improvements</item>
+                <item>refactor - Code improvements</item>
+                <item>Other types follow</item>
+            </priority_order>
+            <example>
+                <scenario>Adding a feature that also refactors existing code</scenario>
+                <choice>feat: add user authentication (not refactor:)</choice>
+            </example>
+        </convention>
+    </pr_title_conventions>
+
+    <description_structure_guidelines>
+        <section name="summary">
+            <checklist>
+                <item>Written for non-technical audience</item>
+                <item>2-4 sentences in length</item>
+                <item>Explains what and why</item>
+                <item>Focuses on user/business impact</item>
+                <item>Avoids technical jargon</item>
+            </checklist>
+        </section>
+
+        <section name="technical_changes">
+            <required_subsections>
+                <subsection>Modified Components - Always include</subsection>
+                <subsection>Logic Alterations - Always include</subsection>
+                <subsection>Dependencies - Include if dependencies changed</subsection>
+                <subsection>Architectural Shifts - Include if architecture changed</subsection>
+                <subsection>Bug Fixes - Include for bug fixes</subsection>
+                <subsection>Performance Impacts - Include if performance affected</subsection>
+                <subsection>Testing - Include if tests added/modified</subsection>
+                <subsection>Breaking Changes - Include if breaking changes present</subsection>
+            </required_subsections>
+            <checklist>
+                <item>Use bullet points for readability</item>
+                <item>Include specific file paths</item>
+                <item>Mention function/class names</item>
+                <item>Explain what changed and why</item>
+                <item>Note configuration changes</item>
+                <item>Be specific and detailed</item>
+            </checklist>
+        </section>
+
+        <section name="commit_messages_reference">
+            <format>Simple bullet list of original commit messages</format>
+            <checklist>
+                <item>One commit per line</item>
+                <item>In chronological order (oldest first)</item>
+                <item>Use original messages without modification</item>
+                <item>Include all commits in the PR</item>
+            </checklist>
+        </section>
+    </description_structure_guidelines>
+
+    <common_pitfalls>
+        <pitfall>
+            <description>Generating vague or generic titles</description>
+            <why_problematic>Makes it hard to understand PR purpose at a glance</why_problematic>
+            <correct_approach>Be specific about what changed</correct_approach>
+            <example>
+                <bad>fix: update code</bad>
+                <good>fix: resolve null pointer exception in user profile page</good>
+            </example>
+        </pitfall>
+
+        <pitfall>
+            <description>Making titles too long</description>
+            <why_problematic>Gets truncated in GitHub UI; hard to scan</why_problematic>
+            <correct_approach>Keep under 70 characters; be concise</correct_approach>
+            <example>
+                <bad>feat: add a comprehensive user authentication system with JWT tokens, password
+                    hashing, and session management</bad>
+                <good>feat: add JWT-based user authentication</good>
+            </example>
+        </pitfall>
+
+        <pitfall>
+            <description>Using past tense in titles</description>
+            <why_problematic>Doesn't follow conventional commits standard</why_problematic>
+            <correct_approach>Use imperative mood (command form)</correct_approach>
+            <example>
+                <bad>feat: added user authentication</bad>
+                <good>feat: add user authentication</good>
+            </example>
+        </pitfall>
+
+        <pitfall>
+            <description>Writing technical summary</description>
+            <why_problematic>Non-technical stakeholders can't understand changes</why_problematic>
+            <correct_approach>Use plain language focused on business value</correct_approach>
+            <example>
+                <bad>This PR implements a JWT-based authentication service using bcrypt.</bad>
+                <good>This PR enables users to securely create accounts and log in to protect their
+                    data.</good>
+            </example>
+        </pitfall>
+
+        <pitfall>
+            <description>Providing insufficient technical details</description>
+            <why_problematic>Reviewers lack context for effective review</why_problematic>
+            <correct_approach>Include specific files, functions, and logic changes</correct_approach>
+            <example>
+                <bad>Updated authentication code</bad>
+                <good>
+                    - **Modified Components:** `src/auth/AuthService.ts`,
+                    `src/controllers/AuthController.ts`
+                    - **Logic Alterations:** Added JWT token generation in
+                    `AuthService.generateToken()`, implemented password hashing using bcrypt with
+                    salt rounds of 10
+                    - **Dependencies:** Added `jsonwebtoken@9.0.0` and `bcrypt@5.1.0`
+                </good>
+            </example>
+        </pitfall>
+
+        <pitfall>
+            <description>Not analyzing code changes, only commit messages</description>
+            <why_problematic>Commit messages may not capture all changes or may be outdated</why_problematic>
+            <correct_approach>Always analyze actual code diffs using git diff</correct_approach>
+        </pitfall>
+
+        <pitfall>
+            <description>Skipping the review phase</description>
+            <why_problematic>User may want to adjust generated content</why_problematic>
+            <correct_approach>Always present generated content and ask for approval</correct_approach>
+        </pitfall>
+    </common_pitfalls>
+
+    <quality_checklist>
+        <category name="before_starting">
+            <item>Verify current branch is not main/master</item>
+            <item>Confirm there are unmerged commits</item>
+            <item>Ensure git and gh CLI are available</item>
+        </category>
+
+        <category name="during_analysis">
+            <item>Use git diff to see actual code changes</item>
+            <item>Parse all commit messages for context</item>
+            <item>Identify the main purpose of the changes</item>
+            <item>Note any breaking changes or version updates</item>
+            <item>Check for dependency changes</item>
+        </category>
+
+        <category name="during_generation">
+            <item>Title follows conventional commits format</item>
+            <item>Title is under 70 characters</item>
+            <item>Title uses imperative mood</item>
+            <item>Summary is written for non-technical audience</item>
+            <item>Summary is 2-4 sentences</item>
+            <item>Technical Changes includes all relevant subsections</item>
+            <item>Technical Changes lists specific files and functions</item>
+            <item>Commit Messages Reference includes all commits</item>
+        </category>
+
+        <category name="before_creation">
+            <item>User has reviewed and approved content</item>
+            <item>gh CLI is authenticated</item>
+            <item>Base branch is correct (usually main)</item>
+            <item>Special characters in description are escaped</item>
+        </category>
+
+        <category name="after_creation">
+            <item>PR URL is displayed to user</item>
+            <item>Success is confirmed</item>
+            <item>User can access the PR</item>
+        </category>
+    </quality_checklist>
+</best_practices>
