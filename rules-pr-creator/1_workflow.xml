@@ -1,0 +1,341 @@
+<workflow_instructions>
+    <mode_overview>
+        This mode analyzes git commits on the current branch and creates professional GitHub Pull
+        Requests with auto-generated titles and descriptions. It ensures you're not on the main
+        branch, identifies unmerged commits, analyzes code changes, generates comprehensive PR
+        content, and creates the PR using GitHub CLI.
+    </mode_overview>
+
+    <initialization_steps>
+        <step number="1">
+            <action>Validate branch status</action>
+            <details>
+                Check if the current branch is main or master. If it is, exit immediately with a
+                clear message.
+                Use: git branch --show-current or git rev-parse --abbrev-ref HEAD
+            </details>
+            <exit_condition>If current branch is "main" or "master"</exit_condition>
+            <exit_message>Cannot create a PR from the main/master branch. Please switch to a feature
+                branch first.</exit_message>
+        </step>
+
+        <step number="2">
+            <action>Identify unmerged commits</action>
+            <details>
+                Find all commits on the current branch that are not yet merged to origin/main.
+                Use: git log origin/main..HEAD --oneline
+
+                This shows commits that exist on HEAD (current branch) but not on origin/main.
+                Parse the output to get commit hashes and messages.
+            </details>
+            <tools>
+                <tool>execute_command - Run git log to get commit list</tool>
+            </tools>
+            <validation>
+                If no commits found, inform user there are no changes to create a PR for.
+            </validation>
+        </step>
+
+        <step number="3">
+            <action>Gather detailed commit information</action>
+            <details>
+                For each commit identified, gather:
+                - Full commit message (title and body)
+                - Changed files
+                - Actual code changes (diffs)
+
+                Use: git show [commit-hash] to get detailed information
+                Use: git log origin/main..HEAD --pretty=format:"%H|%s|%b" to get structured commit
+                data
+            </details>
+        </step>
+    </initialization_steps>
+
+    <main_workflow>
+        <phase name="analysis">
+            <description>Analyze commits and code changes to understand the purpose and scope</description>
+            <steps>
+                <step number="1">
+                    <action>Parse commit messages</action>
+                    <details>
+                        Analyze commit messages to identify:
+                        - Conventional commit types (feat, fix, refactor, docs, chore, etc.)
+                        - Common themes or purposes
+                        - Breaking changes (BREAKING CHANGE in commit body)
+                        - Related issues or tickets (e.g., "fixes #123")
+                    </details>
+                </step>
+
+                <step number="2">
+                    <action>Analyze code changes</action>
+                    <details>
+                        Use git diff origin/main..HEAD to see all changes.
+                        Identify:
+                        - Modified components (files, classes, functions)
+                        - Logic alterations (what was added, removed, or changed)
+                        - New dependencies (package.json, requirements.txt, go.mod, etc.)
+                        - Architectural changes (new modules, restructuring)
+                        - Bug fixes (look for fixed logic, error handling)
+                        - Performance impacts (algorithm changes, database queries)
+                    </details>
+                    <preference>
+                        Primary: Use git CLI tools (git diff, git show) to analyze changes
+                        Secondary: Only use read_file if git output doesn't provide enough context
+                    </preference>
+                </step>
+
+                <step number="3">
+                    <action>Identify the main purpose</action>
+                    <details>
+                        Based on commits and changes, determine:
+                        - What is the primary goal of this PR?
+                        - Is it a feature, fix, refactor, or documentation update?
+                        - What problem does it solve?
+                        - Who will benefit from this change?
+                    </details>
+                </step>
+            </steps>
+        </phase>
+
+        <phase name="generation">
+            <description>Generate PR title and description</description>
+            <steps>
+                <step number="1">
+                    <action>Generate PR title</action>
+                    <guidelines>
+                        - Maximum 70 characters
+                        - Use conventional commit prefix (feat:, fix:, refactor:, docs:, etc.)
+                        - Be concise but descriptive
+                        - Summarize the main change
+                        - Use imperative mood (e.g., "add" not "adds" or "added")
+                    </guidelines>
+                    <examples>
+                        <good>feat: add user authentication with JWT tokens</good>
+                        <good>fix: resolve race condition in payment processing</good>
+                        <good>refactor: migrate database queries to TypeORM</good>
+                        <bad>Updated some stuff</bad>
+                        <bad>feat: This PR adds a new feature for user authentication and also fixes
+                            some bugs</bad>
+                    </examples>
+                </step>
+
+                <step number="2">
+                    <action>Generate Summary section</action>
+                    <purpose>For product managers and non-technical stakeholders</purpose>
+                    <guidelines>
+                        - 2-4 sentences
+                        - Explain WHAT is being changed
+                        - Explain WHY it's necessary
+                        - Focus on business value or user impact
+                        - Avoid technical jargon
+                        - Use plain language
+                    </guidelines>
+                    <template>
+                        This PR [does what]. This change is necessary because [reason]. [Optional:
+                        impact or benefit].
+                    </template>
+                </step>
+
+                <step number="3">
+                    <action>Generate Technical Changes section</action>
+                    <purpose>For technical reviewers and developers</purpose>
+                    <structure>
+                        Provide detailed bullet points covering:
+                        - **Modified Components:** List specific files, classes, functions, or
+                        modules changed
+                        - **Logic Alterations:** Detail what logic was added, removed, or updated
+                        - **Dependencies:** Note any new dependencies added or versions updated
+                        - **Architectural Shifts:** Describe changes to architecture, API contracts,
+                        or data models
+                        - **Bug Fixes:** If applicable, explain root cause and solution
+                        - **Performance Impacts:** Mention any performance improvements or
+                        considerations
+                        - **Testing:** Note any new tests added or test coverage changes
+                        - **Breaking Changes:** Highlight any breaking changes
+                    </structure>
+                    <guidelines>
+                        - Be specific and technical
+                        - Use bullet points for clarity
+                        - Include file paths when referencing code
+                        - Mention important function or class names
+                        - Note any configuration changes
+                    </guidelines>
+                </step>
+
+                <step number="4">
+                    <action>Generate Commit Messages Reference section</action>
+                    <purpose>For traceability and context</purpose>
+                    <format>
+                        List each commit message (one per line) in chronological order.
+                        Use the original commit messages without modification.
+                    </format>
+                    <template>
+                        - [commit message 1]
+                        - [commit message 2]
+                        - [commit message 3]
+                    </template>
+                </step>
+
+                <step number="5">
+                    <action>Assemble complete PR description</action>
+                    <structure>
+                        ### Summary
+                        [2-4 sentence high-level overview]
+
+                        ### Technical Changes
+                        - **Modified Components:** [list]
+                        - **Logic Alterations:** [details]
+                        - **Dependencies:** [if applicable]
+                        - **Architectural Shifts:** [if applicable]
+                        - **Bug Fixes:** [if applicable]
+                        - **Performance Impacts:** [if applicable]
+
+                        ### Commit Messages Reference
+                        - [commit 1]
+                        - [commit 2]
+                    </structure>
+                </step>
+            </steps>
+        </phase>
+
+        <phase name="review">
+            <description>Present to user for review and approval</description>
+            <steps>
+                <step number="1">
+                    <action>Present generated content</action>
+                    <details>
+                        Display the generated PR title and description in a clear, readable format.
+                        Use proper markdown formatting.
+                        Make it easy for the user to see exactly what will be used.
+                    </details>
+                </step>
+
+                <step number="2">
+                    <action>Ask for approval or changes</action>
+                    <details>
+                        Use ask_followup_question to get user feedback.
+                        Provide options to:
+                        1. Approve and create the PR
+                        2. Request modifications to title
+                        3. Request modifications to description
+                        4. Cancel the PR creation
+                    </details>
+                </step>
+
+                <step number="3">
+                    <action>Handle user feedback</action>
+                    <details>
+                        If user requests changes:
+                        - Apply the requested modifications
+                        - Present the updated version
+                        - Ask for approval again
+
+                        If user approves:
+                        - Proceed to PR creation phase
+
+                        If user cancels:
+                        - Acknowledge and exit gracefully
+                    </details>
+                </step>
+            </steps>
+        </phase>
+
+        <phase name="creation">
+            <description>Create the PR using GitHub CLI</description>
+            <steps>
+                <step number="1">
+                    <action>Verify gh CLI is installed</action>
+                    <command>gh --version</command>
+                    <fallback>
+                        If gh is not installed, provide instructions for installation:
+                        - macOS: brew install gh
+                        - Linux: See https://github.com/cli/cli/blob/trunk/docs/install_linux.md
+                        - Windows: winget install GitHub.cli
+                    </fallback>
+                </step>
+
+                <step number="2">
+                    <action>Verify gh authentication</action>
+                    <command>gh auth status</command>
+                    <fallback>
+                        If not authenticated, instruct user to run: gh auth login
+                    </fallback>
+                </step>
+
+                <step number="3">
+                    <action>Create the pull request</action>
+                    <command>
+                        gh pr create --title "[TITLE]" --body "[DESCRIPTION]" --base main
+                    </command>
+                    <details>
+                        - Use the approved title and description
+                        - Escape special characters in title and description for shell
+                        - Target base branch should be "main" (or detect default branch)
+                        - The command will push the current branch if not already pushed
+                    </details>
+                    <alternative_approach>
+                        If description is very long, write it to a temporary file and use:
+                        gh pr create --title "[TITLE]" --body-file /tmp/pr-description.md --base
+                        main
+                    </alternative_approach>
+                </step>
+
+                <step number="4">
+                    <action>Confirm success</action>
+                    <details>
+                        Parse the gh CLI output to get the PR URL.
+                        Present the URL to the user.
+                        Confirm the PR was created successfully.
+                    </details>
+                </step>
+            </steps>
+        </phase>
+    </main_workflow>
+
+    <error_handling>
+        <error scenario="Not on a git repository">
+            <message>This directory is not a git repository. Please run this command from within a
+                git repository.</message>
+            <exit>true</exit>
+        </error>
+
+        <error scenario="On main/master branch">
+            <message>Cannot create a PR from the main/master branch. Please switch to a feature
+                branch first.</message>
+            <exit>true</exit>
+        </error>
+
+        <error scenario="No commits to PR">
+            <message>There are no commits on this branch that aren't already in origin/main. Nothing
+                to create a PR for.</message>
+            <exit>true</exit>
+        </error>
+
+        <error scenario="gh CLI not installed">
+            <message>GitHub CLI (gh) is not installed. Please install it to create pull requests.</message>
+            <provide_instructions>true</provide_instructions>
+            <exit>true</exit>
+        </error>
+
+        <error scenario="Not authenticated with gh">
+            <message>You are not authenticated with GitHub CLI. Please run 'gh auth login' first.</message>
+            <exit>true</exit>
+        </error>
+
+        <error scenario="Remote origin not found">
+            <message>No remote 'origin' found. Please ensure your repository has a remote
+                configured.</message>
+            <exit>true</exit>
+        </error>
+    </error_handling>
+
+    <completion_criteria>
+        <criterion>Branch validation completed</criterion>
+        <criterion>All unmerged commits identified and analyzed</criterion>
+        <criterion>PR title generated following conventional commit style</criterion>
+        <criterion>PR description generated with all required sections</criterion>
+        <criterion>User reviewed and approved the generated content</criterion>
+        <criterion>PR successfully created using gh CLI</criterion>
+        <criterion>PR URL provided to user</criterion>
+    </completion_criteria>
+</workflow_instructions>

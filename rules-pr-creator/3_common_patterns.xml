@@ -1,0 +1,377 @@
+<common_patterns>
+    <overview>
+        Common git and GitHub CLI patterns for analyzing commits and creating pull requests.
+    </overview>
+
+    <git_commands>
+        <command name="check_current_branch">
+            <purpose>Verify the current branch name to ensure not on main/master</purpose>
+            <syntax>git branch --show-current</syntax>
+            <alternative>git rev-parse --abbrev-ref HEAD</alternative>
+            <output_example>feature/add-authentication</output_example>
+            <validation>
+                If output is "main" or "master", exit with error message
+            </validation>
+        </command>
+
+        <command name="list_unmerged_commits">
+            <purpose>Find commits on current branch not in origin/main</purpose>
+            <syntax>git log origin/main..HEAD --oneline</syntax>
+            <output_format>
+                Each line: [short-hash] [commit message]
+                Example: a1b2c3d feat: add user authentication
+            </output_format>
+            <alternative>git log origin/main..HEAD --format="%h %s"</alternative>
+            <edge_cases>
+                <case>If no output, there are no unmerged commits</case>
+                <case>If origin/main doesn't exist, may need to use origin/master</case>
+            </edge_cases>
+        </command>
+
+        <command name="get_structured_commit_data">
+            <purpose>Get detailed commit information in parseable format</purpose>
+            <syntax>git log origin/main..HEAD --pretty=format:"%H|%s|%b"</syntax>
+            <output_format>
+                [full-hash]|[subject]|[body]
+                One commit per line, fields separated by pipe character
+            </output_format>
+            <parsing>
+                Split each line by "|" to get:
+                - Field 0: Full commit hash
+                - Field 1: Commit subject (first line of message)
+                - Field 2: Commit body (additional message lines)
+            </parsing>
+        </command>
+
+        <command name="show_commit_details">
+            <purpose>Get detailed information about a specific commit including changes</purpose>
+            <syntax>git show [commit-hash]</syntax>
+            <output_includes>
+                - Commit metadata (author, date, message)
+                - File changes (diff format)
+                - Added/removed lines
+            </output_includes>
+            <example>git show a1b2c3d</example>
+        </command>
+
+        <command name="view_all_changes">
+            <purpose>See all code changes between origin/main and current branch</purpose>
+            <syntax>git diff origin/main..HEAD</syntax>
+            <options>
+                <option>--stat (show summary of changed files)</option>
+                <option>--name-only (show only filenames)</option>
+                <option>--name-status (show files with change type: A=added, M=modified, D=deleted)</option>
+            </options>
+            <best_practice>
+                Use git diff origin/main..HEAD for complete view of all changes
+            </best_practice>
+        </command>
+
+        <command name="list_changed_files">
+            <purpose>Get list of all files modified in the PR</purpose>
+            <syntax>git diff origin/main..HEAD --name-only</syntax>
+            <output_format>
+                One filename per line
+            </output_format>
+            <alternative>git diff origin/main..HEAD --name-status (includes change type)</alternative>
+        </command>
+
+        <command name="detect_dependency_changes">
+            <purpose>Check if dependency files were modified</purpose>
+            <syntax>git diff origin/main..HEAD --name-only | grep -E
+                "(package\.json|requirements\.txt|go\.mod|Gemfile|pom\.xml|build\.gradle)"</syntax>
+            <files_to_check>
+                <file>package.json - Node.js/JavaScript dependencies</file>
+                <file>package-lock.json - Node.js locked versions</file>
+                <file>yarn.lock - Yarn locked versions</file>
+                <file>requirements.txt - Python pip dependencies</file>
+                <file>Pipfile - Python pipenv dependencies</file>
+                <file>go.mod - Go module dependencies</file>
+                <file>Gemfile - Ruby gem dependencies</file>
+                <file>pom.xml - Maven dependencies (Java)</file>
+                <file>build.gradle - Gradle dependencies (Java/Kotlin)</file>
+                <file>Cargo.toml - Rust dependencies</file>
+            </files_to_check>
+        </command>
+
+        <command name="check_for_breaking_changes">
+            <purpose>Search commit messages for breaking change indicators</purpose>
+            <syntax>git log origin/main..HEAD --grep="BREAKING CHANGE"</syntax>
+            <also_check>
+                - Commits with "!" after type (e.g., "feat!:")
+                - Major version bumps in package files
+                - API endpoint removals or signature changes
+            </also_check>
+        </command>
+
+        <command name="get_commit_count">
+            <purpose>Count number of commits in PR</purpose>
+            <syntax>git rev-list --count origin/main..HEAD</syntax>
+            <output_format>Single number</output_format>
+        </command>
+
+        <command name="get_file_diff">
+            <purpose>See changes to a specific file</purpose>
+            <syntax>git diff origin/main..HEAD -- path/to/file</syntax>
+            <use_case>When git diff output is too large, examine files individually</use_case>
+        </command>
+    </git_commands>
+
+    <github_cli_commands>
+        <command name="check_gh_version">
+            <purpose>Verify GitHub CLI is installed</purpose>
+            <syntax>gh --version</syntax>
+            <expected_output>gh version X.Y.Z (YYYY-MM-DD)</expected_output>
+            <error_handling>
+                If command fails, gh is not installed. Provide installation instructions.
+            </error_handling>
+        </command>
+
+        <command name="check_authentication">
+            <purpose>Verify user is authenticated with GitHub</purpose>
+            <syntax>gh auth status</syntax>
+            <expected_output>
+                ✓ Logged in to github.com as [username]
+            </expected_output>
+            <error_handling>
+                If not authenticated, instruct user to run: gh auth login
+            </error_handling>
+        </command>
+
+        <command name="create_pr_basic">
+            <purpose>Create a pull request with title and body</purpose>
+            <syntax>gh pr create --title "TITLE" --body "DESCRIPTION" --base main</syntax>
+            <parameters>
+                <parameter name="--title">PR title (required)</parameter>
+                <parameter name="--body">PR description (required)</parameter>
+                <parameter name="--base">Target branch (default: main)</parameter>
+            </parameters>
+            <character_escaping>
+                Escape special characters in title and body:
+                - Double quotes: \"
+                - Dollar signs: \$
+                - Backticks: \`
+                - Newlines: use actual newlines or \n
+            </character_escaping>
+        </command>
+
+        <command name="create_pr_from_file">
+            <purpose>Create PR with description from file (for long descriptions)</purpose>
+            <syntax>gh pr create --title "TITLE" --body-file /tmp/pr-description.md --base main</syntax>
+            <when_to_use>
+                When description is very long or contains complex formatting
+            </when_to_use>
+            <workflow>
+                1. Write description to temporary file
+                2. Use --body-file parameter
+                3. Clean up temporary file after creation
+            </workflow>
+        </command>
+
+        <command name="create_pr_interactive">
+            <purpose>Create PR with interactive prompts</purpose>
+            <syntax>gh pr create</syntax>
+            <note>Not recommended for this mode - we want to provide title and body directly</note>
+        </command>
+
+        <command name="detect_default_branch">
+            <purpose>Detect the repository's default branch</purpose>
+            <syntax>gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name'</syntax>
+            <use_case>When unsure if default branch is "main" or "master"</use_case>
+            <fallback>git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'</fallback>
+        </command>
+
+        <command name="list_existing_prs">
+            <purpose>Check if PR already exists for this branch</purpose>
+            <syntax>gh pr list --head $(git branch --show-current)</syntax>
+            <use_case>Verify no PR exists before creating</use_case>
+        </command>
+    </github_cli_commands>
+
+    <analysis_patterns>
+        <pattern name="identify_pr_type">
+            <description>Determine the conventional commit type for PR title</description>
+            <algorithm>
+                1. Parse all commit messages
+                2. Count occurrences of each type (feat, fix, refactor, etc.)
+                3. If majority is one type, use that type
+                4. If mixed:
+                - Prioritize: fix > feat > perf > refactor > others
+                - Use the highest priority type found
+                5. If no conventional commits, analyze code changes:
+                - New files/features = feat
+                - Bug fixes = fix
+                - Code restructuring = refactor
+                - Documentation = docs
+            </algorithm>
+        </pattern>
+
+        <pattern name="extract_scope">
+            <description>Identify the scope for conventional commit title</description>
+            <algorithm>
+                1. Look for common directory prefixes in changed files
+                2. Common scopes by directory:
+                - src/auth/* → (auth)
+                - src/api/* → (api)
+                - src/components/* → (ui) or (components)
+                - docs/* → (docs)
+                - tests/* → (test)
+                3. If changes span multiple areas, omit scope
+                4. Keep scope short (one word if possible)
+            </algorithm>
+        </pattern>
+
+        <pattern name="detect_dependencies_added">
+            <description>Identify new dependencies from package files</description>
+            <algorithm>
+                1. Check if package.json, requirements.txt, etc. modified
+                2. Use git diff on dependency file
+                3. Look for lines starting with "+" that add dependencies
+                4. Parse dependency names and versions
+                5. Include in Technical Changes section
+            </algorithm>
+            <example>
+                git diff origin/main..HEAD -- package.json | grep "^+"
+            </example>
+        </pattern>
+
+        <pattern name="summarize_for_non_technical">
+            <description>Convert technical changes to business language</description>
+            <transformations>
+                <transform>
+                    <technical>Added JWT authentication service</technical>
+                    <business>Users can now securely log in to protect their accounts</business>
+                </transform>
+                <transform>
+                    <technical>Optimized database queries with indexes</technical>
+                    <business>The application now loads data faster, improving user experience</business>
+                </transform>
+                <transform>
+                    <technical>Refactored components to use hooks</technical>
+                    <business>Improved code maintainability for future feature development</business>
+                </transform>
+                <transform>
+                    <technical>Fixed race condition in payment processor</technical>
+                    <business>Resolved an issue where payments could occasionally fail</business>
+                </transform>
+            </transformations>
+        </pattern>
+
+        <pattern name="categorize_changes">
+            <description>Organize changes into Technical Changes categories</description>
+            <categories>
+                <category name="Modified Components">
+                    Extract from: git diff --name-status
+                    List all files, group by directory or functionality
+                </category>
+                <category name="Logic Alterations">
+                    Extract from: git diff (analyze actual code changes)
+                    Describe what functions/methods were added, modified, removed
+                </category>
+                <category name="Dependencies">
+                    Extract from: changes to package.json, requirements.txt, etc.
+                    List new dependencies with versions
+                </category>
+                <category name="Architectural Shifts">
+                    Identify from: new directories, file reorganization, pattern changes
+                    Describe structural changes
+                </category>
+                <category name="Bug Fixes">
+                    Extract from: commit messages with "fix:", "bug:", changes to error handling
+                    Explain what was broken and how it's fixed
+                </category>
+                <category name="Performance Impacts">
+                    Identify from: algorithm changes, caching, database optimization
+                    Describe performance improvements or considerations
+                </category>
+                <category name="Testing">
+                    Extract from: changes to test files, new test files
+                    Note test additions or modifications
+                </category>
+                <category name="Breaking Changes">
+                    Extract from: BREAKING CHANGE in commits, API signature changes, removals
+                    Highlight what breaks backward compatibility
+                </category>
+            </categories>
+        </pattern>
+    </analysis_patterns>
+
+    <shell_escaping_patterns>
+        <pattern name="escape_for_shell">
+            <description>Properly escape content for shell commands</description>
+            <characters_to_escape>
+                <char value="&quot;">Escape as: \&quot;</char>
+                <char value="$">Escape as: \$</char>
+                <char value="`">Escape as: \`</char>
+                <char value="!">May need escaping depending on shell: \!</char>
+                <char value="\">Escape as: \\</char>
+            </characters_to_escape>
+            <alternative>
+                Use --body-file approach to avoid shell escaping entirely for complex descriptions
+            </alternative>
+        </pattern>
+
+        <pattern name="multiline_description">
+            <description>Handle multiline PR descriptions in shell</description>
+            <approach_1>
+                Use $'...' syntax for newlines:
+                gh pr create --title "Title" --body $'Line 1\nLine 2\nLine 3'
+            </approach_1>
+            <approach_2>
+                Write to temporary file and use --body-file (recommended):
+                1. echo "Description" > /tmp/pr-desc.md
+                2. gh pr create --title "Title" --body-file /tmp/pr-desc.md
+                3. rm /tmp/pr-desc.md
+            </approach_2>
+        </pattern>
+    </shell_escaping_patterns>
+
+    <error_recovery_patterns>
+        <pattern name="remote_branch_not_found">
+            <scenario>origin/main doesn't exist</scenario>
+            <check>git rev-parse --verify origin/main</check>
+            <recovery>
+                Try origin/master instead:
+                git log origin/master..HEAD --oneline
+            </recovery>
+        </pattern>
+
+        <pattern name="no_remote_origin">
+            <scenario>Repository has no remote named origin</scenario>
+            <check>git remote -v | grep origin</check>
+            <recovery>
+                List all remotes and ask user which to use:
+                git remote -v
+            </recovery>
+        </pattern>
+
+        <pattern name="unpushed_branch">
+            <scenario>Current branch not pushed to remote</scenario>
+            <note>gh pr create will automatically push the branch</note>
+            <alternative>
+                Explicitly push first:
+                git push -u origin $(git branch --show-current)
+            </alternative>
+        </pattern>
+
+        <pattern name="gh_not_installed">
+            <scenario>GitHub CLI not available</scenario>
+            <detection>gh --version returns error</detection>
+            <recovery>
+                Provide installation instructions:
+                - macOS: brew install gh
+                - Ubuntu/Debian: See https://github.com/cli/cli/blob/trunk/docs/install_linux.md
+                - Windows: winget install GitHub.cli
+            </recovery>
+        </pattern>
+
+        <pattern name="not_authenticated">
+            <scenario>User not logged in to GitHub</scenario>
+            <detection>gh auth status returns not authenticated</detection>
+            <recovery>
+                Instruct user to authenticate:
+                gh auth login
+            </recovery>
+        </pattern>
+    </error_recovery_patterns>
+</common_patterns>
