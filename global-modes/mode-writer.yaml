@@ -21,7 +21,7 @@ description: Create and implement custom modes.
 groups:
   - read
   - - edit
-    - fileRegex: (\.roomodes$|\.roo/.*\.xml$|\.yaml$)
+    - fileRegex: (\.roomodes$|\.roo/.*\.xml$|rules-[^/]+/.*\.xml$|global-modes/.*\.yaml$)
       description: Mode configuration files and XML instructions
   - command
   - mcp

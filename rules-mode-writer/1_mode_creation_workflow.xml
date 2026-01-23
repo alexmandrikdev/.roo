@@ -6,19 +6,36 @@
 
   <detailed_steps>
     <step number="1">
-      <title>Gather Requirements</title>
+      <title>Gather Requirements and Determine Scope</title>
       <description>
-        Understand what the user wants the mode to accomplish
+        Understand what the user wants the mode to accomplish and whether it's a global or
+        project-specific mode
       </description>
       <actions>
+        <action>Determine if this is a global (system-wide) or project-specific mode</action>
         <action>Ask about the mode's primary purpose and use cases</action>
         <action>Identify what types of tasks the mode should handle</action>
         <action>Determine what tools and file access the mode needs</action>
         <action>Clarify any special behaviors or restrictions</action>
       </actions>
+      <scope_distinction>
+        <global_mode>
+          <description>Global modes are system-wide and available across all projects</description>
+          <yaml_location>global-modes/[mode-slug].yaml</yaml_location>
+          <xml_location>rules-[mode-slug]/ (in repository root)</xml_location>
+          <source_field>Must include "source: global" in YAML</source_field>
+        </global_mode>
+        <project_mode>
+          <description>Project-specific modes are only available in the current project</description>
+          <yaml_location>.roomodes (appended to existing file)</yaml_location>
+          <xml_location>.roo/rules-[mode-slug]/</xml_location>
+          <source_field>No source field (defaults to project)</source_field>
+        </project_mode>
+      </scope_distinction>
       <example>
         <ask_followup_question>
-          <question>What is the primary purpose of this new mode? What types of tasks should it handle?</question>
+          <question>What is the primary purpose of this new mode? What types of tasks should it
+            handle?</question>
           <follow_up>
             <suggest>A mode for writing and maintaining documentation</suggest>
             <suggest>A mode for database schema design and migrations</suggest>
@@ -71,7 +88,8 @@
       <important_note>
         Do not include customInstructions in the .roomodes configuration.
         All detailed instructions should be placed in XML files within
-        the .roo/rules-[mode-slug]/ directory instead.
+        the .roo/rules-[mode-slug]/ directory for project modes, or within
+        the rules-[mode-slug]/ directory (repository root) for global modes.
       </important_note>
     </step>
 
@@ -83,12 +101,12 @@
       <example>
         <comment>Restrict edit access to specific file types</comment>
         <code>
-groups:
-  - read
-  - - edit
-    - fileRegex: \.(md|txt|rst)$
-      description: Documentation files only
-  - command
+          groups:
+          - read
+          - - edit
+          - fileRegex: \.(md|txt|rst)$
+          description: Documentation files only
+          - command
         </code>
       </example>
       <guidelines>
@@ -101,8 +119,18 @@ groups:
     <step number="4">
       <title>Create XML Instruction Files</title>
       <description>
-        Design structured instruction files in .roo/rules-[mode-slug]/
+        Design structured instruction files in the appropriate location
       </description>
+      <location_based_on_scope>
+        <global_mode>
+          <path>rules-[mode-slug]/</path>
+          <note>XML files go in repository root directory for global modes</note>
+        </global_mode>
+        <project_mode>
+          <path>.roo/rules-[mode-slug]/</path>
+          <note>XML files go in .roo folder for project-specific modes</note>
+        </project_mode>
+      </location_based_on_scope>
       <file_structure>
         <file name="1_workflow.xml">Main workflow and step-by-step processes</file>
         <file name="2_best_practices.xml">Guidelines and conventions</file>
@@ -134,9 +162,19 @@ groups:
   </detailed_steps>
 
   <quick_reference>
-    <command>Create mode in .roomodes for project-specific modes</command>
-    <command>Create mode in global custom_modes.yaml for system-wide modes</command>
-    <command>Use list_files to verify .roo folder structure</command>
-    <command>Test file regex patterns with search_files</command>
+    <global_mode_commands>
+      <command>Create YAML file in global-modes/[mode-slug].yaml</command>
+      <command>Create XML instruction files in rules-[mode-slug]/ (repository root)</command>
+      <command>Include "source: global" field in YAML configuration</command>
+    </global_mode_commands>
+    <project_mode_commands>
+      <command>Append mode configuration to .roomodes file</command>
+      <command>Create XML instruction files in .roo/rules-[mode-slug]/</command>
+      <command>No source field needed (defaults to project)</command>
+    </project_mode_commands>
+    <verification_commands>
+      <command>Use list_files to verify folder structure</command>
+      <command>Test file regex patterns with search_files</command>
+    </verification_commands>
   </quick_reference>
 </mode_creation_workflow>
