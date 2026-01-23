@@ -25,6 +25,9 @@ whenToUse: Use this mode when you need to create a GitHub Pull Request for the c
 description: Create professional GitHub Pull Requests with auto-generated titles and descriptions.
 groups:
   - read
+  - - edit
+    - fileRegex: ^/tmp/.*
+      description: Temporary files for complex PR descriptions
   - command
   - mcp
 source: global

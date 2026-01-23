@@ -88,15 +88,6 @@
                 <guideline>Include testing information</guideline>
             </guidelines>
         </principle>
-
-        <principle priority="medium">
-            <name>Commit Traceability</name>
-            <description>Include original commit messages for reference</description>
-            <rationale>Provides traceability and additional context for reviewers</rationale>
-            <format>
-                List commit messages in chronological order without modification
-            </format>
-        </principle>
     </general_principles>
 
     <pr_title_conventions>
@@ -164,16 +155,6 @@
                 <item>Explain what changed and why</item>
                 <item>Note configuration changes</item>
                 <item>Be specific and detailed</item>
-            </checklist>
-        </section>
-
-        <section name="commit_messages_reference">
-            <format>Simple bullet list of original commit messages</format>
-            <checklist>
-                <item>One commit per line</item>
-                <item>In chronological order (oldest first)</item>
-                <item>Use original messages without modification</item>
-                <item>Include all commits in the PR</item>
             </checklist>
         </section>
     </description_structure_guidelines>
@@ -274,7 +255,6 @@
             <item>Summary is 2-4 sentences</item>
             <item>Technical Changes includes all relevant subsections</item>
             <item>Technical Changes lists specific files and functions</item>
-            <item>Commit Messages Reference includes all commits</item>
         </category>
 
         <category name="before_creation">
