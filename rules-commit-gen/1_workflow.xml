@@ -1,0 +1,339 @@
+<workflow_instructions>
+    <mode_overview>
+        The Commit Generator mode helps users create semantic, well-formatted git commit
+        messages following the Conventional Commits specification. It analyzes repository
+        changes, generates appropriate commit messages, allows iterative refinement based
+        on user feedback, and executes the commit when approved.
+    </mode_overview>
+
+    <initialization_steps>
+        <step number="1">
+            <action>Verify Git Repository</action>
+            <details>
+                First, ensure you're working in a git repository by checking for the .git directory
+                or running git status. If not in a repository, inform the user and exit gracefully.
+            </details>
+            <command>git status</command>
+        </step>
+
+        <step number="2">
+            <action>Check for changes to commit</action>
+            <details>
+                Determine what changes exist in the repository:
+                - First priority: Check for staged changes using `git diff --staged`
+                - Second priority: If no staged changes, check for unstaged changes using `git diff`
+                - Handle edge cases: untracked files, merge conflicts, empty repositories
+            </details>
+            <commands>
+                <command priority="1">git diff --staged</command>
+                <command priority="2">git diff</command>
+                <command priority="3">git status --short</command>
+            </commands>
+        </step>
+
+        <step number="3">
+            <action>Handle edge cases</action>
+            <details>
+                Before proceeding with commit message generation:
+                - If no changes exist at all: Inform user there's nothing to commit
+                - If untracked files exist: Ask user if they want to add them first
+                - If merge conflicts exist: Alert user to resolve conflicts before committing
+                - If large binary files detected: Warn about committing binaries
+            </details>
+        </step>
+    </initialization_steps>
+
+    <main_workflow>
+        <phase name="analysis">
+            <description>Analyze changes to understand their semantic meaning</description>
+            <steps>
+                <step number="1">
+                    <action>Gather comprehensive context</action>
+                    <details>
+                        Use git commands to gather complete picture of changes:
+                        - Run `git diff --staged` (or `git diff`) to see detailed changes
+                        - Run `git status --short` to see high-level file changes
+                        - Optionally run `git log -1` to see the most recent commit for context
+                        - Parse the diff output to identify:
+                        * Which files are modified/added/deleted
+                        * The nature of changes (new features, bug fixes, refactoring)
+                        * The scope of changes (which modules/components affected)
+                    </details>
+                </step>
+
+                <step number="2">
+                    <action>Read files for context when needed</action>
+                    <details>
+                        Only read file contents directly when git diff output lacks sufficient
+                        context to understand the changes. This may be needed for:
+                        - New files with no diff history
+                        - Large refactorings where diff is too complex
+                        - Configuration changes that need context
+                        - Understanding the purpose of new functions/classes
+                    </details>
+                    <tool>read_file</tool>
+                </step>
+
+                <step number="3">
+                    <action>Determine commit type and scope</action>
+                    <details>
+                        Analyze the changes to determine the appropriate Conventional Commit type:
+
+                        - feat: A new feature or functionality
+                        - fix: A bug fix
+                        - docs: Documentation only changes
+                        - style: Code style changes (formatting, missing semi-colons, etc.)
+                        - refactor: Code changes that neither fix bugs nor add features
+                        - perf: Performance improvements
+                        - test: Adding or updating tests
+                        - build: Changes to build system or dependencies
+                        - ci: Changes to CI configuration files and scripts
+                        - chore: Other changes that don't modify src or test files
+                        - revert: Reverts a previous commit
+
+                        Identify the scope (optional but recommended):
+                        - The section of the codebase affected (e.g., api, auth, ui, database)
+                        - Keep scope concise and meaningful
+                        - Use existing scopes when possible (check git log for consistency)
+                    </details>
+                </step>
+
+                <step number="4">
+                    <action>Assess breaking changes and issues</action>
+                    <details>
+                        Determine if changes include:
+                        - Breaking changes (API changes, removed features, incompatible updates)
+                        - Related issue numbers or tickets
+                        - Co-authors or attribution
+                    </details>
+                </step>
+            </steps>
+        </phase>
+
+        <phase name="generation">
+            <description>Generate the commit message following Conventional Commits</description>
+            <steps>
+                <step number="1">
+                    <action>Craft the commit subject line</action>
+                    <details>
+                        Create a concise subject line (50-72 characters recommended):
+                        - Format: type(scope): subject
+                        - Use imperative mood (e.g., "add", not "added" or "adds")
+                        - No period at the end
+                        - Be specific but concise
+                        - Accurately reflect the semantic meaning of changes
+
+                        Examples:
+                        - feat(auth): add OAuth2 authentication provider
+                        - fix(api): resolve race condition in user creation
+                        - docs(readme): update installation instructions
+                    </details>
+                </step>
+
+                <step number="2">
+                    <action>Write the commit body (optional but recommended)</action>
+                    <details>
+                        Create a detailed body when changes need explanation:
+                        - Wrap at 72 characters per line
+                        - Explain WHAT changed and WHY (not HOW)
+                        - Separate from subject with a blank line
+                        - Use bullet points for multiple changes
+                        - Provide context for decision-making
+
+                        Skip the body for simple, obvious changes.
+                    </details>
+                </step>
+
+                <step number="3">
+                    <action>Add footer information (when applicable)</action>
+                    <details>
+                        Include footer for:
+                        - Breaking changes: Start with "BREAKING CHANGE: " followed by description
+                        - Issue references: "Fixes #123", "Closes #456", "Refs #789"
+                        - Co-authors: "Co-authored-by: Name &lt;email@example.com&gt;"
+
+                        Separate footer from body with blank line.
+                    </details>
+                </step>
+
+                <step number="4">
+                    <action>Assemble the complete commit message</action>
+                    <details>
+                        Combine all parts following this structure:
+
+                        type(scope): subject
+
+                        Body paragraph explaining what and why.
+                        Can span multiple lines.
+
+                        BREAKING CHANGE: Description of breaking change
+                        Fixes #123
+                    </details>
+                </step>
+            </steps>
+        </phase>
+
+        <phase name="presentation">
+            <description>Present the commit message to the user for review</description>
+            <steps>
+                <step number="1">
+                    <action>Display the commit message clearly</action>
+                    <details>
+                        Show the generated commit message in a well-formatted way that
+                        distinguishes different components:
+                        - Clearly label the Type, Scope, and Subject
+                        - Show the Body in a separate section
+                        - Show Footer items separately
+                        - Use formatting to make it easy to read
+
+                        Also show a preview of what the commit will look like.
+                    </details>
+                </step>
+
+                <step number="2">
+                    <action>Request user feedback</action>
+                    <details>
+                        Ask the user if they want to:
+                        - Approve and commit with this message
+                        - Modify the message (any component)
+                        - Cancel the commit
+
+                        Provide specific suggestions for common modifications.
+                    </details>
+                    <tool>ask_followup_question</tool>
+                </step>
+            </steps>
+        </phase>
+
+        <phase name="refinement">
+            <description>Iterate on the commit message based on user feedback</description>
+            <steps>
+                <step number="1">
+                    <action>Process modification requests</action>
+                    <details>
+                        Handle various types of modifications:
+                        - Change commit type (e.g., from feat to fix)
+                        - Modify or add scope
+                        - Reword subject line
+                        - Expand or condense body
+                        - Add/modify footer (breaking changes, issue refs)
+                        - Completely rewrite if requested
+                    </details>
+                </step>
+
+                <step number="2">
+                    <action>Validate modifications</action>
+                    <details>
+                        Ensure modifications still conform to Conventional Commits:
+                        - Subject line length appropriate
+                        - Imperative mood maintained
+                        - Breaking changes properly flagged
+                        - Issue references formatted correctly
+                    </details>
+                </step>
+
+                <step number="3">
+                    <action>Re-present and iterate</action>
+                    <details>
+                        Show the modified message and repeat the feedback loop until
+                        the user approves the message or cancels.
+                    </details>
+                </step>
+            </steps>
+        </phase>
+
+        <phase name="execution">
+            <description>Execute the commit with the approved message</description>
+            <steps>
+                <step number="1">
+                    <action>Prepare the commit command</action>
+                    <details>
+                        Format the git commit command properly:
+                        - For single-line messages: `git commit -m "message"`
+                        - For multi-line messages: Use multiple -m flags or here-doc
+
+                        Example for multi-line:
+                        git commit -m "type(scope): subject" -m "Body paragraph here" -m "Fixes
+                        #123"
+
+                        Or use a temporary file approach if the message is complex.
+                    </details>
+                </step>
+
+                <step number="2">
+                    <action>Execute the commit</action>
+                    <details>
+                        Run the git commit command with the finalized message.
+                        Handle potential errors:
+                        - Pre-commit hooks failing
+                        - Commit message validation failures
+                        - GPG signing issues
+                        - Empty commits (use --allow-empty if intentional)
+                    </details>
+                    <tool>execute_command</tool>
+                </step>
+
+                <step number="3">
+                    <action>Confirm success and display commit hash</action>
+                    <details>
+                        After successful commit:
+                        - Parse the git output to extract the commit hash
+                        - Display confirmation message with commit hash
+                        - Optionally show git log -1 to display the commit
+                    </details>
+                    <command>git log -1 --oneline</command>
+                </step>
+            </steps>
+        </phase>
+    </main_workflow>
+
+    <error_handling>
+        <error_scenario name="no_changes">
+            <description>No staged or unstaged changes exist</description>
+            <action>Inform user there's nothing to commit and exit</action>
+        </error_scenario>
+
+        <error_scenario name="merge_conflicts">
+            <description>Unresolved merge conflicts detected</description>
+            <action>Alert user to resolve conflicts before committing</action>
+            <detection>git status shows "both modified" or "Unmerged paths"</detection>
+        </error_scenario>
+
+        <error_scenario name="untracked_files">
+            <description>Only untracked files exist, nothing staged</description>
+            <action>Ask user if they want to add files first using git add</action>
+        </error_scenario>
+
+        <error_scenario name="commit_failed">
+            <description>Git commit command failed</description>
+            <action>
+                Display the error message, suggest common fixes:
+                - Pre-commit hook failures: Show hook output
+                - Message validation failures: Explain format requirements
+                - GPG signing issues: Suggest configuration checks
+            </action>
+        </error_scenario>
+
+        <error_scenario name="not_a_repository">
+            <description>Current directory is not a git repository</description>
+            <action>Inform user and suggest running git init if needed</action>
+        </error_scenario>
+    </error_handling>
+
+    <completion_criteria>
+        <criterion>Changes have been analyzed successfully</criterion>
+        <criterion>Commit message follows Conventional Commits specification</criterion>
+        <criterion>User has approved the commit message</criterion>
+        <criterion>Commit has been executed successfully</criterion>
+        <criterion>Commit hash has been displayed to user</criterion>
+    </completion_criteria>
+
+    <best_practices_integration>
+        <practice>Always prioritize git commands over file reading</practice>
+        <practice>Use semantic analysis to determine correct commit type</practice>
+        <practice>Keep subject lines concise and meaningful</practice>
+        <practice>Explain what and why in body, not how</practice>
+        <practice>Handle multi-line messages properly for git commit</practice>
+        <practice>Validate Conventional Commits format before committing</practice>
+    </best_practices_integration>
+</workflow_instructions>

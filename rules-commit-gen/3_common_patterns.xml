@@ -1,0 +1,565 @@
+<common_patterns>
+    <git_command_patterns>
+        <overview>
+            This section provides patterns for using git commands to gather context
+            and information needed for generating accurate commit messages.
+        </overview>
+
+        <priority_sequence>
+            <description>Always use git commands in this order to gather information</description>
+            <sequence>
+                <command order="1">
+                    <name>git status</name>
+                    <purpose>Verify repository state and get high-level overview</purpose>
+                    <information_gathered>
+                        - Whether in a git repository
+                        - Current branch
+                        - Staged vs unstaged changes
+                        - Untracked files
+                        - Merge conflicts
+                        - Branch relationship to upstream
+                    </information_gathered>
+                </command>
+
+                <command order="2">
+                    <name>git diff --staged</name>
+                    <purpose>Examine staged changes for commit</purpose>
+                    <information_gathered>
+                        - Detailed line-by-line changes staged for commit
+                        - Files modified/added/deleted
+                        - Context around changes
+                        - Amount of changes
+                    </information_gathered>
+                    <fallback>If no output, check unstaged changes with git diff</fallback>
+                </command>
+
+                <command order="3">
+                    <name>git diff</name>
+                    <purpose>Examine unstaged changes if no staged changes exist</purpose>
+                    <when_to_use>Only when git diff --staged returns no results</when_to_use>
+                </command>
+
+                <command order="4">
+                    <name>git status --short</name>
+                    <purpose>Get concise list of changed files</purpose>
+                    <information_gathered>
+                        - Quick overview of file status
+                        - Easier to parse than verbose git status
+                    </information_gathered>
+                </command>
+
+                <command order="5">
+                    <name>git log -1 --oneline</name>
+                    <purpose>Get context from most recent commit</purpose>
+                    <information_gathered>
+                        - Recent commit message style
+                        - Project conventions
+                        - Commit message patterns
+                    </information_gathered>
+                    <optional>true</optional>
+                </command>
+            </sequence>
+        </priority_sequence>
+
+        <pattern name="check_repository_status">
+            <description>Verify git repository and get initial state</description>
+            <command>git status</command>
+            <parsing>
+                <indicator>
+                    <text>On branch</text>
+                    <meaning>In a git repository, shows current branch</meaning>
+                </indicator>
+                <indicator>
+                    <text>Changes to be committed</text>
+                    <meaning>Staged changes exist</meaning>
+                </indicator>
+                <indicator>
+                    <text>Changes not staged for commit</text>
+                    <meaning>Unstaged modifications exist</meaning>
+                </indicator>
+                <indicator>
+                    <text>Untracked files</text>
+                    <meaning>New files not added to git</meaning>
+                </indicator>
+                <indicator>
+                    <text>Unmerged paths</text>
+                    <meaning>Merge conflicts exist</meaning>
+                </indicator>
+                <indicator>
+                    <text>nothing to commit</text>
+                    <meaning>No changes in working directory</meaning>
+                </indicator>
+            </parsing>
+            <example_output><![CDATA[
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        modified:   src/auth.ts
+        new file:   src/oauth.ts
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   README.md
+      ]]></example_output>
+        </pattern>
+
+        <pattern name="analyze_staged_changes">
+            <description>Get detailed diff of staged changes</description>
+            <command>git diff --staged</command>
+            <flags>
+                <flag name="--stat">Show summary statistics of changes</flag>
+                <flag name="--name-only">Show only file names</flag>
+                <flag name="--name-status">Show file names with change type (M/A/D)</flag>
+            </flags>
+            <parsing>
+                <element>
+                    <marker>diff --git a/... b/...</marker>
+                    <meaning>Start of file diff</meaning>
+                </element>
+                <element>
+                    <marker>--- a/file, +++ b/file</marker>
+                    <meaning>File being compared</meaning>
+                </element>
+                <element>
+                    <marker>@@ -X,Y +A,B @@</marker>
+                    <meaning>Hunk header showing line numbers</meaning>
+                </element>
+                <element>
+                    <marker>Lines starting with +</marker>
+                    <meaning>Added lines</meaning>
+                </element>
+                <element>
+                    <marker>Lines starting with -</marker>
+                    <meaning>Removed lines</meaning>
+                </element>
+                <element>
+                    <marker>Lines starting with space</marker>
+                    <meaning>Context lines (unchanged)</meaning>
+                </element>
+            </parsing>
+            <example_usage><![CDATA[
+# Get detailed diff
+git diff --staged
+
+# Get summary only
+git diff --staged --stat
+
+# Get list of changed files with status
+git diff --staged --name-status
+      ]]></example_usage>
+        </pattern>
+
+        <pattern name="analyze_unstaged_changes">
+            <description>Get detailed diff of unstaged changes</description>
+            <command>git diff</command>
+            <when_to_use>When git diff --staged returns no results</when_to_use>
+            <note>Same parsing rules as staged changes</note>
+        </pattern>
+
+        <pattern name="get_file_list">
+            <description>Get concise list of changed files</description>
+            <command>git status --short</command>
+            <output_format>
+                <code>XY filename</code>
+                <where>
+                    <X>Status of file in staging area</X>
+                    <Y>Status of file in working tree</Y>
+                </where>
+            </output_format>
+            <status_codes>
+                <code value="M">Modified</code>
+                <code value="A">Added</code>
+                <code value="D">Deleted</code>
+                <code value="R">Renamed</code>
+                <code value="C">Copied</code>
+                <code value="U">Updated but unmerged</code>
+                <code value="?">Untracked</code>
+                <code value="!">Ignored</code>
+            </status_codes>
+            <example_output><![CDATA[
+M  src/auth.ts
+A  src/oauth.ts
+ M README.md
+?? new-file.ts
+      ]]></example_output>
+        </pattern>
+
+        <pattern name="check_commit_history">
+            <description>Examine recent commits for context and conventions</description>
+            <commands>
+                <command>
+                    <usage>git log -1 --oneline</usage>
+                    <purpose>See most recent commit</purpose>
+                </command>
+                <command>
+                    <usage>git log --oneline -10</usage>
+                    <purpose>See last 10 commits for pattern analysis</purpose>
+                </command>
+                <command>
+                    <usage>git log --oneline | grep -o '([^)]*' | sort | uniq -c | sort -rn</usage>
+                    <purpose>Find commonly used scopes in project</purpose>
+                </command>
+                <command>
+                    <usage>git log --oneline | grep -oE '^[a-z]+' | sort | uniq -c | sort -rn</usage>
+                    <purpose>Find commonly used commit types in project</purpose>
+                </command>
+            </commands>
+        </pattern>
+
+        <pattern name="handle_untracked_files">
+            <description>Offer to stage untracked files before committing</description>
+            <detection>
+                <indicator>?? in git status --short output</indicator>
+                <indicator>"Untracked files" section in git status</indicator>
+            </detection>
+            <action>
+                <ask_user>Would you like to add these untracked files before committing?</ask_user>
+                <if_yes>
+                    <command>git add &lt;file&gt;</command>
+                    <or>git add .</or>
+                </if_yes>
+            </action>
+        </pattern>
+
+        <pattern name="detect_merge_conflicts">
+            <description>Identify and report merge conflicts</description>
+            <detection>
+                <indicator command="git status">Unmerged paths section</indicator>
+                <indicator command="git status --short">UU, AA, DD status codes</indicator>
+            </detection>
+            <action>
+                <alert>Merge conflicts detected. Please resolve conflicts before committing.</alert>
+                <show_files>List conflicted files from git status</show_files>
+                <abort>Do not proceed with commit message generation</abort>
+            </action>
+        </pattern>
+    </git_command_patterns>
+
+    <commit_execution_patterns>
+        <pattern name="simple_single_line_commit">
+            <description>Execute commit with single-line message</description>
+            <when_to_use>When commit message has no body or footer</when_to_use>
+            <command>git commit -m "type(scope): subject"</command>
+            <example>git commit -m "feat(auth): add OAuth2 support"</example>
+        </pattern>
+
+        <pattern name="multi_line_commit_m_flags">
+            <description>Execute commit with multi-line message using multiple -m flags</description>
+            <when_to_use>When commit has subject, body, and/or footer</when_to_use>
+            <command_structure>git commit -m "subject" -m "body" -m "footer"</command_structure>
+            <rules>
+                <rule>First -m is the subject line</rule>
+                <rule>Each subsequent -m creates a new paragraph</rule>
+                <rule>Empty -m "" creates a blank line</rule>
+                <rule>Git automatically separates paragraphs with blank lines</rule>
+            </rules>
+            <example><![CDATA[
+git commit \
+  -m "feat(auth): add OAuth2 authentication provider" \
+  -m "Add support for authenticating users via OAuth2 providers.
+This enables single sign-on functionality and reduces
+password management burden for users." \
+  -m "Fixes #123"
+      ]]></example>
+        </pattern>
+
+        <pattern name="multi_line_commit_temp_file">
+            <description>Execute commit with complex message using temporary file</description>
+            <when_to_use>For very complex messages or when shell escaping becomes difficult</when_to_use>
+            <steps>
+                <step>Create temporary file with commit message</step>
+                <step>Write formatted message to file</step>
+                <step>Use git commit -F to read from file</step>
+                <step>Clean up temporary file</step>
+            </steps>
+            <example><![CDATA[
+# Create message file
+cat > /tmp/commit-msg.txt << 'EOF'
+feat(auth): add OAuth2 authentication provider
+
+Add support for authenticating users via OAuth2 providers.
+This enables single sign-on functionality and reduces
+password management burden for users.
+
+- Implement OAuth2 authorization code flow
+- Add provider configuration for Google and GitHub
+- Create middleware for token validation
+- Update user model to support external IDs
+
+BREAKING CHANGE: Session-based auth no longer supported
+Fixes #123
+EOF
+
+# Commit using file
+git commit -F /tmp/commit-msg.txt
+
+# Clean up
+rm /tmp/commit-msg.txt
+      ]]></example>
+        </pattern>
+
+        <pattern name="breaking_change_commit">
+            <description>Execute commit with breaking change annotation</description>
+            <requirements>
+                <requirement>Use ! after type/scope in subject</requirement>
+                <requirement>Include BREAKING CHANGE: in footer</requirement>
+            </requirements>
+            <example><![CDATA[
+git commit \
+  -m "feat(api)!: remove deprecated v1 endpoints" \
+  -m "v1 API endpoints have been removed as they were deprecated
+in version 2.0.0. All clients must migrate to v2 endpoints." \
+  -m "BREAKING CHANGE: v1 API endpoints no longer available.
+See docs/api-migration-v2.md for migration guide."
+      ]]></example>
+        </pattern>
+
+        <pattern name="commit_with_issue_references">
+            <description>Execute commit with issue tracker references</description>
+            <footer_formats>
+                <format>Fixes #123</format>
+                <format>Closes #456</format>
+                <format>Resolves #789</format>
+                <format>Refs #101</format>
+            </footer_formats>
+            <multiple_issues>
+                <format>Fixes #123, #456</format>
+                <format>Fixes #123
+                    Closes #456</format>
+            </multiple_issues>
+            <example><![CDATA[
+git commit \
+  -m "fix(api): prevent race condition in user creation" \
+  -m "Add mutex lock to prevent concurrent user creation
+requests from creating duplicate users." \
+  -m "Fixes #234
+Refs #189"
+      ]]></example>
+        </pattern>
+
+        <pattern name="commit_with_coauthors">
+            <description>Execute commit crediting multiple authors</description>
+            <format>Co-authored-by: Name &lt;email@example.com&gt;</format>
+            <example><![CDATA[
+git commit \
+  -m "feat(parser): add support for markdown tables" \
+  -m "Implement markdown table parsing with support for alignment
+and multi-line cells." \
+  -m "Co-authored-by: Jane Smith <jane@example.com>
+Co-authored-by: Bob Jones <bob@example.com>"
+      ]]></example>
+        </pattern>
+
+        <pattern name="amend_last_commit">
+            <description>Amend the most recent commit</description>
+            <when_to_use>When user wants to modify the last commit message</when_to_use>
+            <warning>Do not use if commit has been pushed to shared repository</warning>
+            <command>git commit --amend -m "new message"</command>
+        </pattern>
+
+        <pattern name="empty_commit">
+            <description>Create commit with no changes</description>
+            <when_to_use>For triggering CI/CD or documenting decision</when_to_use>
+            <command>git commit --allow-empty -m "message"</command>
+            <example>git commit --allow-empty -m "chore: trigger CI rebuild"</example>
+        </pattern>
+    </commit_execution_patterns>
+
+    <change_analysis_patterns>
+        <pattern name="identify_feature_addition">
+            <description>Recognize when changes add new functionality</description>
+            <indicators>
+                <indicator>New functions or methods exported</indicator>
+                <indicator>New files added to src/</indicator>
+                <indicator>New API endpoints</indicator>
+                <indicator>New configuration options</indicator>
+                <indicator>New components or modules</indicator>
+            </indicators>
+            <commit_type>feat</commit_type>
+            <example_diff><![CDATA[
++export function authenticateWithOAuth(provider: string) {
++  // New OAuth authentication function
++}
+      ]]></example_diff>
+        </pattern>
+
+        <pattern name="identify_bug_fix">
+            <description>Recognize when changes fix bugs or errors</description>
+            <indicators>
+                <indicator>Fixing null/undefined checks</indicator>
+                <indicator>Correcting logic errors</indicator>
+                <indicator>Handling edge cases</indicator>
+                <indicator>Fixing race conditions</indicator>
+                <indicator>Resolving memory leaks</indicator>
+            </indicators>
+            <commit_type>fix</commit_type>
+            <example_diff><![CDATA[
+-if (user) {
++if (user && user.isActive) {
+   doSomething(user);
+ }
+      ]]></example_diff>
+        </pattern>
+
+        <pattern name="identify_refactoring">
+            <description>Recognize when changes restructure code without changing behavior</description>
+            <indicators>
+                <indicator>Extracting functions or methods</indicator>
+                <indicator>Renaming for clarity</indicator>
+                <indicator>Reorganizing file structure</indicator>
+                <indicator>Removing code duplication</indicator>
+                <indicator>Changing internal implementation without API changes</indicator>
+            </indicators>
+            <commit_type>refactor</commit_type>
+            <important>If behavior changes or bugs are fixed, it's not pure refactoring</important>
+        </pattern>
+
+        <pattern name="identify_documentation_changes">
+            <description>Recognize documentation-only changes</description>
+            <indicators>
+                <indicator>Only .md files changed</indicator>
+                <indicator>Only comment changes (JSDoc, etc.)</indicator>
+                <indicator>README updates</indicator>
+                <indicator>API documentation updates</indicator>
+            </indicators>
+            <commit_type>docs</commit_type>
+            <note>Code changes with updated comments are not docs-only</note>
+        </pattern>
+
+        <pattern name="identify_style_changes">
+            <description>Recognize formatting or whitespace changes</description>
+            <indicators>
+                <indicator>Only whitespace differences</indicator>
+                <indicator>Formatting changes (prettier, eslint --fix)</indicator>
+                <indicator>Adding/removing semicolons</indicator>
+                <indicator>Reorganizing imports</indicator>
+            </indicators>
+            <commit_type>style</commit_type>
+            <note>Must not change code meaning or behavior</note>
+        </pattern>
+
+        <pattern name="identify_performance_improvements">
+            <description>Recognize performance optimization changes</description>
+            <indicators>
+                <indicator>Algorithm optimization</indicator>
+                <indicator>Caching implementation</indicator>
+                <indicator>Database query optimization</indicator>
+                <indicator>Lazy loading</indicator>
+                <indicator>Memoization</indicator>
+            </indicators>
+            <commit_type>perf</commit_type>
+            <body_should_include>Performance metrics if available (before/after)</body_should_include>
+        </pattern>
+
+        <pattern name="identify_test_changes">
+            <description>Recognize test-related changes</description>
+            <indicators>
+                <indicator>Only test files modified</indicator>
+                <indicator>Adding new test cases</indicator>
+                <indicator>Updating test assertions</indicator>
+                <indicator>Adding test fixtures or mocks</indicator>
+            </indicators>
+            <commit_type>test</commit_type>
+            <note>Changes to both src and tests together should use primary change type</note>
+        </pattern>
+
+        <pattern name="identify_build_changes">
+            <description>Recognize build system or dependency changes</description>
+            <indicators>
+                <indicator>package.json dependencies updated</indicator>
+                <indicator>Webpack, rollup, vite config changes</indicator>
+                <indicator>Dockerfile changes</indicator>
+                <indicator>Build scripts modified</indicator>
+            </indicators>
+            <commit_type>build</commit_type>
+        </pattern>
+
+        <pattern name="identify_ci_changes">
+            <description>Recognize CI/CD configuration changes</description>
+            <indicators>
+                <indicator>.github/workflows/ files</indicator>
+                <indicator>.gitlab-ci.yml changes</indicator>
+                <indicator>Jenkins, CircleCI config</indicator>
+                <indicator>GitHub Actions modifications</indicator>
+            </indicators>
+            <commit_type>ci</commit_type>
+        </pattern>
+
+        <pattern name="identify_chore_changes">
+            <description>Recognize maintenance changes</description>
+            <indicators>
+                <indicator>.gitignore updates</indicator>
+                <indicator>Editor config changes</indicator>
+                <indicator>License updates</indicator>
+                <indicator>Tooling configuration</indicator>
+                <indicator>Repository maintenance</indicator>
+            </indicators>
+            <commit_type>chore</commit_type>
+        </pattern>
+    </change_analysis_patterns>
+
+    <message_presentation_patterns>
+        <pattern name="clear_component_display">
+            <description>Present commit message with clearly labeled components</description>
+            <template><![CDATA[
+═══════════════════════════════════════════
+Generated Commit Message
+═══════════════════════════════════════════
+
+Type:    {type}
+Scope:   {scope}
+Subject: {subject}
+
+{if body exists}
+Body:
+{body}
+{endif}
+
+{if footer exists}
+Footer:
+{footer}
+{endif}
+
+═══════════════════════════════════════════
+Preview (as it will appear in git log):
+───────────────────────────────────────────
+{full formatted message}
+═══════════════════════════════════════════
+      ]]></template>
+        </pattern>
+
+        <pattern name="request_feedback">
+            <description>Ask user for feedback with specific options</description>
+            <tool>ask_followup_question</tool>
+            <question>Would you like to proceed with this commit message?</question>
+            <suggestions>
+                <suggestion>Yes, commit with this message</suggestion>
+                <suggestion>Modify the message (specify what to change)</suggestion>
+                <suggestion>Change commit type or scope</suggestion>
+                <suggestion>Cancel commit</suggestion>
+            </suggestions>
+        </pattern>
+
+        <pattern name="handle_modifications">
+            <description>Process user modification requests</description>
+            <modification_types>
+                <type>Change commit type (e.g., from feat to fix)</type>
+                <type>Change or add scope</type>
+                <type>Reword subject line</type>
+                <type>Expand or condense body</type>
+                <type>Add or modify footer</type>
+                <type>Add breaking change annotation</type>
+                <type>Add issue references</type>
+            </modification_types>
+            <process>
+                <step>Parse user's modification request</step>
+                <step>Apply changes while maintaining format</step>
+                <step>Validate new message against Conventional Commits</step>
+                <step>Re-present for approval</step>
+            </process>
+        </pattern>
+    </message_presentation_patterns>
+</common_patterns>

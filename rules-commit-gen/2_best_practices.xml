@@ -1,0 +1,462 @@
+<best_practices>
+    <conventional_commits_specification>
+        <overview>
+            Conventional Commits is a specification for adding human and machine-readable
+            meaning to commit messages. It provides an easy set of rules for creating an
+            explicit commit history, which makes it easier to write automated tools on top
+            of and communicate about changes.
+        </overview>
+
+        <commit_message_structure>
+            <format><![CDATA[
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+      ]]></format>
+
+            <components>
+                <component name="type" required="true">
+                    <description>Describes the category of change</description>
+                    <valid_types>
+                        <type name="feat">
+                            <description>A new feature for the user</description>
+                            <example>feat(auth): add OAuth2 provider support</example>
+                        </type>
+                        <type name="fix">
+                            <description>A bug fix for the user</description>
+                            <example>fix(api): prevent race condition in concurrent requests</example>
+                        </type>
+                        <type name="docs">
+                            <description>Documentation only changes</description>
+                            <example>docs(readme): add deployment instructions</example>
+                        </type>
+                        <type name="style">
+                            <description>Changes that don't affect code meaning (formatting,
+                                whitespace)</description>
+                            <example>style: format code with prettier</example>
+                        </type>
+                        <type name="refactor">
+                            <description>Code change that neither fixes a bug nor adds a feature</description>
+                            <example>refactor(database): extract query builder to separate module</example>
+                        </type>
+                        <type name="perf">
+                            <description>Code change that improves performance</description>
+                            <example>perf(parser): optimize regex matching in tokenizer</example>
+                        </type>
+                        <type name="test">
+                            <description>Adding missing tests or correcting existing tests</description>
+                            <example>test(user): add integration tests for user registration</example>
+                        </type>
+                        <type name="build">
+                            <description>Changes to build system or external dependencies</description>
+                            <example>build: upgrade webpack to v5</example>
+                        </type>
+                        <type name="ci">
+                            <description>Changes to CI configuration files and scripts</description>
+                            <example>ci: add automated security scanning workflow</example>
+                        </type>
+                        <type name="chore">
+                            <description>Other changes that don't modify src or test files</description>
+                            <example>chore: update .gitignore with IDE files</example>
+                        </type>
+                        <type name="revert">
+                            <description>Reverts a previous commit</description>
+                            <example>revert: revert "feat(api): add rate limiting"</example>
+                        </type>
+                    </valid_types>
+                </component>
+
+                <component name="scope" required="false">
+                    <description>A noun describing section of the codebase affected</description>
+                    <guidelines>
+                        <guideline>Use existing scopes when possible for consistency</guideline>
+                        <guideline>Check git log to see what scopes are already in use</guideline>
+                        <guideline>Keep scope concise (one or two words)</guideline>
+                        <guideline>Use lowercase</guideline>
+                        <guideline>Can be omitted for changes across multiple areas</guideline>
+                    </guidelines>
+                    <examples>
+                        <good>api, auth, database, ui, parser, config</good>
+                        <bad>the-entire-authentication-module, AUTH, multiple-different-things</bad>
+                    </examples>
+                </component>
+
+                <component name="description" required="true">
+                    <description>Short summary of the code change</description>
+                    <guidelines>
+                        <guideline priority="critical">Use imperative mood ("add" not "added" or
+                            "adds")</guideline>
+                        <guideline priority="critical">Don't capitalize first letter</guideline>
+                        <guideline priority="critical">No period at the end</guideline>
+                        <guideline>Keep to 50-72 characters when possible</guideline>
+                        <guideline>Be specific and descriptive</guideline>
+                        <guideline>Describe what the change does, not how</guideline>
+                    </guidelines>
+                    <examples>
+                        <good>add user authentication with JWT tokens</good>
+                        <good>fix memory leak in event listener cleanup</good>
+                        <good>remove deprecated API endpoints</good>
+                        <bad>Added user authentication with JWT tokens</bad>
+                        <bad>Fixes bug.</bad>
+                        <bad>various changes</bad>
+                        <bad>Update code</bad>
+                    </examples>
+                </component>
+
+                <component name="body" required="false">
+                    <description>Detailed explanation of the changes</description>
+                    <when_to_include>
+                        <scenario>Changes are not immediately obvious from the subject</scenario>
+                        <scenario>Need to explain the motivation for the change</scenario>
+                        <scenario>Multiple related changes that need enumeration</scenario>
+                        <scenario>Important context or trade-off decisions</scenario>
+                    </when_to_include>
+                    <guidelines>
+                        <guideline>Separate from subject with one blank line</guideline>
+                        <guideline>Wrap at 72 characters per line</guideline>
+                        <guideline>Explain WHAT changed and WHY, not HOW</guideline>
+                        <guideline>Use bullet points for multiple changes (-, *, +)</guideline>
+                        <guideline>Write in imperative mood like the subject</guideline>
+                    </guidelines>
+                    <example><![CDATA[
+feat(auth): add OAuth2 authentication provider
+
+Add support for authenticating users via OAuth2 providers.
+This enables single sign-on functionality and reduces
+password management burden for users.
+
+- Implement OAuth2 authorization code flow
+- Add provider configuration for Google and GitHub
+- Create middleware for token validation
+- Update user model to support external IDs
+          ]]></example>
+                </component>
+
+                <component name="footer" required="false">
+                    <description>Metadata about the commit</description>
+                    <types>
+                        <footer_type name="breaking_change">
+                            <format>BREAKING CHANGE: description of the breaking change</format>
+                            <description>Required when commit introduces breaking changes</description>
+                            <example>BREAKING CHANGE: API endpoints now require authentication
+                                header</example>
+                        </footer_type>
+                        <footer_type name="issue_reference">
+                            <formats>
+                                <format>Fixes #123 - Closes the issue</format>
+                                <format>Closes #456 - Also closes the issue</format>
+                                <format>Refs #789 - References without closing</format>
+                                <format>Resolves #101 - Resolves the issue</format>
+                            </formats>
+                            <description>Links commit to issue tracking system</description>
+                        </footer_type>
+                        <footer_type name="coauthors">
+                            <format>Co-authored-by: Name &lt;email@example.com&gt;</format>
+                            <description>Credits co-authors of the commit</description>
+                        </footer_type>
+                    </types>
+                </component>
+            </components>
+        </commit_message_structure>
+
+        <breaking_changes>
+            <rule>MUST be indicated in type/scope by appending ! before the colon</rule>
+            <rule>MUST include BREAKING CHANGE: footer with description</rule>
+            <examples>
+                <example><![CDATA[
+feat(api)!: remove deprecated v1 endpoints
+
+BREAKING CHANGE: v1 API endpoints have been removed.
+Clients must migrate to v2 endpoints. See migration guide
+at docs/api-migration-v2.md
+        ]]></example>
+                <example><![CDATA[
+refactor!: drop support for Node 12
+
+Node 12 has reached end-of-life and is no longer supported.
+
+BREAKING CHANGE: Minimum Node.js version is now 16.x
+        ]]></example>
+            </examples>
+        </breaking_changes>
+    </conventional_commits_specification>
+
+    <subject_line_best_practices>
+        <principle name="imperative_mood">
+            <description>Write as if giving a command or instruction</description>
+            <rationale>
+                Matches git's own convention (e.g., "Merge branch..." not "Merged branch...")
+                and reads as "This commit will [subject]"
+            </rationale>
+            <examples>
+                <good>add feature X</good>
+                <good>fix bug in Y</good>
+                <good>remove deprecated Z</good>
+                <bad>added feature X</bad>
+                <bad>fixing bug in Y</bad>
+                <bad>removed deprecated Z</bad>
+            </examples>
+        </principle>
+
+        <principle name="conciseness">
+            <description>Keep subject line meaningful but brief</description>
+            <guidelines>
+                <guideline>Aim for 50 characters, maximum 72</guideline>
+                <guideline>If you can't fit it, consider if commit does too much</guideline>
+                <guideline>Details go in the body, not subject</guideline>
+            </guidelines>
+        </principle>
+
+        <principle name="specificity">
+            <description>Be specific about what changed</description>
+            <examples>
+                <good>fix null pointer exception in user profile loader</good>
+                <good>add email validation to registration form</good>
+                <bad>fix bug</bad>
+                <bad>update code</bad>
+                <bad>make changes to improve things</bad>
+            </examples>
+        </principle>
+
+        <principle name="semantic_accuracy">
+            <description>Choose the correct commit type based on actual changes</description>
+            <guidelines>
+                <guideline>Don't use "fix" for adding missing features</guideline>
+                <guideline>Don't use "feat" for bug fixes</guideline>
+                <guideline>Use "refactor" only when behavior doesn't change</guideline>
+                <guideline>Use "chore" for changes that don't affect runtime code</guideline>
+            </guidelines>
+        </principle>
+    </subject_line_best_practices>
+
+    <body_best_practices>
+        <when_to_skip_body>
+            <scenario>Simple, obvious changes (e.g., "fix typo in README")</scenario>
+            <scenario>The subject line fully explains the change</scenario>
+            <scenario>Trivial formatting or whitespace changes</scenario>
+        </when_to_skip_body>
+
+        <when_to_include_body>
+            <scenario>Complex changes requiring explanation</scenario>
+            <scenario>Multiple related changes in one commit</scenario>
+            <scenario>Trade-offs or design decisions need documenting</scenario>
+            <scenario>Breaking changes that need migration guidance</scenario>
+            <scenario>Performance improvements with metrics</scenario>
+        </when_to_include_body>
+
+        <body_structure_patterns>
+            <pattern name="what_and_why">
+                <description>Explain what changed and why, not how</description>
+                <example><![CDATA[
+refactor(cache): replace in-memory cache with Redis
+
+The in-memory cache doesn't scale across multiple server
+instances, causing cache inconsistencies in production.
+Redis provides a shared cache that all instances can use.
+
+This reduces cache miss rate from 45% to 12% in our
+load testing environment.
+        ]]></example>
+            </pattern>
+
+            <pattern name="bullet_points">
+                <description>Use bullet points for multiple related changes</description>
+                <example><![CDATA[
+feat(api): add comprehensive request validation
+
+Add validation middleware to ensure API requests are
+well-formed before processing:
+
+- Validate request body schema with JSON Schema
+- Check authentication tokens for all protected routes
+- Sanitize user input to prevent injection attacks
+- Return detailed error messages for validation failures
+        ]]></example>
+            </pattern>
+
+            <pattern name="migration_guide">
+                <description>For breaking changes, include migration information</description>
+                <example><![CDATA[
+feat(api)!: change authentication to token-based system
+
+Replace session-based authentication with JWT tokens
+for better scalability and stateless API design.
+
+Migration:
+1. Update client to obtain JWT token from /auth/login
+2. Include token in Authorization header: Bearer <token>
+3. Remove session cookie handling
+4. Update token refresh logic to use /auth/refresh
+
+BREAKING CHANGE: Session-based auth no longer supported.
+All clients must migrate to token-based authentication.
+        ]]></example>
+            </pattern>
+        </body_structure_patterns>
+    </body_best_practices>
+
+    <scope_selection_guidelines>
+        <principle name="consistency">
+            <description>Use existing scopes when possible</description>
+            <action>Check git log for commonly used scopes in the project</action>
+            <command>git log --oneline | grep -o '([^)]*' | sort | uniq -c | sort -rn</command>
+        </principle>
+
+        <principle name="granularity">
+            <description>Choose appropriate level of granularity</description>
+            <guidelines>
+                <guideline>Module or component name for large projects</guideline>
+                <guideline>Feature area for medium projects</guideline>
+                <guideline>Can omit scope for very small projects</guideline>
+            </guidelines>
+            <examples>
+                <large_project>auth, api, database, ui/header, ui/footer</large_project>
+                <medium_project>backend, frontend, docs</medium_project>
+                <small_project>Often no scope needed</small_project>
+            </examples>
+        </principle>
+
+        <principle name="cross_cutting_changes">
+            <description>Handle changes that affect multiple areas</description>
+            <options>
+                <option>Omit the scope entirely</option>
+                <option>Use a general scope like "core" or "all"</option>
+                <option>Split into multiple commits with specific scopes</option>
+            </options>
+        </principle>
+    </scope_selection_guidelines>
+
+    <git_workflow_integration>
+        <practice name="atomic_commits">
+            <description>Each commit should represent one logical change</description>
+            <benefits>
+                <benefit>Easier to review</benefit>
+                <benefit>Easier to revert if needed</benefit>
+                <benefit>Clearer history</benefit>
+                <benefit>Simplifies cherry-picking</benefit>
+            </benefits>
+            <antipattern>Commits with multiple unrelated changes</antipattern>
+        </practice>
+
+        <practice name="commit_early_often">
+            <description>Make small, frequent commits during development</description>
+            <rationale>Can always squash later, but can't split easily</rationale>
+        </practice>
+
+        <practice name="meaningful_history">
+            <description>Commit messages should tell a story</description>
+            <guidelines>
+                <guideline>Someone reading git log should understand project evolution</guideline>
+                <guideline>Each commit message should stand on its own</guideline>
+                <guideline>Avoid messages that only make sense with context</guideline>
+            </guidelines>
+        </practice>
+    </git_workflow_integration>
+
+    <mode_specific_practices>
+        <practice name="prefer_git_commands">
+            <description>Always use git commands before reading files directly</description>
+            <rationale>
+                Git diff provides context-aware change information that's more
+                relevant for commit message generation than raw file contents
+            </rationale>
+            <priority>1</priority>
+        </practice>
+
+        <practice name="semantic_analysis">
+            <description>Determine commit type by analyzing actual changes, not just file types</description>
+            <examples>
+                <example>
+                    <change>Adding a new function to existing file</change>
+                    <type>feat (not refactor)</type>
+                </example>
+                <example>
+                    <change>Fixing a bug by refactoring code structure</change>
+                    <type>fix (not refactor)</type>
+                </example>
+                <example>
+                    <change>Restructuring code without changing behavior</change>
+                    <type>refactor</type>
+                </example>
+            </examples>
+        </practice>
+
+        <practice name="iterative_refinement">
+            <description>Present commit message for review and refinement</description>
+            <process>
+                <step>Generate initial commit message based on changes</step>
+                <step>Display clearly formatted message to user</step>
+                <step>Request feedback with specific modification options</step>
+                <step>Apply modifications while maintaining Conventional Commits format</step>
+                <step>Iterate until user approves</step>
+            </process>
+            <tool>ask_followup_question</tool>
+        </practice>
+
+        <practice name="multi_line_handling">
+            <description>Properly format multi-line commit messages for git</description>
+            <approaches>
+                <approach name="multiple_m_flags">
+                    <description>Use multiple -m flags for git commit</description>
+                    <example>git commit -m "type: subject" -m "body line 1" -m "body line 2"</example>
+                    <pros>Works reliably across platforms</pros>
+                </approach>
+                <approach name="temp_file">
+                    <description>Write message to file and use -F flag</description>
+                    <example>git commit -F /tmp/commit-msg.txt</example>
+                    <pros>Handles very complex messages better</pros>
+                </approach>
+            </approaches>
+        </practice>
+
+        <practice name="validation_before_commit">
+            <description>Validate message format before executing commit</description>
+            <checks>
+                <check>Commit type is valid</check>
+                <check>Subject line length is appropriate</check>
+                <check>Breaking changes are properly flagged</check>
+                <check>Footer formatting is correct</check>
+            </checks>
+        </practice>
+    </mode_specific_practices>
+
+    <common_pitfalls>
+        <pitfall name="vague_messages">
+            <bad>fix bug</bad>
+            <bad>update code</bad>
+            <bad>WIP</bad>
+            <why_bad>Provides no useful information about the change</why_bad>
+            <how_to_avoid>Be specific about what changed and why</how_to_avoid>
+        </pitfall>
+
+        <pitfall name="wrong_mood">
+            <bad>added new feature</bad>
+            <bad>fixing the bug</bad>
+            <bad>updated documentation</bad>
+            <why_bad>Doesn't follow imperative mood convention</why_bad>
+            <how_to_avoid>Use imperative: "add", "fix", "update"</how_to_avoid>
+        </pitfall>
+
+        <pitfall name="wrong_type">
+            <bad>feat: fix null pointer exception</bad>
+            <bad>fix: add user authentication</bad>
+            <why_bad>Type doesn't match the semantic meaning</why_bad>
+            <how_to_avoid>Analyze what the change actually does</how_to_avoid>
+        </pitfall>
+
+        <pitfall name="missing_breaking_change_flag">
+            <bad>feat(api): remove v1 endpoints [footer: BREAKING CHANGE but no !]</bad>
+            <why_bad>Breaking changes should be visible in commit subject</why_bad>
+            <how_to_avoid>Use ! in type/scope and BREAKING CHANGE in footer</how_to_avoid>
+        </pitfall>
+
+        <pitfall name="too_much_in_subject">
+            <bad>feat(auth): add OAuth2 provider support for Google, GitHub, and Microsoft with
+                token refresh and session management</bad>
+            <why_bad>Subject line too long and detailed</why_bad>
+            <how_to_avoid>Keep subject concise, put details in body</how_to_avoid>
+        </pitfall>
+    </common_pitfalls>
+</best_practices>
