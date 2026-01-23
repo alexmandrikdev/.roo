@@ -1,0 +1,592 @@
+<error_handling>
+    <overview>
+        This guide covers how to handle various error scenarios and edge cases that
+        may occur during the commit message generation and execution workflow.
+    </overview>
+
+    <repository_errors>
+        <error name="not_a_git_repository">
+            <detection>
+                <command>git status</command>
+                <output>fatal: not a git repository (or any of the parent directories)</output>
+            </detection>
+            <handling>
+                <message>
+                    This directory is not a git repository. You need to initialize a git
+                    repository first before creating commits.
+                </message>
+                <suggestion>
+                    Would you like me to:
+                    - Initialize a new git repository here (git init)
+                    - Navigate to a different directory that contains a git repository
+                    - Cancel the operation
+                </suggestion>
+            </handling>
+            <example_response>
+                I cannot generate a commit message because this directory is not a git
+                repository. To create commits, you first need to initialize git with
+                `git init` or navigate to an existing repository.
+            </example_response>
+        </error>
+
+        <error name="empty_repository">
+            <detection>
+                <command>git status</command>
+                <output>No commits yet</output>
+            </detection>
+            <handling>
+                <note>This is not necessarily an error - it's a new repository</note>
+                <action>Proceed normally with commit generation</action>
+                <special_consideration>
+                    First commit messages are often "Initial commit" or more descriptive
+                    about the project setup
+                </special_consideration>
+            </handling>
+        </error>
+
+        <error name="detached_head">
+            <detection>
+                <command>git status</command>
+                <output>HEAD detached at</output>
+            </detection>
+            <handling>
+                <warning>
+                    You are in a detached HEAD state. Commits made here will not be
+                    associated with any branch.
+                </warning>
+                <suggestion>
+                    Consider checking out a branch before committing:
+                    - git checkout -b new-branch-name (create new branch)
+                    - git checkout existing-branch (switch to existing branch)
+                    - Continue anyway (commits will be detached)
+                </suggestion>
+            </handling>
+        </error>
+    </repository_errors>
+
+    <change_detection_errors>
+        <error name="no_changes_to_commit">
+            <detection>
+                <condition>git diff --staged returns empty</condition>
+                <condition>git diff returns empty</condition>
+                <condition>git status shows "nothing to commit, working tree clean"</condition>
+            </detection>
+            <handling>
+                <message>
+                    There are no changes to commit. The working directory is clean.
+                </message>
+                <suggestion>
+                    - Make changes to files first
+                    - Or use --allow-empty if you need to create an empty commit
+                </suggestion>
+            </handling>
+            <example_response>
+                I don't see any changes to commit. Both `git diff --staged` and `git diff`
+                return no results. Make some changes to your files, or stage existing
+                changes with `git add`, then try again.
+            </example_response>
+        </error>
+
+        <error name="only_untracked_files">
+            <detection>
+                <command>git status --short</command>
+                <output>Only lines starting with ??</output>
+            </detection>
+            <handling>
+                <message>
+                    There are untracked files but nothing is staged for commit.
+                </message>
+                <action>
+                    <ask_user>Would you like to add these files before committing?</ask_user>
+                    <show_files>List the untracked files</show_files>
+                    <options>
+                        <option>Add all untracked files (git add .)</option>
+                        <option>Add specific files (specify which files)</option>
+                        <option>Cancel commit</option>
+                    </options>
+                </action>
+            </handling>
+            <tool>ask_followup_question</tool>
+        </error>
+
+        <error name="large_binary_files_detected">
+            <detection>
+                <indicator>Binary files in git diff output</indicator>
+                <indicator>Large files in staged changes</indicator>
+            </detection>
+            <handling>
+                <warning>
+                    Warning: Large binary files detected in staged changes:
+                    {list files}
+                </warning>
+                <recommendation>
+                    Consider using Git LFS for large files. Would you like to:
+                    - Continue with commit anyway
+                    - Remove binary files from staging
+                    - Set up Git LFS for these files
+                </recommendation>
+            </handling>
+        </error>
+    </change_detection_errors>
+
+    <merge_conflict_errors>
+        <error name="unresolved_merge_conflicts">
+            <detection>
+                <command>git status</command>
+                <indicators>
+                    <indicator>Unmerged paths section present</indicator>
+                    <indicator>"both modified" status</indicator>
+                    <indicator>"both added" status</indicator>
+                </indicators>
+                <command>git status --short</command>
+                <indicators>
+                    <indicator>UU status code (both modified)</indicator>
+                    <indicator>AA status code (both added)</indicator>
+                    <indicator>DD status code (both deleted)</indicator>
+                    <indicator>AU, UA, DU, UD status codes</indicator>
+                </indicators>
+            </detection>
+            <handling>
+                <error_message>
+                    Cannot create commit: There are unresolved merge conflicts.
+                </error_message>
+                <action>
+                    <list_conflicts>Show which files have conflicts</list_conflicts>
+                    <instructions>
+                        To resolve conflicts:
+                        1. Open the conflicted files
+                        2. Look for conflict markers (&lt;&lt;&lt;&lt;&lt;&lt;&lt;, =======,
+                        &gt;&gt;&gt;&gt;&gt;&gt;&gt;)
+                        3. Resolve the conflicts by editing the files
+                        4. Remove the conflict markers
+                        5. Stage the resolved files with `git add`
+                        6. Then try committing again
+                    </instructions>
+                </action>
+                <abort>Do not proceed with commit message generation</abort>
+            </handling>
+            <example_response>
+                I cannot generate a commit message because there are unresolved merge
+                conflicts in the following files:
+                - src/auth.ts (both modified)
+                - src/config.ts (both modified)
+
+                Please resolve these conflicts first, then stage the resolved files with
+                `git add`, and I'll help you create an appropriate commit message.
+            </example_response>
+        </error>
+
+        <error name="merge_in_progress">
+            <detection>
+                <command>git status</command>
+                <output>You are in the middle of a merge</output>
+            </detection>
+            <handling>
+                <note>This is not an error - user is completing a merge</note>
+                <action>
+                    Generate merge commit message, typically in the format:
+                    - Merge branch 'branch-name'
+                    - Or custom message describing what was merged
+                </action>
+                <check_for_conflicts>Ensure all conflicts are resolved first</check_for_conflicts>
+            </handling>
+        </error>
+
+        <error name="rebase_in_progress">
+            <detection>
+                <command>git status</command>
+                <output>rebase in progress</output>
+            </detection>
+            <handling>
+                <message>
+                    A rebase operation is in progress. Commits during rebase are handled
+                    differently.
+                </message>
+                <suggestion>
+                    - Complete the rebase (git rebase --continue)
+                    - Or abort the rebase (git rebase --abort)
+                    - Then try creating a new commit
+                </suggestion>
+            </handling>
+        </error>
+    </merge_conflict_errors>
+
+    <commit_execution_errors>
+        <error name="pre_commit_hook_failure">
+            <detection>
+                <command>git commit</command>
+                <output>Contains hook failure message or non-zero exit code from hook</output>
+            </detection>
+            <handling>
+                <message>
+                    The commit failed because a pre-commit hook rejected the changes.
+                </message>
+                <action>
+                    <show_output>Display the hook's error output</show_output>
+                    <explain>
+                        Pre-commit hooks run automated checks (linting, tests, etc.) before
+                        allowing commits.
+                    </explain>
+                    <suggestions>
+                        <suggestion>Fix the issues reported by the hook</suggestion>
+                        <suggestion>Bypass the hook with --no-verify (not recommended)</suggestion>
+                        <suggestion>Review the hook configuration</suggestion>
+                    </suggestions>
+                </action>
+            </handling>
+            <example_response>
+                The commit was rejected by a pre-commit hook:
+
+                {hook output}
+
+                This usually means code quality checks failed. Please fix the issues
+                above and try committing again.
+            </example_response>
+        </error>
+
+        <error name="commit_msg_hook_failure">
+            <detection>
+                <output>commit-msg hook failure</output>
+            </detection>
+            <handling>
+                <message>
+                    The commit message was rejected by the commit-msg hook.
+                </message>
+                <explanation>
+                    The repository has a commit-msg hook that validates commit message format.
+                    The generated message doesn't meet the required format.
+                </explanation>
+                <action>
+                    <show_output>Display hook's specific error</show_output>
+                    <suggestions>
+                        <suggestion>Review the repository's commit message requirements</suggestion>
+                        <suggestion>Modify the message to meet requirements</suggestion>
+                        <suggestion>Check .git/hooks/commit-msg for validation rules</suggestion>
+                    </suggestions>
+                </action>
+            </handling>
+        </error>
+
+        <error name="gpg_signing_failure">
+            <detection>
+                <output>gpg failed to sign the data</output>
+                <output>error: unable to sign the tag</output>
+            </detection>
+            <handling>
+                <message>
+                    Git is configured to sign commits but GPG signing failed.
+                </message>
+                <common_causes>
+                    <cause>GPG key not properly configured</cause>
+                    <cause>GPG agent not running</cause>
+                    <cause>Key expired</cause>
+                    <cause>Passphrase not provided</cause>
+                </common_causes>
+                <suggestions>
+                    <suggestion>Check GPG configuration: git config --get user.signingkey</suggestion>
+                    <suggestion>Verify GPG key exists: gpg --list-secret-keys</suggestion>
+                    <suggestion>Temporarily disable signing: git commit --no-gpg-sign</suggestion>
+                    <suggestion>Start GPG agent: gpg-agent --daemon</suggestion>
+                </suggestions>
+            </handling>
+        </error>
+
+        <error name="permission_denied">
+            <detection>
+                <output>Permission denied</output>
+                <output>fatal: Unable to create</output>
+            </detection>
+            <handling>
+                <message>
+                    Cannot create commit due to permission issue.
+                </message>
+                <common_causes>
+                    <cause>.git directory has wrong permissions</cause>
+                    <cause>Repository directory is read-only</cause>
+                    <cause>Filesystem is mounted read-only</cause>
+                </common_causes>
+                <suggestions>
+                    <suggestion>Check file permissions: ls -la .git</suggestion>
+                    <suggestion>Ensure you have write access to the repository</suggestion>
+                    <suggestion>Contact administrator if this is a shared repository</suggestion>
+                </suggestions>
+            </handling>
+        </error>
+
+        <error name="nothing_added_to_commit">
+            <detection>
+                <output>nothing added to commit but untracked files present</output>
+            </detection>
+            <handling>
+                <message>
+                    There are untracked files but nothing is staged for commit.
+                </message>
+                <action>Ask user to add files first (covered in change_detection_errors)</action>
+            </handling>
+        </error>
+    </commit_execution_errors>
+
+    <message_validation_errors>
+        <error name="subject_line_too_long">
+            <detection>
+                <condition>Subject line exceeds 72 characters</condition>
+            </detection>
+            <handling>
+                <warning>
+                    Warning: Subject line is {length} characters, which exceeds the
+                    recommended 72 character limit.
+                </warning>
+                <suggestion>
+                    Consider shortening the subject line or moving details to the body.
+                </suggestion>
+                <action>Offer to automatically shorten or ask user for preferred wording</action>
+            </handling>
+        </error>
+
+        <error name="invalid_commit_type">
+            <detection>
+                <condition>Type not in standard Conventional Commits types</condition>
+            </detection>
+            <handling>
+                <warning>
+                    "{type}" is not a standard Conventional Commits type.
+                </warning>
+                <valid_types>feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert</valid_types>
+                <action>
+                    <ask_if_intentional>Is this intentional? (custom types are allowed)</ask_if_intentional>
+                    <suggest_alternatives>Did you mean: {closest matches}?</suggest_alternatives>
+                </action>
+            </handling>
+        </error>
+
+        <error name="breaking_change_inconsistency">
+            <detection>
+                <condition>BREAKING CHANGE in footer but no ! in subject</condition>
+                <condition>! in subject but no BREAKING CHANGE in footer</condition>
+            </detection>
+            <handling>
+                <error_message>
+                    Breaking change notation is inconsistent. Both ! in subject and
+                    BREAKING CHANGE in footer are required for breaking changes.
+                </error_message>
+                <action>
+                    <auto_fix>Add missing component to maintain consistency</auto_fix>
+                    <inform_user>Explain the correction made</inform_user>
+                </action>
+            </handling>
+        </error>
+
+        <error name="imperative_mood_violation">
+            <detection>
+                <indicators>
+                    <indicator>Subject starts with "added", "adds", "adding"</indicator>
+                    <indicator>Subject starts with "fixed", "fixes", "fixing"</indicator>
+                    <indicator>Subject starts with past tense verbs</indicator>
+                </indicators>
+            </detection>
+            <handling>
+                <warning>
+                    Subject line should use imperative mood (e.g., "add" not "added").
+                </warning>
+                <action>
+                    <auto_correct>Convert to imperative mood</auto_correct>
+                    <examples>
+                        <example>
+                            <wrong>added OAuth support</wrong>
+                            <correct>add OAuth support</correct>
+                        </example>
+                    </examples>
+                </action>
+            </handling>
+        </error>
+    </message_validation_errors>
+
+    <edge_cases>
+        <edge_case name="no_upstream_branch">
+            <detection>
+                <command>git status</command>
+                <output>no upstream branch</output>
+            </detection>
+            <handling>
+                <note>This doesn't prevent committing</note>
+                <action>Proceed normally with commit</action>
+                <optional_info>
+                    Inform user they may need to set upstream when pushing:
+                    git push --set-upstream origin branch-name
+                </optional_info>
+            </handling>
+        </edge_case>
+
+        <edge_case name="diverged_branches">
+            <detection>
+                <command>git status</command>
+                <output>have diverged</output>
+            </detection>
+            <handling>
+                <note>This doesn't prevent committing</note>
+                <action>Proceed with commit</action>
+                <inform>
+                    Your branch has diverged from upstream. You may need to merge or
+                    rebase after committing.
+                </inform>
+            </handling>
+        </edge_case>
+
+        <edge_case name="very_large_diff">
+            <detection>
+                <condition>git diff output is extremely large (&gt;10000 lines)</condition>
+            </detection>
+            <handling>
+                <warning>
+                    This commit includes a very large number of changes ({line count} lines).
+                </warning>
+                <suggestion>
+                    Consider splitting into multiple smaller commits if possible.
+                </suggestion>
+                <action>
+                    <use_summary>Use git diff --stat instead of full diff</use_summary>
+                    <ask_for_summary>Ask user to describe changes rather than analyzing all</ask_for_summary>
+                </action>
+            </handling>
+        </edge_case>
+
+        <edge_case name="commit_with_only_deletions">
+            <detection>
+                <condition>All changes are file deletions</condition>
+            </detection>
+            <handling>
+                <note>This is valid and requires appropriate message</note>
+                <type_suggestion>
+                    - chore: if removing unused files
+                    - refactor: if removing deprecated code
+                    - feat!: if removing features (breaking change)
+                </type_suggestion>
+                <body_recommendation>
+                    Include explanation of why files were removed
+                </body_recommendation>
+            </handling>
+        </edge_case>
+
+        <edge_case name="revert_commit">
+            <detection>
+                <condition>User explicitly wants to revert a previous commit</condition>
+            </detection>
+            <handling>
+                <type>revert</type>
+                <subject_format>
+                    revert: [original commit subject]
+
+                    This reverts commit [hash].
+                </subject_format>
+                <body_recommendation>
+                    Explain why the revert is necessary
+                </body_recommendation>
+                <note>git revert automatically creates message, but can be customized</note>
+            </handling>
+        </edge_case>
+
+        <edge_case name="empty_commit_needed">
+            <detection>
+                <condition>User wants to create commit with no changes</condition>
+            </detection>
+            <handling>
+                <use_flag>--allow-empty</use_flag>
+                <common_reasons>
+                    <reason>Trigger CI/CD pipeline</reason>
+                    <reason>Mark a point in history</reason>
+                    <reason>Document a decision</reason>
+                </common_reasons>
+                <type_suggestion>Usually "chore" type</type_suggestion>
+                <example>chore: trigger CI rebuild</example>
+            </handling>
+        </edge_case>
+
+        <edge_case name="initial_commit">
+            <detection>
+                <command>git status</command>
+                <output>No commits yet</output>
+            </detection>
+            <handling>
+                <note>First commit in repository</note>
+                <common_subjects>
+                    <subject>initial commit</subject>
+                    <subject>initial project setup</subject>
+                    <subject>initial implementation of {project_name}</subject>
+                </common_subjects>
+                <type>Usually feat or chore</type>
+                <body_recommendation>
+                    Describe what the project does and initial features included
+                </body_recommendation>
+            </handling>
+        </edge_case>
+    </edge_cases>
+
+    <recovery_procedures>
+        <procedure name="commit_failed_general">
+            <steps>
+                <step>Display the exact error message from git</step>
+                <step>Identify the error category (hook, permission, conflict, etc.)</step>
+                <step>Provide specific guidance for that error type</step>
+                <step>Offer to retry after user fixes the issue</step>
+            </steps>
+        </procedure>
+
+        <procedure name="user_cancels_during_refinement">
+            <handling>
+                <message>Commit cancelled. No changes have been made to the repository.</message>
+                <cleanup>Discard generated message</cleanup>
+                <offer>Would you like to start over or exit?</offer>
+            </handling>
+        </procedure>
+
+        <procedure name="git_command_timeout">
+            <detection>
+                <condition>Git command takes unusually long to execute</condition>
+            </detection>
+            <handling>
+                <warning>Git operation is taking longer than expected...</warning>
+                <possible_causes>
+                    <cause>Very large repository</cause>
+                    <cause>Network issues (if remote operations involved)</cause>
+                    <cause>Filesystem issues</cause>
+                </possible_causes>
+                <action>
+                    <wait>Allow reasonable timeout (30-60 seconds)</wait>
+                    <offer_cancel>Give user option to cancel</offer_cancel>
+                </action>
+            </handling>
+        </procedure>
+    </recovery_procedures>
+
+    <user_communication>
+        <principle name="clear_error_messages">
+            <description>Always provide clear, actionable error messages</description>
+            <format>
+                1. State what went wrong
+                2. Explain why it happened (if known)
+                3. Provide specific steps to fix
+                4. Offer alternatives when applicable
+            </format>
+        </principle>
+
+        <principle name="avoid_technical_jargon">
+            <description>Explain errors in user-friendly terms</description>
+            <example>
+                <bad>fatal: ref HEAD is not a symbolic ref</bad>
+                <good>
+                    Git is in a detached HEAD state, which means commits won't be
+                    associated with a branch. Create a new branch or checkout an
+                    existing one before committing.
+                </good>
+            </example>
+        </principle>
+
+        <principle name="progressive_disclosure">
+            <description>Provide essential information first, details on request</description>
+            <approach>
+                <initial>Brief error description and immediate fix</initial>
+                <if_needed>More detailed explanation and alternatives</if_needed>
+            </approach>
+        </principle>
+    </user_communication>
+</error_handling>

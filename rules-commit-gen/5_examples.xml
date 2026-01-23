@@ -1,0 +1,758 @@
+<examples>
+    <overview>
+        Complete workflow examples demonstrating how the Commit Generator mode
+        operates in various scenarios, from simple commits to complex cases.
+    </overview>
+
+    <example name="simple_feature_addition">
+        <scenario>User has staged a new authentication feature</scenario>
+        <workflow>
+            <step number="1">
+                <action>Check repository status</action>
+                <command>git status</command>
+                <output><![CDATA[
+On branch main
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        new file:   src/auth/oauth.ts
+        modified:   src/auth/index.ts
+        ]]></output>
+            </step>
+
+            <step number="2">
+                <action>Analyze staged changes</action>
+                <command>git diff --staged</command>
+                <output><![CDATA[
+diff --git a/src/auth/oauth.ts b/src/auth/oauth.ts
+new file mode 100644
+index 0000000..abc1234
+--- /dev/null
++++ b/src/auth/oauth.ts
+@@ -0,0 +1,25 @@
++export class OAuth2Provider {
++  async authenticate(code: string): Promise<User> {
++    // OAuth2 authentication implementation
++  }
++}
+
+diff --git a/src/auth/index.ts b/src/auth/index.ts
+index def5678..ghi9012
+--- a/src/auth/index.ts
++++ b/src/auth/index.ts
+@@ -1,2 +1,3 @@
+ export { AuthService } from './auth-service';
++export { OAuth2Provider } from './oauth';
+        ]]></output>
+            </step>
+
+            <step number="3">
+                <action>Generate commit message</action>
+                <analysis>
+                    - New file added (oauth.ts) with OAuth2 functionality
+                    - Existing file modified to export new class
+                    - This is a new feature addition
+                    - Scope is "auth" (authentication module)
+                </analysis>
+                <generated_message><![CDATA[
+feat(auth): add OAuth2 authentication provider
+
+Implement OAuth2 authentication to support single sign-on
+functionality. This allows users to authenticate using
+external OAuth2 providers like Google and GitHub.
+
+- Add OAuth2Provider class with authentication flow
+- Export OAuth2Provider from auth module
+        ]]></generated_message>
+            </step>
+
+            <step number="4">
+                <action>Present to user</action>
+                <display><![CDATA[
+═══════════════════════════════════════════
+Generated Commit Message
+═══════════════════════════════════════════
+
+Type:    feat
+Scope:   auth
+Subject: add OAuth2 authentication provider
+
+Body:
+Implement OAuth2 authentication to support single sign-on
+functionality. This allows users to authenticate using
+external OAuth2 providers like Google and GitHub.
+
+- Add OAuth2Provider class with authentication flow
+- Export OAuth2Provider from auth module
+
+═══════════════════════════════════════════
+Preview (as it will appear in git log):
+───────────────────────────────────────────
+feat(auth): add OAuth2 authentication provider
+
+Implement OAuth2 authentication to support single sign-on
+functionality. This allows users to authenticate using
+external OAuth2 providers like Google and GitHub.
+
+- Add OAuth2Provider class with authentication flow
+- Export OAuth2Provider from auth module
+═══════════════════════════════════════════
+        ]]></display>
+                <ask>
+                    <question>Would you like to proceed with this commit message?</question>
+                    <suggestions>
+                        <suggestion>Yes, commit with this message</suggestion>
+                        <suggestion>Modify the message</suggestion>
+                        <suggestion>Change commit type or scope</suggestion>
+                        <suggestion>Cancel commit</suggestion>
+                    </suggestions>
+                </ask>
+            </step>
+
+            <step number="5">
+                <action>User approves</action>
+                <user_response>Yes, commit with this message</user_response>
+            </step>
+
+            <step number="6">
+                <action>Execute commit</action>
+                <command><![CDATA[
+git commit \
+  -m "feat(auth): add OAuth2 authentication provider" \
+  -m "Implement OAuth2 authentication to support single sign-on
+functionality. This allows users to authenticate using
+external OAuth2 providers like Google and GitHub.
+
+- Add OAuth2Provider class with authentication flow
+- Export OAuth2Provider from auth module"
+        ]]></command>
+            </step>
+
+            <step number="7">
+                <action>Confirm success</action>
+                <output><![CDATA[
+[main abc1234] feat(auth): add OAuth2 authentication provider
+ 2 files changed, 26 insertions(+)
+ create mode 100644 src/auth/oauth.ts
+        ]]></output>
+                <confirmation>
+                    Commit created successfully!
+                    Commit hash: abc1234
+                </confirmation>
+            </step>
+        </workflow>
+    </example>
+
+    <example name="bug_fix_with_issue_reference">
+        <scenario>User has fixed a bug and wants to reference the issue</scenario>
+        <workflow>
+            <step number="1">
+                <command>git diff --staged</command>
+                <output><![CDATA[
+diff --git a/src/api/user-service.ts b/src/api/user-service.ts
+index abc1234..def5678
+--- a/src/api/user-service.ts
++++ b/src/api/user-service.ts
+@@ -45,7 +45,7 @@ export class UserService {
+   async createUser(data: UserData): Promise<User> {
+-    if (user) {
++    if (user && user.isActive) {
+       return user;
+     }
+        ]]></output>
+            </step>
+
+            <step number="2">
+                <generated_message><![CDATA[
+fix(api): prevent null reference in user creation
+
+Add null check for user.isActive to prevent null reference
+exception when creating users. The previous code only checked
+if user existed but didn't verify the isActive property was
+defined before accessing it.
+
+Fixes #234
+        ]]></generated_message>
+            </step>
+
+            <step number="3">
+                <user_feedback>Can you add that this also resolves issue #189?</user_feedback>
+            </step>
+
+            <step number="4">
+                <action>Modify footer</action>
+                <updated_message><![CDATA[
+fix(api): prevent null reference in user creation
+
+Add null check for user.isActive to prevent null reference
+exception when creating users. The previous code only checked
+if user existed but didn't verify the isActive property was
+defined before accessing it.
+
+Fixes #234
+Refs #189
+        ]]></updated_message>
+            </step>
+
+            <step number="5">
+                <action>Execute commit after approval</action>
+                <command><![CDATA[
+git commit \
+  -m "fix(api): prevent null reference in user creation" \
+  -m "Add null check for user.isActive to prevent null reference
+exception when creating users. The previous code only checked
+if user existed but didn't verify the isActive property was
+defined before accessing it." \
+  -m "Fixes #234
+Refs #189"
+        ]]></command>
+            </step>
+        </workflow>
+    </example>
+
+    <example name="breaking_change_commit">
+        <scenario>User has made API changes that break backward compatibility</scenario>
+        <workflow>
+            <step number="1">
+                <command>git diff --staged</command>
+                <output><![CDATA[
+diff --git a/src/api/v1/endpoints.ts b/src/api/v1/endpoints.ts
+deleted file mode 100644
+index abc1234..0000000
+--- a/src/api/v1/endpoints.ts
++++ /dev/null
+@@ -1,50 +0,0 @@
+-// v1 endpoints removed
+
+diff --git a/src/api/v2/endpoints.ts b/src/api/v2/endpoints.ts
+index def5678..ghi9012
+--- a/src/api/v2/endpoints.ts
++++ b/src/api/v2/endpoints.ts
+@@ -10,6 +10,7 @@
++// All endpoints now require authentication
+        ]]></output>
+            </step>
+
+            <step number="2">
+                <analysis>
+                    - v1 API endpoints completely removed
+                    - v2 endpoints now require authentication
+                    - This is a breaking change
+                    - Type: feat (removal of deprecated functionality)
+                    - Must include BREAKING CHANGE in footer
+                    - Must use ! in subject
+                </analysis>
+            </step>
+
+            <step number="3">
+                <generated_message><![CDATA[
+feat(api)!: remove deprecated v1 endpoints
+
+Remove all v1 API endpoints as they were deprecated in
+version 2.0.0 released six months ago. All API endpoints
+now require authentication via Bearer token.
+
+Migration guide available at docs/api-migration-v2.md
+
+BREAKING CHANGE: v1 API endpoints are no longer available.
+All clients must migrate to v2 endpoints and include
+authentication tokens in requests.
+        ]]></generated_message>
+            </step>
+
+            <step number="4">
+                <display><![CDATA[
+═══════════════════════════════════════════
+Generated Commit Message
+═══════════════════════════════════════════
+
+Type:    feat (with breaking change)
+Scope:   api
+Subject: remove deprecated v1 endpoints
+
+⚠️  BREAKING CHANGE DETECTED
+
+Body:
+Remove all v1 API endpoints as they were deprecated in
+version 2.0.0 released six months ago. All API endpoints
+now require authentication via Bearer token.
+
+Migration guide available at docs/api-migration-v2.md
+
+Footer:
+BREAKING CHANGE: v1 API endpoints are no longer available.
+All clients must migrate to v2 endpoints and include
+authentication tokens in requests.
+
+═══════════════════════════════════════════
+        ]]></display>
+            </step>
+
+            <step number="5">
+                <command><![CDATA[
+git commit \
+  -m "feat(api)!: remove deprecated v1 endpoints" \
+  -m "Remove all v1 API endpoints as they were deprecated in
+version 2.0.0 released six months ago. All API endpoints
+now require authentication via Bearer token.
+
+Migration guide available at docs/api-migration-v2.md" \
+  -m "BREAKING CHANGE: v1 API endpoints are no longer available.
+All clients must migrate to v2 endpoints and include
+authentication tokens in requests."
+        ]]></command>
+            </step>
+        </workflow>
+    </example>
+
+    <example name="no_staged_changes_fallback">
+        <scenario>User has unstaged changes but nothing staged</scenario>
+        <workflow>
+            <step number="1">
+                <command>git diff --staged</command>
+                <output>(empty)</output>
+            </step>
+
+            <step number="2">
+                <action>Fall back to unstaged changes</action>
+                <command>git diff</command>
+                <output><![CDATA[
+diff --git a/README.md b/README.md
+index abc1234..def5678
+--- a/README.md
++++ b/README.md
+@@ -15,5 +15,12 @@
++## Installation
++
++```bash
++npm install
++```
+        ]]></output>
+            </step>
+
+            <step number="3">
+                <generated_message><![CDATA[
+docs(readme): add installation instructions
+
+Add npm installation instructions to README to help
+new users get started with the project.
+        ]]></generated_message>
+            </step>
+
+            <step number="4">
+                <action>Inform user about unstaged changes</action>
+                <message>
+                    Note: You have unstaged changes. I'll generate a commit message
+                    based on these changes, but you'll need to stage them first with
+                    `git add README.md` before committing.
+                </message>
+            </step>
+        </workflow>
+    </example>
+
+    <example name="untracked_files_handling">
+        <scenario>User has only untracked files</scenario>
+        <workflow>
+            <step number="1">
+                <command>git status --short</command>
+                <output><![CDATA[
+?? src/new-feature.ts
+?? tests/new-feature.test.ts
+        ]]></output>
+            </step>
+
+            <step number="2">
+                <command>git diff --staged</command>
+                <output>(empty)</output>
+            </step>
+
+            <step number="3">
+                <command>git diff</command>
+                <output>(empty)</output>
+            </step>
+
+            <step number="4">
+                <action>Detect untracked files only</action>
+                <message>
+                    I found untracked files but nothing is staged for commit:
+                    - src/new-feature.ts
+                    - tests/new-feature.test.ts
+                </message>
+                <ask>
+                    <question>Would you like to add these files before committing?</question>
+                    <suggestions>
+                        <suggestion>Yes, add all files (git add .)</suggestion>
+                        <suggestion>Add only src/new-feature.ts</suggestion>
+                        <suggestion>Add only tests/new-feature.test.ts</suggestion>
+                        <suggestion>Cancel</suggestion>
+                    </suggestions>
+                </ask>
+            </step>
+
+            <step number="5">
+                <user_response>Yes, add all files</user_response>
+            </step>
+
+            <step number="6">
+                <command>git add .</command>
+                <action>Then proceed with normal workflow</action>
+            </step>
+        </workflow>
+    </example>
+
+    <example name="merge_conflict_detection">
+        <scenario>User tries to commit with unresolved merge conflicts</scenario>
+        <workflow>
+            <step number="1">
+                <command>git status</command>
+                <output><![CDATA[
+On branch main
+You have unmerged paths.
+  (fix conflicts and run "git commit")
+  (use "git merge --abort" to abort the merge)
+
+Unmerged paths:
+  (use "git add <file>..." to mark resolution)
+        both modified:   src/config.ts
+        both modified:   src/auth.ts
+        ]]></output>
+            </step>
+
+            <step number="2">
+                <action>Detect merge conflicts</action>
+                <error_message><![CDATA[
+Cannot create commit: There are unresolved merge conflicts.
+
+The following files have conflicts:
+- src/config.ts (both modified)
+- src/auth.ts (both modified)
+
+To resolve conflicts:
+1. Open the conflicted files
+2. Look for conflict markers (<<<<<<<, =======, >>>>>>>)
+3. Resolve the conflicts by editing the files
+4. Remove the conflict markers
+5. Stage the resolved files with `git add <file>`
+6. Then try committing again
+
+I'll be ready to help you create a commit message once the
+conflicts are resolved.
+        ]]></error_message>
+            </step>
+
+            <step number="3">
+                <action>Abort commit message generation</action>
+                <note>Do not proceed until conflicts are resolved</note>
+            </step>
+        </workflow>
+    </example>
+
+    <example name="performance_improvement">
+        <scenario>User has optimized database queries</scenario>
+        <workflow>
+            <step number="1">
+                <command>git diff --staged</command>
+                <output><![CDATA[
+diff --git a/src/database/queries.ts b/src/database/queries.ts
+index abc1234..def5678
+--- a/src/database/queries.ts
++++ b/src/database/queries.ts
+@@ -10,8 +10,10 @@
+-  const users = await db.users.findMany();
+-  return users.filter(u => u.isActive);
++  const users = await db.users.findMany({
++    where: { isActive: true }
++  });
++  return users;
+        ]]></output>
+            </step>
+
+            <step number="2">
+                <generated_message><![CDATA[
+perf(database): optimize user query filtering
+
+Move active user filtering from application layer to database
+query. This reduces data transfer and memory usage by filtering
+at the database level instead of fetching all users and filtering
+in JavaScript.
+
+Performance improvement: Query time reduced from ~450ms to ~45ms
+in testing with 10,000 user records.
+        ]]></generated_message>
+            </step>
+        </workflow>
+    </example>
+
+    <example name="refactoring_without_behavior_change">
+        <scenario>User has extracted functions for better code organization</scenario>
+        <workflow>
+            <step number="1">
+                <command>git diff --staged</command>
+                <output><![CDATA[
+diff --git a/src/utils/validation.ts b/src/utils/validation.ts
+index abc1234..def5678
+--- a/src/utils/validation.ts
++++ b/src/utils/validation.ts
+@@ -5,20 +5,25 @@
+ export function validateUserInput(data: any) {
+-  if (!data.email || !data.email.includes('@')) {
+-    throw new Error('Invalid email');
+-  }
+-  if (!data.password || data.password.length < 8) {
+-    throw new Error('Invalid password');
+-  }
++  validateEmail(data.email);
++  validatePassword(data.password);
+   return true;
+ }
++
++function validateEmail(email: string) {
++  if (!email || !email.includes('@')) {
++    throw new Error('Invalid email');
++  }
++}
++
++function validatePassword(password: string) {
++  if (!password || password.length < 8) {
++    throw new Error('Invalid password');
++  }
++}
+        ]]></output>
+            </step>
+
+            <step number="2">
+                <analysis>
+                    - Code has been restructured
+                    - Logic extracted into separate functions
+                    - No behavior change (same validation rules)
+                    - This is pure refactoring
+                </analysis>
+            </step>
+
+            <step number="3">
+                <generated_message><![CDATA[
+refactor(validation): extract email and password validation
+
+Extract email and password validation logic into separate
+functions for better code organization and reusability.
+No functional changes to validation behavior.
+        ]]></generated_message>
+            </step>
+        </workflow>
+    </example>
+
+    <example name="multiple_commits_suggestion">
+        <scenario>User has staged changes that should be multiple commits</scenario>
+        <workflow>
+            <step number="1">
+                <command>git diff --staged --stat</command>
+                <output><![CDATA[
+src/auth/oauth.ts        | 50 +++++++++++++++++++++++++++++
+src/api/endpoints.ts     | 30 +++++++++---------
+src/database/schema.sql  | 15 +++++++++
+tests/api.test.ts        | 45 +++++++++++++++++++++++++
+README.md                | 10 ++++++
+5 files changed, 145 insertions(+), 5 deletions(-)
+        ]]></output>
+            </step>
+
+            <step number="2">
+                <analysis>
+                    Multiple unrelated changes:
+                    - New OAuth feature (new file)
+                    - API refactoring (existing file modified)
+                    - Database schema changes
+                    - New tests
+                    - Documentation updates
+                </analysis>
+            </step>
+
+            <step number="3">
+                <action>Suggest splitting commits</action>
+                <suggestion><![CDATA[
+I notice you have several unrelated changes staged. For a clearer
+git history, consider splitting these into separate commits:
+
+1. feat(auth): add OAuth2 authentication
+   - src/auth/oauth.ts
+
+2. refactor(api): restructure endpoint handlers
+   - src/api/endpoints.ts
+
+3. feat(database): add user authentication schema
+   - src/database/schema.sql
+
+4. test(api): add endpoint integration tests
+   - tests/api.test.ts
+
+5. docs(readme): update authentication documentation
+   - README.md
+
+Would you like to:
+- Split into multiple commits (I can guide you through this)
+- Proceed with a single commit anyway
+- Cancel and manually stage changes
+        ]]></suggestion>
+            </step>
+        </workflow>
+    </example>
+
+    <example name="iterative_refinement">
+        <scenario>User wants to modify the generated message</scenario>
+        <workflow>
+            <step number="1">
+                <initial_message><![CDATA[
+feat(api): add rate limiting middleware
+
+Implement rate limiting to prevent API abuse and ensure
+fair usage across all clients.
+        ]]></initial_message>
+            </step>
+
+            <step number="2">
+                <user_feedback>
+                    Can you expand the body to include details about the limits
+                    and also mention that this fixes issue #456?
+                </user_feedback>
+            </step>
+
+            <step number="3">
+                <revised_message><![CDATA[
+feat(api): add rate limiting middleware
+
+Implement rate limiting to prevent API abuse and ensure
+fair usage across all clients. The middleware enforces
+the following limits:
+
+- 100 requests per minute for authenticated users
+- 20 requests per minute for unauthenticated requests
+- 1000 requests per hour global limit
+
+Rate limit information is returned in response headers
+to help clients manage their request rates.
+
+Fixes #456
+        ]]></revised_message>
+            </step>
+
+            <step number="4">
+                <user_feedback>Perfect, but can you change the type to "fix" since this was fixing
+                    the abuse issue?</user_feedback>
+            </step>
+
+            <step number="5">
+                <final_message><![CDATA[
+fix(api): add rate limiting middleware
+
+Implement rate limiting to prevent API abuse and ensure
+fair usage across all clients. The middleware enforces
+the following limits:
+
+- 100 requests per minute for authenticated users
+- 20 requests per minute for unauthenticated requests
+- 1000 requests per hour global limit
+
+Rate limit information is returned in response headers
+to help clients manage their request rates.
+
+Fixes #456
+        ]]></final_message>
+            </step>
+
+            <step number="6">
+                <user_approval>Yes, commit with this message</user_approval>
+            </step>
+        </workflow>
+    </example>
+
+    <template_reference>
+        <commit_message_template><![CDATA[
+<type>[optional scope][optional !]: <description>
+
+[optional body]
+
+[optional footer(s)]
+    ]]></commit_message_template>
+
+        <type_selection_guide>
+            <question>What does this change do?</question>
+            <answers>
+                <answer>
+                    <response>Adds new functionality</response>
+                    <type>feat</type>
+                </answer>
+                <answer>
+                    <response>Fixes a bug or issue</response>
+                    <type>fix</type>
+                </answer>
+                <answer>
+                    <response>Updates documentation only</response>
+                    <type>docs</type>
+                </answer>
+                <answer>
+                    <response>Changes code formatting/style only</response>
+                    <type>style</type>
+                </answer>
+                <answer>
+                    <response>Restructures code without changing behavior</response>
+                    <type>refactor</type>
+                </answer>
+                <answer>
+                    <response>Improves performance</response>
+                    <type>perf</type>
+                </answer>
+                <answer>
+                    <response>Adds or updates tests</response>
+                    <type>test</type>
+                </answer>
+                <answer>
+                    <response>Changes build system or dependencies</response>
+                    <type>build</type>
+                </answer>
+                <answer>
+                    <response>Changes CI/CD configuration</response>
+                    <type>ci</type>
+                </answer>
+                <answer>
+                    <response>Other changes (tooling, config, etc.)</response>
+                    <type>chore</type>
+                </answer>
+                <answer>
+                    <response>Reverts a previous commit</response>
+                    <type>revert</type>
+                </answer>
+            </answers>
+        </type_selection_guide>
+
+        <presentation_template><![CDATA[
+═══════════════════════════════════════════
+Generated Commit Message
+═══════════════════════════════════════════
+
+Type:    {commit_type}
+Scope:   {scope_or_none}
+Subject: {subject_line}
+
+{if body_exists}
+Body:
+{body_text}
+{endif}
+
+{if footer_exists}
+Footer:
+{footer_text}
+{endif}
+
+{if breaking_change}
+⚠️  BREAKING CHANGE DETECTED
+{endif}
+
+═══════════════════════════════════════════
+Preview (as it will appear in git log):
+───────────────────────────────────────────
+{full_commit_message}
+═══════════════════════════════════════════
+
+Would you like to proceed with this commit message?
+    ]]></presentation_template>
+    </template_reference>
+</examples>
