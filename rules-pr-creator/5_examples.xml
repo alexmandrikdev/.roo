@@ -107,11 +107,6 @@
                     - Added unit tests for AuthService token generation and validation
                     - Added component tests for Login form rendering and submission
                     - Achieved 95% code coverage on authentication modules
-
-                    ### Commit Messages Reference
-                    - Add JWT authentication service
-                    - Implement login component
-                    - Add login tests
                 </generated_description>
             </step>
 
@@ -237,10 +232,6 @@
                     - Added test suite for concurrent payment scenarios
                     - Verified mutex correctly prevents race conditions
                     - Tested payment retry logic with proper locking
-
-                    ### Commit Messages Reference
-                    - Fix race condition in payment processor
-                    - Add test for concurrent payment processing
                 </description>
             </generated_content>
         </workflow>
@@ -291,13 +282,6 @@
                 - Updated all component tests to work with functional components
                 - Maintained 100% test coverage
                 - All existing tests pass without behavioral changes
-
-                ### Commit Messages Reference
-                - Refactor UserProfile to use hooks
-                - Refactor Dashboard to use hooks
-                - Refactor Settings to use hooks
-                - Update tests for functional components
-                - Remove unused lifecycle methods
             </description>
         </generated_content>
     </example>
@@ -334,10 +318,6 @@
                 - Added error response examples
                 - Included rate limiting information
                 - Added authentication flow diagrams
-
-                ### Commit Messages Reference
-                - Add authentication examples to API docs
-                - Update user endpoint documentation with examples
             </description>
         </generated_content>
     </example>
@@ -395,11 +375,6 @@
                 - **Breaking Changes:**
                 - Settings form now requires sanitized input; any direct DOM manipulation will be
                 blocked
-
-                ### Commit Messages Reference
-                - feat: add user preferences page
-                - fix: resolve XSS vulnerability in settings form
-                - feat: add theme selection
             </description>
         </generated_content>
     </example>

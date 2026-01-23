@@ -163,20 +163,6 @@
                 </step>
 
                 <step number="4">
-                    <action>Generate Commit Messages Reference section</action>
-                    <purpose>For traceability and context</purpose>
-                    <format>
-                        List each commit message (one per line) in chronological order.
-                        Use the original commit messages without modification.
-                    </format>
-                    <template>
-                        - [commit message 1]
-                        - [commit message 2]
-                        - [commit message 3]
-                    </template>
-                </step>
-
-                <step number="5">
                     <action>Assemble complete PR description</action>
                     <structure>
                         ### Summary
@@ -189,10 +175,6 @@
                         - **Architectural Shifts:** [if applicable]
                         - **Bug Fixes:** [if applicable]
                         - **Performance Impacts:** [if applicable]
-
-                        ### Commit Messages Reference
-                        - [commit 1]
-                        - [commit 2]
                     </structure>
                 </step>
             </steps>
@@ -244,25 +226,6 @@
             <description>Create the PR using GitHub CLI</description>
             <steps>
                 <step number="1">
-                    <action>Verify gh CLI is installed</action>
-                    <command>gh --version</command>
-                    <fallback>
-                        If gh is not installed, provide instructions for installation:
-                        - macOS: brew install gh
-                        - Linux: See https://github.com/cli/cli/blob/trunk/docs/install_linux.md
-                        - Windows: winget install GitHub.cli
-                    </fallback>
-                </step>
-
-                <step number="2">
-                    <action>Verify gh authentication</action>
-                    <command>gh auth status</command>
-                    <fallback>
-                        If not authenticated, instruct user to run: gh auth login
-                    </fallback>
-                </step>
-
-                <step number="3">
                     <action>Create the pull request</action>
                     <command>
                         gh pr create --title "[TITLE]" --body "[DESCRIPTION]" --base main
@@ -280,7 +243,7 @@
                     </alternative_approach>
                 </step>
 
-                <step number="4">
+                <step number="2">
                     <action>Confirm success</action>
                     <details>
                         Parse the gh CLI output to get the PR URL.
@@ -308,17 +271,6 @@
         <error scenario="No commits to PR">
             <message>There are no commits on this branch that aren't already in origin/main. Nothing
                 to create a PR for.</message>
-            <exit>true</exit>
-        </error>
-
-        <error scenario="gh CLI not installed">
-            <message>GitHub CLI (gh) is not installed. Please install it to create pull requests.</message>
-            <provide_instructions>true</provide_instructions>
-            <exit>true</exit>
-        </error>
-
-        <error scenario="Not authenticated with gh">
-            <message>You are not authenticated with GitHub CLI. Please run 'gh auth login' first.</message>
             <exit>true</exit>
         </error>
 
