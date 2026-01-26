@@ -120,26 +120,12 @@
             </step>
 
             <step number="9">
-                <description>Verify gh CLI</description>
-                <command>gh --version</command>
-                <output>gh version 2.40.0 (2024-01-15)</output>
-                <action>gh is installed, proceed</action>
-            </step>
-
-            <step number="10">
-                <description>Check authentication</description>
-                <command>gh auth status</command>
-                <output>✓ Logged in to github.com as developer123</output>
-                <action>Authenticated, proceed</action>
-            </step>
-
-            <step number="11">
                 <description>Write description to file</description>
                 <command>echo "[DESCRIPTION]" > /tmp/pr-description.md</command>
                 <note>Using temp file to avoid shell escaping issues</note>
             </step>
 
-            <step number="12">
+            <step number="10">
                 <description>Create PR</description>
                 <command>gh pr create --title "feat: add JWT-based user authentication" --body-file
                     /tmp/pr-description.md --base main</command>
@@ -149,12 +135,12 @@
                 </output>
             </step>
 
-            <step number="13">
+            <step number="11">
                 <description>Clean up</description>
                 <command>rm /tmp/pr-description.md</command>
             </step>
 
-            <step number="14">
+            <step number="12">
                 <description>Confirm to user</description>
                 <message>
                     Pull request created successfully!

@@ -110,18 +110,6 @@
 
             <phase name="pr_creation">
                 <step number="1">
-                    <command>gh --version</command>
-                    <purpose>Verify gh CLI is installed</purpose>
-                    <error_handling>Provide installation instructions if not found</error_handling>
-                </step>
-
-                <step number="2">
-                    <command>gh auth status</command>
-                    <purpose>Verify authentication</purpose>
-                    <error_handling>Instruct to run gh auth login if not authenticated</error_handling>
-                </step>
-
-                <step number="3">
                     <command>gh pr create --title "TITLE" --body-file /tmp/pr-description.md --base
                         main</command>
                     <purpose>Create the pull request</purpose>
@@ -145,11 +133,6 @@
             <error scenario="Remote branch not found">
                 <detection>Error message contains "unknown revision" or "does not exist"</detection>
                 <response>Try alternative branch name (master instead of main, or vice versa)</response>
-            </error>
-
-            <error scenario="Authentication required">
-                <detection>gh command fails with authentication error</detection>
-                <response>Instruct user to run: gh auth login</response>
             </error>
         </error_handling>
     </execute_command_guidance>
@@ -304,35 +287,23 @@
             <step number="8">
                 <conditional>If user approves</conditional>
                 <tool>execute_command</tool>
-                <command>gh --version</command>
-                <purpose>Verify gh CLI available</purpose>
-            </step>
-
-            <step number="9">
-                <tool>execute_command</tool>
-                <command>gh auth status</command>
-                <purpose>Verify authenticated</purpose>
-            </step>
-
-            <step number="10">
-                <tool>execute_command</tool>
                 <command>echo "DESCRIPTION" > /tmp/pr-description.md</command>
                 <purpose>Write description to temp file</purpose>
             </step>
 
-            <step number="11">
+            <step number="9">
                 <tool>execute_command</tool>
                 <command>gh pr create --title "TITLE" --body-file /tmp/pr-description.md --base main</command>
                 <purpose>Create the PR</purpose>
             </step>
 
-            <step number="12">
+            <step number="10">
                 <tool>execute_command</tool>
                 <command>rm /tmp/pr-description.md</command>
                 <purpose>Clean up temp file</purpose>
             </step>
 
-            <step number="13">
+            <step number="11">
                 <action>Present PR URL to user and confirm success</action>
             </step>
         </complete_workflow>

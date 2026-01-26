@@ -118,26 +118,6 @@
     </git_commands>
 
     <github_cli_commands>
-        <command name="check_gh_version">
-            <purpose>Verify GitHub CLI is installed</purpose>
-            <syntax>gh --version</syntax>
-            <expected_output>gh version X.Y.Z (YYYY-MM-DD)</expected_output>
-            <error_handling>
-                If command fails, gh is not installed. Provide installation instructions.
-            </error_handling>
-        </command>
-
-        <command name="check_authentication">
-            <purpose>Verify user is authenticated with GitHub</purpose>
-            <syntax>gh auth status</syntax>
-            <expected_output>
-                ✓ Logged in to github.com as [username]
-            </expected_output>
-            <error_handling>
-                If not authenticated, instruct user to run: gh auth login
-            </error_handling>
-        </command>
-
         <command name="create_pr_basic">
             <purpose>Create a pull request with title and body</purpose>
             <syntax>gh pr create --title "TITLE" --body "DESCRIPTION" --base main</syntax>
@@ -354,24 +334,5 @@
             </alternative>
         </pattern>
 
-        <pattern name="gh_not_installed">
-            <scenario>GitHub CLI not available</scenario>
-            <detection>gh --version returns error</detection>
-            <recovery>
-                Provide installation instructions:
-                - macOS: brew install gh
-                - Ubuntu/Debian: See https://github.com/cli/cli/blob/trunk/docs/install_linux.md
-                - Windows: winget install GitHub.cli
-            </recovery>
-        </pattern>
-
-        <pattern name="not_authenticated">
-            <scenario>User not logged in to GitHub</scenario>
-            <detection>gh auth status returns not authenticated</detection>
-            <recovery>
-                Instruct user to authenticate:
-                gh auth login
-            </recovery>
-        </pattern>
     </error_recovery_patterns>
 </common_patterns>
