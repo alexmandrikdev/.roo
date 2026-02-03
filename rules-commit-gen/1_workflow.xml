@@ -179,14 +179,14 @@
                 <step number="1">
                     <action>Display the commit message clearly</action>
                     <details>
-                        Show the generated commit message in a well-formatted way that
-                        distinguishes different components:
-                        - Clearly label the Type, Scope, and Subject
-                        - Show the Body in a separate section
-                        - Show Footer items separately
-                        - Use formatting to make it easy to read
+                        Show the generated commit message as it will appear in git log.
+                        Use clear formatting with visual separators to make it easy to read:
+                        - Display the full commit message (subject + body + footer)
+                        - Use box drawing characters for visual separation
+                        - Include a warning indicator (⚠️) if breaking changes are present
 
-                        Also show a preview of what the commit will look like.
+                        Do NOT show redundant breakdowns of Type/Scope/Subject separately,
+                        as the preview already shows the final format clearly.
                     </details>
                 </step>
 

@@ -69,24 +69,9 @@ external OAuth2 providers like Google and GitHub.
                 <action>Present to user</action>
                 <display><![CDATA[
 ═══════════════════════════════════════════
-Generated Commit Message
+Commit Message
 ═══════════════════════════════════════════
 
-Type:    feat
-Scope:   auth
-Subject: add OAuth2 authentication provider
-
-Body:
-Implement OAuth2 authentication to support single sign-on
-functionality. This allows users to authenticate using
-external OAuth2 providers like Google and GitHub.
-
-- Add OAuth2Provider class with authentication flow
-- Export OAuth2Provider from auth module
-
-═══════════════════════════════════════════
-Preview (as it will appear in git log):
-───────────────────────────────────────────
 feat(auth): add OAuth2 authentication provider
 
 Implement OAuth2 authentication to support single sign-on
@@ -95,6 +80,7 @@ external OAuth2 providers like Google and GitHub.
 
 - Add OAuth2Provider class with authentication flow
 - Export OAuth2Provider from auth module
+
 ═══════════════════════════════════════════
         ]]></display>
                 <ask>
@@ -262,23 +248,19 @@ authentication tokens in requests.
             <step number="4">
                 <display><![CDATA[
 ═══════════════════════════════════════════
-Generated Commit Message
+Commit Message
 ═══════════════════════════════════════════
 
-Type:    feat (with breaking change)
-Scope:   api
-Subject: remove deprecated v1 endpoints
+⚠️  BREAKING CHANGE
 
-⚠️  BREAKING CHANGE DETECTED
+feat(api)!: remove deprecated v1 endpoints
 
-Body:
 Remove all v1 API endpoints as they were deprecated in
 version 2.0.0 released six months ago. All API endpoints
 now require authentication via Bearer token.
 
 Migration guide available at docs/api-migration-v2.md
 
-Footer:
 BREAKING CHANGE: v1 API endpoints are no longer available.
 All clients must migrate to v2 endpoints and include
 authentication tokens in requests.
@@ -725,31 +707,15 @@ Fixes #456
 
         <presentation_template><![CDATA[
 ═══════════════════════════════════════════
-Generated Commit Message
+Commit Message
 ═══════════════════════════════════════════
-
-Type:    {commit_type}
-Scope:   {scope_or_none}
-Subject: {subject_line}
-
-{if body_exists}
-Body:
-{body_text}
-{endif}
-
-{if footer_exists}
-Footer:
-{footer_text}
-{endif}
 
 {if breaking_change}
-⚠️  BREAKING CHANGE DETECTED
-{endif}
+⚠️  BREAKING CHANGE
 
-═══════════════════════════════════════════
-Preview (as it will appear in git log):
-───────────────────────────────────────────
+{endif}
 {full_commit_message}
+
 ═══════════════════════════════════════════
 
 Would you like to proceed with this commit message?
