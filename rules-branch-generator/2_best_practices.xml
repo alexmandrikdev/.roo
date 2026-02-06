@@ -1,0 +1,254 @@
+<best_practices>
+    <general_principles>
+        <principle priority="high">
+            <name>Logical Commit Grouping</name>
+            <description>
+                Group commits based on their logical purpose and relationships, not just file
+                proximity.
+                Each branch should represent a cohesive feature, fix, or change that can stand
+                alone.
+            </description>
+            <rationale>
+                Well-grouped commits make PRs easier to review, test, and merge. They also enable
+                independent deployment and easier rollback if issues arise.
+            </rationale>
+            <guidelines>
+                <guideline>Group commits that modify related functionality together</guideline>
+                <guideline>Keep unrelated changes in separate branches</guideline>
+                <guideline>Consider the atomic principle: each branch should be the smallest
+                    deployable unit</guideline>
+                <guideline>Respect dependencies: if commit B depends on commit A, keep them together</guideline>
+            </guidelines>
+        </principle>
+
+        <principle priority="high">
+            <name>Descriptive Branch Naming</name>
+            <description>
+                Branch names should clearly convey the type and purpose of changes using the
+                alexmandrik/{type}/{descriptive-name} format.
+            </description>
+            <rationale>
+                Clear branch names improve repository navigation, make PR intent obvious, and
+                help team members understand work in progress.
+            </rationale>
+            <examples>
+                <good>alexmandrik/feat/user-authentication</good>
+                <good>alexmandrik/fix/null-pointer-in-parser</good>
+                <good>alexmandrik/docs/api-endpoint-guide</good>
+                <good>alexmandrik/refactor/extract-validation-logic</good>
+                <bad>alexmandrik/misc/changes</bad>
+                <bad>alexmandrik/feat/stuff</bad>
+                <bad>alexmandrik/updates</bad>
+            </examples>
+            <naming_rules>
+                <rule>Use kebab-case for the descriptive portion</rule>
+                <rule>Keep names concise but meaningful (3-5 words ideal)</rule>
+                <rule>Use conventional commit types: feat, fix, docs, chore, refactor, test, style,
+                    perf</rule>
+                <rule>Avoid generic terms like "update", "change", "misc"</rule>
+            </naming_rules>
+        </principle>
+
+        <principle priority="medium">
+            <name>Chronological Cherry-Picking</name>
+            <description>
+                Always cherry-pick commits in chronological order within each branch group to
+                maintain proper history and minimize conflicts.
+            </description>
+            <rationale>
+                Preserving chronological order helps avoid merge conflicts and maintains the
+                logical progression of changes.
+            </rationale>
+            <example>
+                If commits are:
+                - A (oldest)
+                - B
+                - C (newest)
+
+                Cherry-pick in order: A, then B, then C
+                Never: C, then A, then B
+            </example>
+        </principle>
+
+        <principle priority="high">
+            <name>Clean Base Branch</name>
+            <description>
+                Always create new branches from an updated main branch and pull latest changes
+                after each merge before creating the next branch.
+            </description>
+            <rationale>
+                Starting from updated main ensures branches have the latest code and reduces
+                conflicts. Pulling after merges keeps the base current for subsequent branches.
+            </rationale>
+            <workflow>
+                <step>git checkout main</step>
+                <step>git pull origin main</step>
+                <step>git checkout -b new-branch-name</step>
+                <step>... cherry-pick commits ...</step>
+                <step>... create PR and wait for merge ...</step>
+                <step>git checkout main</step>
+                <step>git pull origin main (get the merged changes)</step>
+                <step>Repeat for next branch</step>
+            </workflow>
+        </principle>
+
+        <principle priority="medium">
+            <name>User Confirmation Points</name>
+            <description>
+                Always confirm with the user before executing the plan and after each PR creation
+                before proceeding to the next branch.
+            </description>
+            <rationale>
+                User confirmation ensures the grouping plan is correct and allows them to review
+                and merge PRs at their own pace.
+            </rationale>
+            <confirmation_points>
+                <point>After presenting the branching plan</point>
+                <point>After each PR is created (wait for merge confirmation)</point>
+                <point>When conflicts occur during cherry-picking</point>
+            </confirmation_points>
+        </principle>
+    </general_principles>
+
+    <commit_analysis_guidelines>
+        <guideline category="type_detection">
+            <rule>Look for conventional commit prefixes in commit messages</rule>
+            <patterns>
+                <pattern>feat: or feat(scope): indicates new features</pattern>
+                <pattern>fix: or fix(scope): indicates bug fixes</pattern>
+                <pattern>docs: indicates documentation changes</pattern>
+                <pattern>test: indicates test additions/modifications</pattern>
+                <pattern>refactor: indicates code refactoring</pattern>
+                <pattern>style: indicates formatting changes</pattern>
+                <pattern>chore: indicates maintenance tasks</pattern>
+                <pattern>perf: indicates performance improvements</pattern>
+            </patterns>
+            <fallback>If no prefix found, infer type from commit message content and file changes</fallback>
+        </guideline>
+
+        <guideline category="relationship_detection">
+            <rule>Identify commits that should be grouped together</rule>
+            <indicators>
+                <indicator>Commits modifying the same files or modules</indicator>
+                <indicator>Commits with similar message patterns or keywords</indicator>
+                <indicator>Commits that reference each other ("Fixes #123", "Related to prev
+                    commit")</indicator>
+                <indicator>Commits that together complete a feature ("Add X", "Wire up X", "Test X")</indicator>
+                <indicator>Sequential commits by the same author on the same topic</indicator>
+            </indicators>
+        </guideline>
+
+        <guideline category="file_analysis">
+            <rule>Use git show to examine file changes for each commit</rule>
+            <what_to_check>
+                <item>Number and types of files changed</item>
+                <item>Scope of changes (localized vs. widespread)</item>
+                <item>Functional areas affected (auth, UI, database, etc.)</item>
+            </what_to_check>
+        </guideline>
+    </commit_analysis_guidelines>
+
+    <git_operation_best_practices>
+        <practice category="safety">
+            <rule>Always check git status before major operations</rule>
+            <rule>Verify branch existence before checkout</rule>
+            <rule>Confirm cherry-pick success before continuing</rule>
+            <rule>Handle dirty working directory appropriately (stash or commit)</rule>
+        </practice>
+
+        <practice category="conflict_resolution">
+            <rule>When conflicts occur, inform user immediately</rule>
+            <rule>Show which files have conflicts</rule>
+            <rule>Offer options: skip commit, abort branch, or pause for manual resolution</rule>
+            <rule>Never proceed with unresolved conflicts</rule>
+        </practice>
+
+        <practice category="pr_coordination">
+            <rule>Use new_task tool to delegate to pr-creator mode</rule>
+            <rule>Provide clear context about the branch being processed</rule>
+            <rule>Wait for PR creation confirmation before asking user to merge</rule>
+            <rule>Include PR URL in merge confirmation request</rule>
+        </practice>
+    </git_operation_best_practices>
+
+    <quality_checklist>
+        <category name="before_starting">
+            <item>Verify git repository is initialized</item>
+            <item>Confirm main branch exists</item>
+            <item>Check working directory is clean or get user guidance</item>
+            <item>Verify there are unmerged commits to process</item>
+        </category>
+
+        <category name="during_grouping">
+            <item>Analyze all commits thoroughly before grouping</item>
+            <item>Ensure each group has a clear, single purpose</item>
+            <item>Generate descriptive, meaningful branch names</item>
+            <item>Present plan clearly with all details</item>
+            <item>Get user confirmation before proceeding</item>
+        </category>
+
+        <category name="during_execution">
+            <item>Always start from updated main branch</item>
+            <item>Create branches one at a time</item>
+            <item>Cherry-pick commits in chronological order</item>
+            <item>Verify each cherry-pick success</item>
+            <item>Handle conflicts appropriately</item>
+            <item>Create PR via pr-creator mode</item>
+            <item>Wait for user to confirm merge before continuing</item>
+            <item>Update main after each merge</item>
+        </category>
+
+        <category name="before_completion">
+            <item>Verify all planned branches were created</item>
+            <item>Confirm all commits were cherry-picked</item>
+            <item>Ensure all PRs were created (or user notified of issues)</item>
+            <item>Verify main branch is up to date</item>
+            <item>Provide summary of completed work</item>
+        </category>
+    </quality_checklist>
+
+    <communication_guidelines>
+        <guideline>
+            <rule>Use clear, structured output when presenting the branching plan</rule>
+            <example><![CDATA[
+## Branching Plan
+
+Found 5 unmerged commits to organize into 2 branches:
+
+### Branch 1: alexmandrik/feat/user-authentication
+**Commits:**
+- abc1234 feat: add login form component
+- def5678 feat: implement JWT authentication
+- ghi9012 test: add auth integration tests
+
+**Rationale:** These commits work together to implement user authentication
+
+### Branch 2: alexmandrik/fix/null-pointer-validation
+**Commits:**
+- jkl3456 fix: add null check in data parser
+- mno7890 test: add validation test cases
+
+**Rationale:** These commits fix and test null pointer issues in the parser
+      ]]></example>
+        </guideline>
+
+        <guideline>
+            <rule>Provide clear progress updates during execution</rule>
+            <example>
+                "Creating branch 1 of 2: alexmandrik/feat/user-authentication..."
+                "Cherry-picking commit 1 of 3: abc1234..."
+                "PR created successfully. Waiting for merge confirmation..."
+            </example>
+        </guideline>
+
+        <guideline>
+            <rule>Use ask_followup_question with specific, actionable suggestions</rule>
+            <good>
+                Question: "Has the PR at https://github.com/user/repo/pull/123 been merged?"
+                Suggestions:
+                - "Yes, PR is merged - continue to next branch"
+                - "Not yet - let me review it first"
+            </good>
+        </guideline>
+    </communication_guidelines>
+</best_practices>

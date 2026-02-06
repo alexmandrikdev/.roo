@@ -1,0 +1,444 @@
+<examples>
+    <overview>
+        Complete workflow examples demonstrating how the branch generator mode operates
+        in different scenarios, from simple cases to complex multi-feature situations.
+    </overview>
+
+    <example name="simple_two_feature_split">
+        <scenario>
+            User has been working on a feature branch and made commits for two different features
+            that should be split into separate PRs.
+        </scenario>
+
+        <initial_state>
+            <current_branch>feature/mixed-work</current_branch>
+            <commits>
+                <commit hash="abc1234">feat: add user login form</commit>
+                <commit hash="def5678">feat: implement dark mode toggle</commit>
+                <commit hash="ghi9012">feat: add JWT authentication</commit>
+                <commit hash="jkl3456">test: add auth tests</commit>
+                <commit hash="mno7890">style: update dark mode colors</commit>
+            </commits>
+        </initial_state>
+
+        <workflow_execution>
+            <step phase="initialization">
+                <execute_command>git status</execute_command>
+                <output>On branch feature/mixed-work, nothing to commit, working tree clean</output>
+            </step>
+
+            <step phase="commit_retrieval">
+                <execute_command>git log main..HEAD --pretty=format:"%H|%s|%b" --reverse</execute_command>
+                <output><![CDATA[
+abc1234|feat: add user login form|
+def5678|feat: implement dark mode toggle|
+ghi9012|feat: add JWT authentication|Builds on login form
+jkl3456|test: add auth tests|
+mno7890|style: update dark mode colors|
+        ]]></output>
+            </step>
+
+            <step phase="commit_analysis">
+                <for_each_commit>
+                    <execute_command>git show --name-only --pretty=format: abc1234</execute_command>
+                    <output>src/components/LoginForm.tsx</output>
+                </for_each_commit>
+                <analysis>
+                    Group 1: abc1234, ghi9012, jkl3456 (authentication feature)
+                    Group 2: def5678, mno7890 (dark mode feature)
+                </analysis>
+            </step>
+
+            <step phase="plan_presentation">
+                <output><![CDATA[
+## Branching Plan
+
+Found 5 unmerged commits to organize into 2 branches:
+
+### Branch 1: alexmandrik/feat/user-authentication
+**Commits:**
+- abc1234 feat: add user login form
+- ghi9012 feat: add JWT authentication
+- jkl3456 test: add auth tests
+
+**Rationale:** These commits work together to implement user authentication
+
+### Branch 2: alexmandrik/feat/dark-mode
+**Commits:**
+- def5678 feat: implement dark mode toggle
+- mno7890 style: update dark mode colors
+
+**Rationale:** These commits implement dark mode functionality
+        ]]></output>
+            </step>
+
+            <step phase="confirmation">
+                <ask_followup_question>
+                    <question>Ready to create 2 branches and organize 5 commits?</question>
+                    <user_response>Yes, proceed with the plan</user_response>
+                </ask_followup_question>
+            </step>
+
+            <step phase="branch_1_creation">
+                <execute_command>git checkout main</execute_command>
+                <execute_command>git pull origin main</execute_command>
+                <execute_command>git checkout -b alexmandrik/feat/user-authentication</execute_command>
+                <execute_command>git cherry-pick abc1234</execute_command>
+                <execute_command>git cherry-pick ghi9012</execute_command>
+                <execute_command>git cherry-pick jkl3456</execute_command>
+                <execute_command>git push -u origin alexmandrik/feat/user-authentication</execute_command>
+            </step>
+
+            <step phase="pr_creation_1">
+                <new_task>
+                    <mode>pr-creator</mode>
+                    <message>Create a PR for branch alexmandrik/feat/user-authentication to merge
+                        into main.</message>
+                </new_task>
+                <pr_result>https://github.com/user/repo/pull/101</pr_result>
+            </step>
+
+            <step phase="wait_for_merge_1">
+                <ask_followup_question>
+                    <question>PR created at https://github.com/user/repo/pull/101. Has it been
+                        merged?</question>
+                    <user_response>Yes, PR is merged - continue to next branch</user_response>
+                </ask_followup_question>
+            </step>
+
+            <step phase="branch_2_creation">
+                <execute_command>git checkout main</execute_command>
+                <execute_command>git pull origin main</execute_command>
+                <execute_command>git checkout -b alexmandrik/feat/dark-mode</execute_command>
+                <execute_command>git cherry-pick def5678</execute_command>
+                <execute_command>git cherry-pick mno7890</execute_command>
+                <execute_command>git push -u origin alexmandrik/feat/dark-mode</execute_command>
+            </step>
+
+            <step phase="pr_creation_2">
+                <new_task>
+                    <mode>pr-creator</mode>
+                    <message>Create a PR for branch alexmandrik/feat/dark-mode to merge into main.</message>
+                </new_task>
+                <pr_result>https://github.com/user/repo/pull/102</pr_result>
+            </step>
+
+            <step phase="wait_for_merge_2">
+                <ask_followup_question>
+                    <question>PR created at https://github.com/user/repo/pull/102. Has it been
+                        merged?</question>
+                    <user_response>Yes, PR is merged - continue to next branch</user_response>
+                </ask_followup_question>
+            </step>
+
+            <step phase="completion">
+                <execute_command>git checkout main</execute_command>
+                <execute_command>git pull origin main</execute_command>
+                <attempt_completion>
+                    Successfully organized 5 commits into 2 branches:
+
+                    1. alexmandrik/feat/user-authentication (PR #101 - merged)
+                    - 3 commits related to user authentication
+
+                    2. alexmandrik/feat/dark-mode (PR #102 - merged)
+                    - 2 commits for dark mode feature
+
+                    All branches have been created, PRs merged, and main branch is up to date.
+                </attempt_completion>
+            </step>
+        </workflow_execution>
+    </example>
+
+    <example name="mixed_types_cleanup">
+        <scenario>
+            A developer has made various commits including features, fixes, and documentation
+            updates
+            that need to be organized into separate PRs for easier review.
+        </scenario>
+
+        <initial_state>
+            <current_branch>dev/cleanup</current_branch>
+            <commits>
+                <commit hash="a1b2c3d">feat: add search functionality</commit>
+                <commit hash="e4f5g6h">fix: correct timezone bug in datepicker</commit>
+                <commit hash="i7j8k9l">docs: update README with new features</commit>
+                <commit hash="m0n1o2p">feat: implement autocomplete for search</commit>
+                <commit hash="q3r4s5t">fix: handle null values in search</commit>
+                <commit hash="u6v7w8x">chore: update dependencies</commit>
+            </commits>
+        </initial_state>
+
+        <analysis_and_grouping>
+            <group number="1" type="feat">
+                <branch_name>alexmandrik/feat/search-functionality</branch_name>
+                <commits>
+                    <commit>a1b2c3d feat: add search functionality</commit>
+                    <commit>m0n1o2p feat: implement autocomplete for search</commit>
+                    <commit>q3r4s5t fix: handle null values in search</commit>
+                </commits>
+                <rationale>All three relate to search feature implementation and fixes</rationale>
+            </group>
+
+            <group number="2" type="fix">
+                <branch_name>alexmandrik/fix/timezone-datepicker</branch_name>
+                <commits>
+                    <commit>e4f5g6h fix: correct timezone bug in datepicker</commit>
+                </commits>
+                <rationale>Standalone bug fix unrelated to other changes</rationale>
+            </group>
+
+            <group number="3" type="docs">
+                <branch_name>alexmandrik/docs/readme-updates</branch_name>
+                <commits>
+                    <commit>i7j8k9l docs: update README with new features</commit>
+                </commits>
+                <rationale>Documentation update</rationale>
+            </group>
+
+            <group number="4" type="chore">
+                <branch_name>alexmandrik/chore/dependency-updates</branch_name>
+                <commits>
+                    <commit>u6v7w8x chore: update dependencies</commit>
+                </commits>
+                <rationale>Maintenance task</rationale>
+            </group>
+        </analysis_and_grouping>
+
+        <key_points>
+            <point>Commits are grouped by logical purpose, not just type</point>
+            <point>Search feature includes a fix (q3r4s5t) because it's part of the feature
+                completion</point>
+            <point>Four separate PRs allow independent review and merging</point>
+            <point>Each branch can be deployed independently</point>
+        </key_points>
+    </example>
+
+    <example name="conflict_resolution">
+        <scenario>
+            During cherry-picking, a conflict occurs because the same file was modified in main
+            after the original commits were made.
+        </scenario>
+
+        <workflow_at_conflict>
+            <step>
+                <execute_command>git cherry-pick abc1234</execute_command>
+                <output><![CDATA[
+error: could not apply abc1234... feat: add user service
+hint: after resolving the conflicts, mark the corrected paths
+hint: with 'git add <paths>' or 'git rm <paths>'
+hint: and commit the result with 'git commit'
+CONFLICT (content): Merge conflict in src/services/user.ts
+        ]]></output>
+            </step>
+
+            <step>
+                <execute_command>git status</execute_command>
+                <output><![CDATA[
+On branch alexmandrik/feat/user-service
+You are currently cherry-picking commit abc1234.
+
+Unmerged paths:
+  both modified:   src/services/user.ts
+        ]]></output>
+            </step>
+
+            <step>
+                <ask_followup_question>
+                    <question>
+                        Cherry-pick conflicts detected in src/services/user.ts. How should we
+                        proceed?
+                    </question>
+                    <follow_up>
+                        <option>Skip this commit and continue</option>
+                        <option>Abort this branch group</option>
+                        <option>Pause - I'll resolve manually</option>
+                    </follow_up>
+                </ask_followup_question>
+            </step>
+
+            <resolution_option_1>
+                <user_choice>Skip this commit and continue</user_choice>
+                <action>
+                    <execute_command>git cherry-pick --abort</execute_command>
+                    <note>Skip abc1234, continue with next commit in group</note>
+                    <inform_user>Skipped abc1234 due to conflicts. You may need to apply this change
+                        manually later.</inform_user>
+                </action>
+            </resolution_option_1>
+
+            <resolution_option_2>
+                <user_choice>Pause - I'll resolve manually</user_choice>
+                <action>
+                    <inform_user>
+                        Please resolve conflicts in src/services/user.ts, then run:
+                        git add src/services/user.ts
+                        git cherry-pick --continue
+
+                        Let me know when ready to continue.
+                    </inform_user>
+                    <wait_for_user_confirmation>User resolves and confirms</wait_for_user_confirmation>
+                    <execute_command>git cherry-pick --continue</execute_command>
+                    <continue_workflow>Proceed with next commit in group</continue_workflow>
+                </action>
+            </resolution_option_2>
+
+            <resolution_option_3>
+                <user_choice>Abort this branch group</user_choice>
+                <action>
+                    <execute_command>git cherry-pick --abort</execute_command>
+                    <execute_command>git checkout main</execute_command>
+                    <execute_command>git branch -D alexmandrik/feat/user-service</execute_command>
+                    <note>Skip entire branch group, move to next group in plan</note>
+                    <inform_user>Aborted branch group due to conflicts. Moving to next branch.</inform_user>
+                </action>
+            </resolution_option_3>
+        </workflow_at_conflict>
+    </example>
+
+    <example name="no_commits_to_organize">
+        <scenario>
+            User runs the mode but their branch is already up to date with main.
+        </scenario>
+
+        <workflow_execution>
+            <step>
+                <execute_command>git log main..HEAD --oneline</execute_command>
+                <output>(empty - no output)</output>
+            </step>
+
+            <step>
+                <inform_user>
+                    No unmerged commits found. Your current branch is up to date with main.
+                </inform_user>
+            </step>
+
+            <step>
+                <ask_followup_question>
+                    <question>Would you like to check a different branch?</question>
+                    <follow_up>
+                        <option>Yes, let me switch branches</option>
+                        <option>No, I'm done</option>
+                    </follow_up>
+                </ask_followup_question>
+            </step>
+        </workflow_execution>
+    </example>
+
+    <example name="dependency_chain_grouping">
+        <scenario>
+            Commits form a dependency chain where each builds on the previous.
+            They must stay together in one branch.
+        </scenario>
+
+        <commits>
+            <commit hash="aaa1111">feat: add database connection module</commit>
+            <commit hash="bbb2222">feat: create user repository using db connection</commit>
+            <commit hash="ccc3333">feat: add user service layer using repository</commit>
+            <commit hash="ddd4444">feat: create user API endpoints using service</commit>
+            <commit hash="eee5555">test: add integration tests for user API</commit>
+        </commits>
+
+        <analysis>
+            All commits are part of a dependency chain:
+            - bbb2222 depends on aaa1111 (uses db connection)
+            - ccc3333 depends on bbb2222 (uses repository)
+            - ddd4444 depends on ccc3333 (uses service)
+            - eee5555 tests ddd4444 (tests endpoints)
+
+            Cannot be split - must stay together
+        </analysis>
+
+        <grouping>
+            <single_branch>
+                <name>alexmandrik/feat/user-data-layer</name>
+                <all_commits>aaa1111, bbb2222, ccc3333, ddd4444, eee5555</all_commits>
+                <rationale>Sequential dependency chain forming complete feature</rationale>
+            </single_branch>
+        </grouping>
+
+        <workflow>
+            <plan_presentation>
+                ## Branching Plan
+
+                Found 5 unmerged commits to organize into 1 branch:
+
+                ### Branch 1: alexmandrik/feat/user-data-layer
+                **Commits:**
+                - aaa1111 feat: add database connection module
+                - bbb2222 feat: create user repository using db connection
+                - ccc3333 feat: add user service layer using repository
+                - ddd4444 feat: create user API endpoints using service
+                - eee5555 test: add integration tests for user API
+
+                **Rationale:** These commits form a sequential dependency chain where each builds
+                on the previous. They implement a complete user data layer from database to API.
+            </plan_presentation>
+        </workflow>
+    </example>
+
+    <example name="user_modifies_plan">
+        <scenario>
+            User reviews the generated plan and requests modifications before proceeding.
+        </scenario>
+
+        <initial_plan>
+            <branch>alexmandrik/feat/dashboard-widgets</branch>
+            <commits>
+                <commit>Add chart widget</commit>
+                <commit>Add table widget</commit>
+                <commit>Add map widget</commit>
+            </commits>
+        </initial_plan>
+
+        <confirmation_step>
+            <ask_followup_question>
+                <question>Ready to create 1 branch with 3 commits?</question>
+                <user_response>No, let me review and adjust</user_response>
+            </ask_followup_question>
+        </confirmation_step>
+
+        <user_feedback>
+            User requests: "Please split the map widget into a separate branch -
+            it's experimental and I don't want to hold up the other widgets."
+        </user_feedback>
+
+        <revised_plan>
+            <branch number="1">
+                <name>alexmandrik/feat/dashboard-basic-widgets</name>
+                <commits>
+                    <commit>Add chart widget</commit>
+                    <commit>Add table widget</commit>
+                </commits>
+            </branch>
+            <branch number="2">
+                <name>alexmandrik/feat/map-widget-experimental</name>
+                <commits>
+                    <commit>Add map widget</commit>
+                </commits>
+            </branch>
+        </revised_plan>
+
+        <re_confirmation>
+            <ask_followup_question>
+                <question>Ready to create 2 branches as revised?</question>
+                <user_response>Yes, proceed with the plan</user_response>
+            </ask_followup_question>
+        </re_confirmation>
+
+        <note>
+            Mode should be flexible and allow user to adjust grouping before execution.
+            Re-present the plan after modifications for confirmation.
+        </note>
+    </example>
+
+    <key_takeaways>
+        <takeaway>Always start from updated main branch for each new branch</takeaway>
+        <takeaway>Cherry-pick commits in chronological order within groups</takeaway>
+        <takeaway>Handle conflicts gracefully with user input</takeaway>
+        <takeaway>Wait for user confirmation after each PR is created</takeaway>
+        <takeaway>Update main after each merge before creating next branch</takeaway>
+        <takeaway>Group commits by logical purpose, not just type or file proximity</takeaway>
+        <takeaway>Allow user to modify the plan before execution</takeaway>
+        <takeaway>Provide clear, structured output at each phase</takeaway>
+    </key_takeaways>
+</examples>
