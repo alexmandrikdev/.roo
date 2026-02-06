@@ -1,0 +1,255 @@
+<workflow_instructions>
+    <mode_overview>
+        This mode analyzes commits on the current branch that haven't been merged to main,
+        groups them logically based on their content and purpose, generates descriptive branch
+        names with the alexmandrik/{type}/ prefix, creates the branches, cherry-picks commits,
+        and coordinates PR creation through the pr-creator mode with manual merge confirmations.
+    </mode_overview>
+
+    <initialization_steps>
+        <step number="1">
+            <action>Verify git environment</action>
+            <details>
+                Ensure we're in a git repository and confirm:
+                - Current branch name
+                - Main branch exists (usually 'main' or 'master')
+                - Working directory is clean or acknowledge uncommitted changes
+            </details>
+            <tools>
+                <tool>execute_command - Run 'git status' to check state</tool>
+                <tool>execute_command - Run 'git branch' to see branches</tool>
+            </tools>
+        </step>
+
+        <step number="2">
+            <action>Retrieve unmerged commits</action>
+            <details>
+                Get all commits on current branch that are not in main:
+                - Use 'git log main..HEAD --oneline' for commit list
+                - Use 'git log main..HEAD --pretty=format:"%H|%s|%b"' for detailed info
+                - Store commit hashes, subjects, and bodies
+            </details>
+            <tools>
+                <tool>execute_command - Execute git log commands</tool>
+            </tools>
+        </step>
+
+        <step number="3">
+            <action>Analyze commit content</action>
+            <details>
+                For each commit, examine:
+                - Commit message (subject and body)
+                - Changed files (use 'git show --name-only {hash}')
+                - Commit type indicators (fix:, feat:, docs:, etc.)
+                - Functional relationships between commits
+            </details>
+            <tools>
+                <tool>execute_command - Run 'git show' for each commit</tool>
+            </tools>
+        </step>
+    </initialization_steps>
+
+    <main_workflow>
+        <phase name="grouping_analysis">
+            <description>Group commits into logical branches based on functionality and
+                relationships</description>
+            <steps>
+                <step>
+                    <title>Identify commit types</title>
+                    <action>Classify each commit by conventional commit type (feat, fix, docs,
+                        chore, refactor, test, style, perf)</action>
+                </step>
+
+                <step>
+                    <title>Detect relationships</title>
+                    <action>Identify commits that:
+                        - Modify the same files
+                        - Have similar commit message patterns
+                        - Reference each other in commit messages
+                        - Belong to the same logical feature or fix
+                    </action>
+                </step>
+
+                <step>
+                    <title>Create logical groups</title>
+                    <action>Organize commits into groups where each group:
+                        - Has a clear, single purpose
+                        - Contains related commits
+                        - Can stand alone as a PR
+                        - Follows a logical dependency order
+                    </action>
+                </step>
+
+                <step>
+                    <title>Generate branch names</title>
+                    <action>For each group, create a branch name:
+                        - Format: alexmandrik/{type}/{descriptive-name}
+                        - Type: feat, fix, docs, chore, refactor, test, style, or perf
+                        - Descriptive name: kebab-case summary of the group's purpose
+                        - Example: alexmandrik/feat/user-authentication
+                        - Example: alexmandrik/fix/null-pointer-validation
+                    </action>
+                </step>
+            </steps>
+        </phase>
+
+        <phase name="confirmation">
+            <description>Present the branching plan to the user for approval</description>
+            <steps>
+                <step>
+                    <title>Display grouping plan</title>
+                    <action>Show:
+                        - Total number of commits to organize
+                        - Number of branches to create
+                        - For each branch:
+                        * Proposed branch name
+                        * List of commits (with hashes and messages)
+                        * Brief explanation of the grouping
+                    </action>
+                </step>
+
+                <step>
+                    <title>Request confirmation</title>
+                    <action>Use ask_followup_question to confirm:
+                        - "Ready to create {n} branches and organize commits?"
+                        - Suggestions:
+                        * "Yes, proceed with the plan"
+                        * "No, let me review and adjust"
+                    </action>
+                </step>
+
+                <step>
+                    <title>Handle modifications</title>
+                    <action>If user requests changes:
+                        - Allow regrouping of commits
+                        - Allow renaming of branches
+                        - Re-present the plan for confirmation
+                    </action>
+                </step>
+            </steps>
+        </phase>
+
+        <phase name="branch_creation">
+            <description>Execute the branching plan systematically</description>
+            <steps>
+                <step>
+                    <title>Prepare base</title>
+                    <action>
+                        - Ensure we're starting from main branch
+                        - Run 'git checkout main'
+                        - Pull latest changes: 'git pull origin main'
+                    </action>
+                </step>
+
+                <step>
+                    <title>Iterate through each branch group</title>
+                    <action>For each branch in the plan:
+
+                        5.1. CREATE BRANCH:
+                        - Run 'git checkout -b {branch-name}' from main
+                        - Confirm branch creation
+
+                        5.2. CHERRY-PICK COMMITS:
+                        - For each commit in the group (in chronological order):
+                        * Run 'git cherry-pick {commit-hash}'
+                        * Handle conflicts if they occur (inform user and get guidance)
+                        * Verify cherry-pick success
+
+                        5.3. CREATE PR VIA PR-CREATOR MODE:
+                        - Use new_task tool to create a subtask in pr-creator mode
+                        - Pass context about the branch and commits
+                        - Message: "Create a PR for branch {branch-name} to main"
+                        - Wait for pr-creator mode to complete and get PR URL
+
+                        5.4. WAIT FOR USER TO MERGE:
+                        - Inform user: "PR created at {pr-url}. Please merge it when ready."
+                        - Use ask_followup_question:
+                        * Question: "Has the PR been merged? Once merged, I'll update main and
+                        continue."
+                        * Suggestions:
+                        - "Yes, PR is merged - continue"
+                        - "Wait, I need to review"
+                        - Poll until user confirms merge
+
+                        5.5. UPDATE MAIN AND CONTINUE:
+                        - Run 'git checkout main'
+                        - Run 'git pull origin main' to get the merged changes
+                        - Move to next branch group and repeat from 5.1
+                    </action>
+                </step>
+
+                <step>
+                    <title>Return to original branch</title>
+                    <action>
+                        - After all branches are processed
+                        - Inform user of completion
+                        - Stay on main branch (already there from last iteration)
+                    </action>
+                </step>
+            </steps>
+        </phase>
+    </main_workflow>
+
+    <error_handling>
+        <scenario name="no_unmerged_commits">
+            <condition>Git log returns no commits between main and HEAD</condition>
+            <action>Inform user: "No unmerged commits found. Current branch is up to date with
+                main."</action>
+        </scenario>
+
+        <scenario name="merge_conflicts">
+            <condition>Cherry-pick results in conflicts</condition>
+            <action>
+                - Show conflict details
+                - Use ask_followup_question to get resolution strategy:
+                * "Conflicts detected in {files}. How should we proceed?"
+                * Suggestions:
+                - "Skip this commit and continue"
+                - "Abort this branch group"
+                - "Let me resolve manually (pause)"
+            </action>
+        </scenario>
+
+        <scenario name="pr_creation_failure">
+            <condition>PR creator mode fails or returns error</condition>
+            <action>
+                - Log the error
+                - Continue with branch creation but skip PR creation
+                - Inform user they'll need to create PR manually
+                - Continue to next branch
+            </action>
+        </scenario>
+
+        <scenario name="dirty_working_directory">
+            <condition>Uncommitted changes in working directory</condition>
+            <action>
+                - Use ask_followup_question:
+                * "Working directory has uncommitted changes. What should we do?"
+                * Suggestions:
+                - "Stash changes and continue"
+                - "Commit changes first"
+                - "Cancel operation"
+            </action>
+        </scenario>
+    </error_handling>
+
+    <completion_criteria>
+        <criterion>All commits have been analyzed and grouped</criterion>
+        <criterion>All planned branches have been created</criterion>
+        <criterion>All commits have been cherry-picked into their respective branches</criterion>
+        <criterion>PRs have been created for all branches (or user notified of failures)</criterion>
+        <criterion>All PRs have been merged (user confirmed)</criterion>
+        <criterion>Main branch is up to date with all merged changes</criterion>
+        <criterion>User is informed of final state and any manual actions needed</criterion>
+    </completion_criteria>
+
+    <important_notes>
+        <note>Always work from main branch when creating new branches</note>
+        <note>Use chronological order when cherry-picking commits within a group</note>
+        <note>Use new_task tool to delegate PR creation to pr-creator mode</note>
+        <note>Wait for user confirmation after each PR is created before continuing</note>
+        <note>Pull latest main after each merge to keep base current</note>
+        <note>Preserve commit hashes and messages accurately</note>
+        <note>Handle conflicts gracefully with user input</note>
+    </important_notes>
+</workflow_instructions>

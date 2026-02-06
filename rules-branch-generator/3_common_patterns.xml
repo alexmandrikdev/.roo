@@ -1,0 +1,382 @@
+<common_patterns>
+    <overview>
+        Common command patterns and commit grouping scenarios encountered when organizing
+        commits into logical branches.
+    </overview>
+
+    <git_command_patterns>
+        <pattern name="get_unmerged_commits">
+            <description>Retrieve all commits on current branch not in main</description>
+            <commands>
+                <command purpose="simple_list">
+                    git log main..HEAD --oneline
+                </command>
+                <command purpose="detailed_info">
+                    git log main..HEAD --pretty=format:"%H|%s|%b" --reverse
+                </command>
+                <command purpose="with_dates">
+                    git log main..HEAD --pretty=format:"%H|%ai|%s|%b" --reverse
+                </command>
+            </commands>
+            <note>--reverse flag ensures chronological order (oldest first)</note>
+        </pattern>
+
+        <pattern name="examine_commit_changes">
+            <description>View files changed in a specific commit</description>
+            <commands>
+                <command purpose="file_list_only">
+                    git show --name-only --pretty=format: {commit_hash}
+                </command>
+                <command purpose="file_list_with_status">
+                    git show --name-status --pretty=format: {commit_hash}
+                </command>
+                <command purpose="detailed_diff">
+                    git show {commit_hash}
+                </command>
+            </commands>
+        </pattern>
+
+        <pattern name="create_and_populate_branch">
+            <description>Standard workflow for creating a branch and cherry-picking commits</description>
+            <workflow>
+                <step>git checkout main</step>
+                <step>git pull origin main</step>
+                <step>git checkout -b alexmandrik/{type}/{name}</step>
+                <step>git cherry-pick {commit1}</step>
+                <step>git cherry-pick {commit2}</step>
+                <step>... continue for all commits in group ...</step>
+                <step>git push -u origin alexmandrik/{type}/{name}</step>
+            </workflow>
+        </pattern>
+
+        <pattern name="handle_cherry_pick_conflict">
+            <description>Commands for handling cherry-pick conflicts</description>
+            <scenarios>
+                <scenario name="abort_cherry_pick">
+                    <command>git cherry-pick --abort</command>
+                    <when>User decides to skip the conflicting commit</when>
+                </scenario>
+                <scenario name="continue_after_manual_resolution">
+                    <command>git cherry-pick --continue</command>
+                    <when>User resolves conflicts manually and wants to proceed</when>
+                </scenario>
+                <scenario name="check_conflict_status">
+                    <command>git status</command>
+                    <when>To see which files have conflicts</when>
+                </scenario>
+            </scenarios>
+        </pattern>
+
+        <pattern name="verify_branch_state">
+            <description>Commands to verify branch state during workflow</description>
+            <commands>
+                <command purpose="current_branch">git branch --show-current</command>
+                <command purpose="branch_exists">git branch --list {branch_name}</command>
+                <command purpose="commit_count">git rev-list --count main..HEAD</command>
+                <command purpose="latest_commit">git log -1 --oneline</command>
+            </commands>
+        </pattern>
+    </git_command_patterns>
+
+    <grouping_scenarios>
+        <scenario name="feature_development">
+            <description>Multiple commits building up a complete feature</description>
+            <example>
+                <commits>
+                    <commit>feat: add user model and schema</commit>
+                    <commit>feat: create user registration endpoint</commit>
+                    <commit>feat: add email validation for users</commit>
+                    <commit>test: add user registration tests</commit>
+                </commits>
+                <grouping>
+                    <branch>alexmandrik/feat/user-registration</branch>
+                    <rationale>All commits work together to implement user registration feature</rationale>
+                </grouping>
+            </example>
+        </scenario>
+
+        <scenario name="bug_fix_with_tests">
+            <description>Bug fix commits with associated tests</description>
+            <example>
+                <commits>
+                    <commit>fix: handle null pointer in data parser</commit>
+                    <commit>test: add test case for null input</commit>
+                </commits>
+                <grouping>
+                    <branch>alexmandrik/fix/null-pointer-parser</branch>
+                    <rationale>Fix and its test belong together</rationale>
+                </grouping>
+            </example>
+        </scenario>
+
+        <scenario name="unrelated_changes">
+            <description>Commits that address different concerns entirely</description>
+            <example>
+                <commits>
+                    <commit>feat: add dark mode toggle</commit>
+                    <commit>fix: correct timezone calculation</commit>
+                    <commit>docs: update API documentation</commit>
+                    <commit>feat: implement search functionality</commit>
+                </commits>
+                <grouping>
+                    <branch name="alexmandrik/feat/dark-mode">
+                        <commits>feat: add dark mode toggle</commits>
+                    </branch>
+                    <branch name="alexmandrik/fix/timezone-calculation">
+                        <commits>fix: correct timezone calculation</commits>
+                    </branch>
+                    <branch name="alexmandrik/docs/api-documentation">
+                        <commits>docs: update API documentation</commits>
+                    </branch>
+                    <branch name="alexmandrik/feat/search-functionality">
+                        <commits>feat: implement search functionality</commits>
+                    </branch>
+                </grouping>
+            </example>
+        </scenario>
+
+        <scenario name="refactoring_series">
+            <description>Series of refactoring commits improving the same area</description>
+            <example>
+                <commits>
+                    <commit>refactor: extract validation logic to separate module</commit>
+                    <commit>refactor: simplify validation error handling</commit>
+                    <commit>test: update tests for refactored validation</commit>
+                </commits>
+                <grouping>
+                    <branch>alexmandrik/refactor/validation-logic</branch>
+                    <rationale>All commits are part of the same refactoring effort</rationale>
+                </grouping>
+            </example>
+        </scenario>
+
+        <scenario name="mixed_feature_commits">
+            <description>Interleaved commits from different features</description>
+            <example>
+                <commits>
+                    <commit>feat: add login form UI</commit>
+                    <commit>feat: implement shopping cart model</commit>
+                    <commit>feat: add login API endpoint</commit>
+                    <commit>feat: add cart add/remove methods</commit>
+                    <commit>test: test login flow</commit>
+                </commits>
+                <grouping>
+                    <branch name="alexmandrik/feat/user-login">
+                        <commits>
+                            feat: add login form UI
+                            feat: add login API endpoint
+                            test: test login flow
+                        </commits>
+                    </branch>
+                    <branch name="alexmandrik/feat/shopping-cart">
+                        <commits>
+                            feat: implement shopping cart model
+                            feat: add cart add/remove methods
+                        </commits>
+                    </branch>
+                </grouping>
+                <note>Commits are reordered chronologically within each branch during cherry-pick</note>
+            </example>
+        </scenario>
+
+        <scenario name="dependency_chain">
+            <description>Commits that depend on each other sequentially</description>
+            <example>
+                <commits>
+                    <commit>feat: add database connection module</commit>
+                    <commit>feat: create user repository using database</commit>
+                    <commit>feat: add user service layer using repository</commit>
+                </commits>
+                <grouping>
+                    <branch>alexmandrik/feat/user-data-layer</branch>
+                    <rationale>These commits form a dependency chain and must stay together</rationale>
+                </grouping>
+            </example>
+        </scenario>
+    </grouping_scenarios>
+
+    <branch_naming_patterns>
+        <pattern type="feat">
+            <examples>
+                <example>alexmandrik/feat/user-authentication</example>
+                <example>alexmandrik/feat/payment-integration</example>
+                <example>alexmandrik/feat/dark-mode-support</example>
+                <example>alexmandrik/feat/csv-export</example>
+            </examples>
+            <tips>
+                <tip>Focus on the main feature being added</tip>
+                <tip>Use nouns describing the feature</tip>
+            </tips>
+        </pattern>
+
+        <pattern type="fix">
+            <examples>
+                <example>alexmandrik/fix/null-pointer-validation</example>
+                <example>alexmandrik/fix/memory-leak-in-cache</example>
+                <example>alexmandrik/fix/timezone-calculation</example>
+                <example>alexmandrik/fix/broken-link-in-footer</example>
+            </examples>
+            <tips>
+                <tip>Describe what is being fixed</tip>
+                <tip>Be specific about the issue</tip>
+            </tips>
+        </pattern>
+
+        <pattern type="refactor">
+            <examples>
+                <example>alexmandrik/refactor/extract-validation-logic</example>
+                <example>alexmandrik/refactor/simplify-auth-flow</example>
+                <example>alexmandrik/refactor/consolidate-api-clients</example>
+            </examples>
+            <tips>
+                <tip>Indicate what is being refactored</tip>
+                <tip>Optionally mention the goal (extract, simplify, consolidate)</tip>
+            </tips>
+        </pattern>
+
+        <pattern type="docs">
+            <examples>
+                <example>alexmandrik/docs/api-endpoint-guide</example>
+                <example>alexmandrik/docs/getting-started-tutorial</example>
+                <example>alexmandrik/docs/deployment-instructions</example>
+            </examples>
+            <tips>
+                <tip>Specify what documentation is being added/updated</tip>
+            </tips>
+        </pattern>
+
+        <pattern type="test">
+            <examples>
+                <example>alexmandrik/test/integration-test-suite</example>
+                <example>alexmandrik/test/user-auth-coverage</example>
+                <example>alexmandrik/test/e2e-checkout-flow</example>
+            </examples>
+            <tips>
+                <tip>Indicate what is being tested</tip>
+                <tip>Mention test type if relevant (unit, integration, e2e)</tip>
+            </tips>
+        </pattern>
+
+        <pattern type="chore">
+            <examples>
+                <example>alexmandrik/chore/update-dependencies</example>
+                <example>alexmandrik/chore/configure-ci-pipeline</example>
+                <example>alexmandrik/chore/cleanup-unused-imports</example>
+            </examples>
+            <tips>
+                <tip>Describe the maintenance task</tip>
+            </tips>
+        </pattern>
+
+        <pattern type="perf">
+            <examples>
+                <example>alexmandrik/perf/optimize-database-queries</example>
+                <example>alexmandrik/perf/reduce-bundle-size</example>
+                <example>alexmandrik/perf/cache-api-responses</example>
+            </examples>
+            <tips>
+                <tip>Indicate what aspect is being optimized</tip>
+            </tips>
+        </pattern>
+
+        <pattern type="style">
+            <examples>
+                <example>alexmandrik/style/format-code-with-prettier</example>
+                <example>alexmandrik/style/update-button-colors</example>
+                <example>alexmandrik/style/standardize-spacing</example>
+            </examples>
+            <tips>
+                <tip>Describe the styling changes</tip>
+            </tips>
+        </pattern>
+    </branch_naming_patterns>
+
+    <pr_creation_delegation>
+        <pattern name="delegate_to_pr_creator">
+            <description>How to use new_task to create a PR via pr-creator mode</description>
+            <example><![CDATA[
+<new_task>
+  <mode>pr-creator</mode>
+  <message>
+    Create a PR for branch alexmandrik/feat/user-authentication to merge into main.
+  </message>
+</new_task>
+      ]]></example>
+        </pattern>
+
+        <pattern name="wait_for_merge_confirmation">
+            <description>How to confirm PR has been merged before continuing</description>
+            <example><![CDATA[
+<ask_followup_question>
+  <question>
+    PR created at https://github.com/user/repo/pull/123.
+    Please review and merge it. Has the PR been merged?
+  </question>
+  <follow_up>
+    <suggest>Yes, PR is merged - continue to next branch</suggest>
+    <suggest>Not yet - I need more time to review</suggest>
+  </follow_up>
+</ask_followup_question>
+      ]]></example>
+        </pattern>
+    </pr_creation_delegation>
+
+    <error_recovery_patterns>
+        <pattern name="dirty_working_directory">
+            <detection>git status shows modified or untracked files</detection>
+            <resolution>
+                <option>
+                    <action>Stash changes</action>
+                    <commands>
+                        <command>git stash push -m "Branch generator: stashing before
+                            reorganization"</command>
+                    </commands>
+                    <note>Can be restored later with git stash pop</note>
+                </option>
+                <option>
+                    <action>Commit changes</action>
+                    <commands>
+                        <command>git add .</command>
+                        <command>git commit -m "WIP: temporary commit before branch reorganization"</command>
+                    </commands>
+                </option>
+                <option>
+                    <action>Cancel operation</action>
+                    <note>Let user clean up manually</note>
+                </option>
+            </resolution>
+        </pattern>
+
+        <pattern name="cherry_pick_conflict">
+            <detection>git cherry-pick returns conflict error</detection>
+            <resolution>
+                <step>Run git status to see conflicting files</step>
+                <step>Present conflict information to user</step>
+                <step>Offer options:
+                    - Skip this commit (git cherry-pick --abort)
+                    - Abort this entire branch group
+                    - Pause for manual resolution (then git cherry-pick --continue)
+                </step>
+            </resolution>
+        </pattern>
+
+        <pattern name="no_unmerged_commits">
+            <detection>git log main..HEAD returns empty result</detection>
+            <resolution>
+                <step>Inform user branch is up to date with main</step>
+                <step>Offer to check a different branch</step>
+                <step>Exit gracefully</step>
+            </resolution>
+        </pattern>
+
+        <pattern name="pr_creation_failure">
+            <detection>pr-creator mode returns error or fails</detection>
+            <resolution>
+                <step>Log the error for user visibility</step>
+                <step>Inform user that branch was created but PR creation failed</step>
+                <step>Provide branch name so user can create PR manually</step>
+                <step>Continue to next branch in the plan</step>
+            </resolution>
+        </pattern>
+    </error_recovery_patterns>
+</common_patterns>

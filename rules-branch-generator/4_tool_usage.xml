@@ -1,0 +1,438 @@
+<tool_usage_guide>
+    <overview>
+        Specific guidance on using tools effectively within the branch generator mode.
+        This mode primarily uses execute_command for git operations, ask_followup_question
+        for user confirmations, and new_task for delegating PR creation.
+    </overview>
+
+    <tool_priorities>
+        <priority level="1">
+            <tool>execute_command</tool>
+            <when>For all git operations throughout the workflow</when>
+            <why>Git CLI provides precise control over branches, commits, and cherry-picking</why>
+            <note>Most frequently used tool in this mode</note>
+        </priority>
+
+        <priority level="2">
+            <tool>ask_followup_question</tool>
+            <when>Before executing plan and after each PR creation</when>
+            <why>User confirmation ensures correctness and allows manual review/merge steps</why>
+        </priority>
+
+        <priority level="3">
+            <tool>new_task</tool>
+            <when>To delegate PR creation to pr-creator mode</when>
+            <why>Separates concerns and reuses existing PR creation functionality</why>
+        </priority>
+    </tool_priorities>
+
+    <tool_specific_guidance>
+        <tool name="execute_command">
+            <description>
+                Primary tool for all git operations. Used extensively throughout the workflow
+                for checking status, retrieving commits, creating branches, and cherry-picking.
+            </description>
+
+            <best_practices>
+                <practice>Always check command output for errors before proceeding</practice>
+                <practice>Use --reverse flag with git log to get chronological order</practice>
+                <practice>Include proper formatting flags to make output parseable</practice>
+                <practice>Verify branch exists before attempting checkout</practice>
+                <practice>Use -b flag with git checkout to create new branches</practice>
+            </best_practices>
+
+            <common_commands>
+                <command_group name="repository_status">
+                    <command>
+                        <usage>git status</usage>
+                        <purpose>Check for uncommitted changes, current branch</purpose>
+                        <when>At start of workflow and before major operations</when>
+                    </command>
+
+                    <command>
+                        <usage>git branch --show-current</usage>
+                        <purpose>Get current branch name</purpose>
+                        <when>To verify branch context</when>
+                    </command>
+
+                    <command>
+                        <usage>git branch</usage>
+                        <purpose>List all local branches</purpose>
+                        <when>To check if main exists</when>
+                    </command>
+                </command_group>
+
+                <command_group name="commit_retrieval">
+                    <command>
+                        <usage>git log main..HEAD --oneline</usage>
+                        <purpose>Quick list of unmerged commits</purpose>
+                        <when>To count commits and get overview</when>
+                        <output_example><![CDATA[
+abc1234 feat: add login form
+def5678 fix: null check in parser
+            ]]></output_example>
+                    </command>
+
+                    <command>
+                        <usage>git log main..HEAD --pretty=format:"%H|%s|%b" --reverse</usage>
+                        <purpose>Detailed commit info in chronological order</purpose>
+                        <when>To analyze commits for grouping</when>
+                        <output_format>commit_hash|subject|body (pipe-separated)</output_format>
+                        <note>Parse this output to extract commit details</note>
+                    </command>
+
+                    <command>
+                        <usage>git show --name-only --pretty=format: {commit_hash}</usage>
+                        <purpose>View files changed in a specific commit</purpose>
+                        <when>To understand commit scope and detect relationships</when>
+                        <output_example><![CDATA[
+src/auth/login.ts
+src/auth/login.test.ts
+docs/auth.md
+            ]]></output_example>
+                    </command>
+                </command_group>
+
+                <command_group name="branch_operations">
+                    <command>
+                        <usage>git checkout main</usage>
+                        <purpose>Switch to main branch</purpose>
+                        <when>Before creating each new branch</when>
+                        <error_handling>If fails, check if branch is actually called 'master'</error_handling>
+                    </command>
+
+                    <command>
+                        <usage>git pull origin main</usage>
+                        <purpose>Update main with latest remote changes</purpose>
+                        <when>Before creating new branch and after each PR merge</when>
+                        <note>Critical to keep base current</note>
+                    </command>
+
+                    <command>
+                        <usage>git checkout -b alexmandrik/{type}/{name}</usage>
+                        <purpose>Create and switch to new branch from current location</purpose>
+                        <when>When creating each branch in the plan</when>
+                        <note>Current location should always be main</note>
+                    </command>
+
+                    <command>
+                        <usage>git push -u origin alexmandrik/{type}/{name}</usage>
+                        <purpose>Push new branch to remote and set upstream</purpose>
+                        <when>After cherry-picking all commits to a branch</when>
+                        <note>Required before PR can be created</note>
+                    </command>
+                </command_group>
+
+                <command_group name="cherry_picking">
+                    <command>
+                        <usage>git cherry-pick {commit_hash}</usage>
+                        <purpose>Apply a specific commit to current branch</purpose>
+                        <when>For each commit in a branch group, in chronological order</when>
+                        <success_indicator>No conflict output, clean exit code</success_indicator>
+                        <conflict_indicator>Output contains "CONFLICT" or "error"</conflict_indicator>
+                    </command>
+
+                    <command>
+                        <usage>git cherry-pick --abort</usage>
+                        <purpose>Cancel an in-progress cherry-pick</purpose>
+                        <when>User decides to skip conflicting commit</when>
+                    </command>
+
+                    <command>
+                        <usage>git cherry-pick --continue</usage>
+                        <purpose>Continue after manually resolving conflicts</purpose>
+                        <when>User resolves conflicts and wants to proceed</when>
+                    </command>
+                </command_group>
+
+                <command_group name="conflict_handling">
+                    <command>
+                        <usage>git status</usage>
+                        <purpose>See which files have conflicts</purpose>
+                        <when>After cherry-pick reports conflicts</when>
+                        <output_indicators>
+                            <indicator>both modified: indicates conflict</indicator>
+                            <indicator>Unmerged paths: indicates conflicts exist</indicator>
+                        </output_indicators>
+                    </command>
+
+                    <command>
+                        <usage>git diff</usage>
+                        <purpose>View conflict markers and details</purpose>
+                        <when>User wants to see what the conflicts are</when>
+                    </command>
+                </command_group>
+            </common_commands>
+
+            <error_handling>
+                <scenario name="command_fails">
+                    <detection>Non-zero exit code or error in output</detection>
+                    <action>
+                        - Capture the error message
+                        - Inform user of the failure
+                        - Offer appropriate recovery options based on the command
+                        - Don't proceed blindly if a critical command fails
+                    </action>
+                </scenario>
+
+                <scenario name="branch_already_exists">
+                    <detection>git checkout -b fails with "already exists"</detection>
+                    <action>
+                        - Ask user if they want to:
+                        * Use existing branch (checkout without -b)
+                        * Delete and recreate (git branch -D then create)
+                        * Choose a different name
+                    </action>
+                </scenario>
+
+                <scenario name="no_upstream_branch">
+                    <detection>git pull fails, no upstream configured</detection>
+                    <action>
+                        - Use git fetch origin main &amp;&amp; git merge origin/main instead
+                        - Or proceed without pull if it's a new repo
+                    </action>
+                </scenario>
+            </error_handling>
+        </tool>
+
+        <tool name="ask_followup_question">
+            <description>
+                Used to get user confirmation at critical decision points in the workflow.
+            </description>
+
+            <best_practices>
+                <practice>Provide 2-4 specific, actionable suggestion options</practice>
+                <practice>Order suggestions by likelihood (most common first)</practice>
+                <practice>Make suggestions complete without placeholders</practice>
+                <practice>Include relevant context in the question</practice>
+                <practice>Don't overuse - only for genuinely needed confirmations</practice>
+            </best_practices>
+
+            <usage_scenarios>
+                <scenario name="confirm_branching_plan">
+                    <when>After analyzing commits and generating the plan</when>
+                    <example><![CDATA[
+{
+  "question": "Ready to create 3 branches and organize 8 commits? See the plan above.",
+  "follow_up": [
+    {"text": "Yes, proceed with the plan", "mode": null},
+    {"text": "No, let me review and adjust", "mode": null}
+  ]
+}
+          ]]></example>
+                </scenario>
+
+                <scenario name="wait_for_pr_merge">
+                    <when>After PR is created, before continuing to next branch</when>
+                    <example><![CDATA[
+{
+  "question": "PR created at https://github.com/user/repo/pull/123. Has it been merged?",
+  "follow_up": [
+    {"text": "Yes, PR is merged - continue to next branch", "mode": null},
+    {"text": "Not yet - I need more time to review", "mode": null}
+  ]
+}
+          ]]></example>
+                </scenario>
+
+                <scenario name="handle_conflicts">
+                    <when>Cherry-pick results in merge conflicts</when>
+                    <example><![CDATA[
+{
+  "question": "Cherry-pick conflicts detected in src/auth/login.ts. How should we proceed?",
+  "follow_up": [
+    {"text": "Skip this commit and continue", "mode": null},
+    {"text": "Abort this branch group", "mode": null},
+    {"text": "Pause - I'll resolve manually", "mode": null}
+  ]
+}
+          ]]></example>
+                </scenario>
+
+                <scenario name="dirty_working_directory">
+                    <when>Uncommitted changes detected at start</when>
+                    <example><![CDATA[
+{
+  "question": "Working directory has uncommitted changes. How should we proceed?",
+  "follow_up": [
+    {"text": "Stash changes and continue", "mode": null},
+    {"text": "Commit changes first", "mode": null},
+    {"text": "Cancel operation", "mode": null}
+  ]
+}
+          ]]></example>
+                </scenario>
+            </usage_scenarios>
+
+            <anti_patterns>
+                <anti_pattern>
+                    <bad>Asking open-ended questions without suggestions</bad>
+                    <why>Makes user type unnecessarily; slower workflow</why>
+                </anti_pattern>
+                <anti_pattern>
+                    <bad>Providing generic suggestions like "Yes" and "No"</bad>
+                    <why>Not actionable; doesn't specify what happens next</why>
+                </anti_pattern>
+                <anti_pattern>
+                    <bad>Asking for confirmation on every trivial step</bad>
+                    <why>Slows down workflow; annoying for user</why>
+                </anti_pattern>
+            </anti_patterns>
+        </tool>
+
+        <tool name="new_task">
+            <description>
+                Used to delegate PR creation to the pr-creator mode for each branch.
+            </description>
+
+            <best_practices>
+                <practice>Provide clear context about the branch being processed</practice>
+                <practice>Keep the message concise but informative</practice>
+                <practice>Do not include todos parameter (pr-creator manages its own workflow)</practice>
+                <practice>Wait for task completion before asking user about merge</practice>
+            </best_practices>
+
+            <usage_pattern>
+                <when>After pushing a branch with cherry-picked commits</when>
+                <example><![CDATA[
+{
+  "mode": "pr-creator",
+  "message": "Create a PR for branch alexmandrik/feat/user-authentication to merge into main.",
+  "todos": ""
+}
+        ]]></example>
+                <note>The pr-creator mode will analyze the branch commits and generate appropriate
+                    PR title and description</note>
+            </usage_pattern>
+
+            <workflow_integration>
+                <step>Create and populate branch with cherry-picked commits</step>
+                <step>Push branch to remote</step>
+                <step>Use new_task to delegate to pr-creator mode</step>
+                <step>Wait for new_task completion (PR created)</step>
+                <step>Use ask_followup_question to wait for user to merge</step>
+                <step>Once confirmed merged, update main and continue to next branch</step>
+            </workflow_integration>
+
+            <error_handling>
+                <scenario>
+                    <condition>new_task fails or pr-creator returns error</condition>
+                    <action>
+                        - Log the error for visibility
+                        - Inform user: "Branch {name} created but PR creation failed. Please create
+                        PR manually at: {branch_url}"
+                        - Continue to next branch (don't block the entire workflow)
+                    </action>
+                </scenario>
+            </error_handling>
+        </tool>
+
+        <tool name="attempt_completion">
+            <description>
+                Used at the end of the workflow to summarize results.
+            </description>
+
+            <when_to_use>
+                After all branches have been created, commits cherry-picked, PRs created,
+                and confirmed merged by the user.
+            </when_to_use>
+
+            <best_practices>
+                <practice>Provide clear summary of what was accomplished</practice>
+                <practice>List all created branches and their PR URLs</practice>
+                <practice>Mention current branch state (should be on main)</practice>
+                <practice>Note any failures or manual actions needed</practice>
+                <practice>Don't end with questions or offers for help (requirement)</practice>
+            </best_practices>
+
+            <example><![CDATA[
+{
+  "result": "Successfully organized 8 commits into 3 branches:\n\n1. alexmandrik/feat/user-authentication (PR #123 - merged)\n   - 3 commits related to user login\n\n2. alexmandrik/fix/null-pointer-validation (PR #124 - merged)\n   - 2 commits fixing parser issues\n\n3. alexmandrik/docs/api-documentation (PR #125 - merged)\n   - 3 commits updating API docs\n\nAll branches have been created, PRs merged, and main branch is now up to date."
+}
+      ]]></example>
+        </tool>
+    </tool_specific_guidance>
+
+    <workflow_tool_sequence>
+        <phase name="initialization">
+            <step>execute_command: git status</step>
+            <step>execute_command: git branch --show-current</step>
+            <step>execute_command: git branch (verify main exists)</step>
+            <step>If dirty: ask_followup_question (stash/commit/cancel)</step>
+        </phase>
+
+        <phase name="commit_analysis">
+            <step>execute_command: git log main..HEAD --oneline</step>
+            <step>execute_command: git log main..HEAD --pretty=format:"%H|%s|%b" --reverse</step>
+            <step>For each commit: execute_command: git show --name-only {hash}</step>
+            <step>Analyze and group commits (internal logic)</step>
+            <step>Generate branch names (internal logic)</step>
+        </phase>
+
+        <phase name="confirmation">
+            <step>Present plan to user (markdown output)</step>
+            <step>ask_followup_question: Confirm plan</step>
+            <step>If not confirmed: adjust and re-present</step>
+        </phase>
+
+        <phase name="branch_creation_loop">
+            <for_each>branch in plan</for_each>
+            <steps>
+                <step>execute_command: git checkout main</step>
+                <step>execute_command: git pull origin main</step>
+                <step>execute_command: git checkout -b {branch_name}</step>
+                <step>For each commit in group (chronological order): <substep>execute_command: git
+                    cherry-pick {commit_hash}</substep>
+          <substep>If conflict: ask_followup_question
+                    (skip/abort/manual)</substep>
+                </step>
+                <step>execute_command: git push -u origin {branch_name}</step>
+                <step>new_task: Delegate to pr-creator mode</step>
+                <step>ask_followup_question: Wait for merge confirmation</step>
+                <step>Once confirmed: continue to next iteration</step>
+            </steps>
+        </phase>
+
+        <phase name="completion">
+            <step>execute_command: git checkout main</step>
+            <step>execute_command: git pull origin main (final update)</step>
+            <step>attempt_completion: Summarize results</step>
+        </phase>
+    </workflow_tool_sequence>
+
+    <troubleshooting>
+        <issue name="git_command_not_found">
+            <symptom>execute_command returns "command not found: git"</symptom>
+            <solution>
+                Inform user git is not installed or not in PATH. Cannot proceed without git.
+            </solution>
+        </issue>
+
+        <issue name="not_a_git_repository">
+            <symptom>git commands return "not a git repository"</symptom>
+            <solution>
+                Inform user current directory is not a git repository. Ask if they want to
+                run from a different directory.
+            </solution>
+        </issue>
+
+        <issue name="no_main_branch">
+            <symptom>Main branch doesn't exist</symptom>
+            <solution>
+                Check for 'master' branch instead. If neither exists, ask user which branch
+                to use as the base.
+            </solution>
+        </issue>
+
+        <issue name="permission_denied_push">
+            <symptom>git push fails with permission denied</symptom>
+            <solution>
+                Inform user they don't have push permissions. They may need to:
+                - Authenticate with git
+                - Fork the repository
+                - Request write access
+                Offer to continue creating branches locally without pushing.
+            </solution>
+        </issue>
+    </troubleshooting>
+</tool_usage_guide>
