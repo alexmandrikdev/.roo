@@ -431,9 +431,156 @@ Unmerged paths:
         </note>
     </example>
 
+    <example name="chronological_branch_ordering">
+        <scenario>
+            Demonstrates the critical requirement to process branch groups in chronological order
+            based on the oldest commit in each group, using the real-world case from the user's
+            feedback.
+        </scenario>
+
+        <initial_state>
+            <current_branch>feature/mixed-commits</current_branch>
+            <commits_with_timestamps>
+                <commit hash="623c9c0" timestamp="1707000000" date="2024-02-04 10:00:00">
+                    feat(modes): add viral LinkedIn article architect mode
+                </commit>
+                <commit hash="eba0af8" timestamp="1707050000" date="2024-02-04 23:53:20">
+                    feat: add UTK Turfgrass FIFA World Cup 26 project
+                </commit>
+                <commit hash="56ff816" timestamp="1707100000" date="2024-02-05 13:46:40">
+                    docs(content-generator): add project page generation workflow
+                </commit>
+            </commits_with_timestamps>
+        </initial_state>
+
+        <commit_retrieval>
+            <execute_command>git log main..HEAD --pretty=format:"%H|%at|%s|%b" --reverse</execute_command>
+            <output><![CDATA[
+623c9c0|1707000000|feat(modes): add viral LinkedIn article architect mode|
+eba0af8|1707050000|feat: add UTK Turfgrass FIFA World Cup 26 project|
+56ff816|1707100000|docs(content-generator): add project page generation workflow|
+        ]]></output>
+        </commit_retrieval>
+
+        <grouping_analysis>
+            <group id="1" name="UTK Turfgrass Project">
+                <commits>eba0af8</commits>
+                <oldest_commit_timestamp>1707050000</oldest_commit_timestamp>
+                <files>
+                    - projects/utk-turfgrass.htm
+                    - linkedin-projects/utk-turfgrass.txt
+                    - 12 screenshot images
+                </files>
+            </group>
+            <group id="2" name="Documentation Update">
+                <commits>56ff816</commits>
+                <oldest_commit_timestamp>1707100000</oldest_commit_timestamp>
+                <files>
+                    - .roo/rules-content-generator/project-page-generation-workflow.xml
+                </files>
+            </group>
+            <group id="3" name="LinkedIn Mode">
+                <commits>623c9c0</commits>
+                <oldest_commit_timestamp>1707000000</oldest_commit_timestamp>
+                <files>
+                    - .roo/rules-linkedin-article-architect/*.xml
+                    - .roomodes
+                </files>
+            </group>
+        </grouping_analysis>
+
+        <chronological_sorting>
+            <explanation>
+                Before presenting the plan, sort groups by oldest commit timestamp:
+                - Group 3 (LinkedIn Mode): oldest = 1707000000 (Feb 4, 10:00)
+                - Group 1 (UTK Project): oldest = 1707050000 (Feb 4, 23:53)
+                - Group 2 (Documentation): oldest = 1707100000 (Feb 5, 13:46)
+            </explanation>
+        </chronological_sorting>
+
+        <correct_plan_presentation>
+            <output><![CDATA[
+## Branching Plan
+
+Found 3 unmerged commits to organize into 3 branches:
+
+### Branch 1: alexmandrik/feat/linkedin-article-architect-mode
+**Commits:**
+- 623c9c0 feat(modes): add viral LinkedIn article architect mode
+
+**Files changed:**
+- .roo/rules-linkedin-article-architect/1_workflow.xml
+- .roo/rules-linkedin-article-architect/2_hook_formulas.xml
+- .roo/rules-linkedin-article-architect/3_outline_templates.xml
+- .roo/rules-linkedin-article-architect/4_engagement_techniques.xml
+- .roo/rules-linkedin-article-architect/5_examples.xml
+- .roomodes
+
+**Rationale:** New custom mode for creating viral LinkedIn articles, including comprehensive rule files and mode configuration.
+
+**Chronology:** Contains the OLDEST commit (Feb 4, 10:00) - must be processed first
+
+### Branch 2: alexmandrik/feat/utk-turfgrass-project
+**Commits:**
+- eba0af8 feat: add UTK Turfgrass FIFA World Cup 26 project
+
+**Files changed:**
+- projects/utk-turfgrass.htm
+- linkedin-projects/utk-turfgrass.txt
+- 12 screenshot images in projects/images/utk-turfgrass/
+
+**Rationale:** Standalone feature adding a new project page to the portfolio with associated images and LinkedIn content.
+
+**Chronology:** Contains the second oldest commit (Feb 4, 23:53)
+
+### Branch 3: alexmandrik/docs/content-generator-workflow
+**Commits:**
+- 56ff816 docs(content-generator): add project page generation workflow
+
+**Files changed:**
+- .roo/rules-content-generator/project-page-generation-workflow.xml
+
+**Rationale:** Documentation addition for the content generator workflow, defining the process for generating project pages.
+
+**Chronology:** Contains the newest commit (Feb 5, 13:46) - processed last
+        ]]></output>
+        </correct_plan_presentation>
+
+        <incorrect_example>
+            <wrong_approach>
+                <!-- DO NOT DO THIS --> Presenting branches in arbitrary order without considering chronology:
+                Branch 1: UTK Project (timestamp: 1707050000) Branch 2: Documentation (timestamp:
+                1707100000) Branch 3: LinkedIn Mode (timestamp: 1707000000) <!-- WRONG - oldest
+                should be first! -->
+            </wrong_approach>
+            <why_wrong>
+                This violates chronological ordering. The LinkedIn Mode has the oldest commit
+                (623c9c0)
+                and MUST be processed as Branch 1, not Branch 3.
+            </why_wrong>
+        </incorrect_example>
+
+        <execution_order>
+            <step>Process Branch 1 (LinkedIn Mode - oldest commit 623c9c0)</step>
+            <step>Wait for PR merge and update main</step>
+            <step>Process Branch 2 (UTK Project - middle commit eba0af8)</step>
+            <step>Wait for PR merge and update main</step>
+            <step>Process Branch 3 (Documentation - newest commit 56ff816)</step>
+            <step>Wait for PR merge and update main</step>
+        </execution_order>
+
+        <critical_principle>
+            ALWAYS sort branch groups by their oldest commit's timestamp before presenting the plan.
+            The branch containing the chronologically oldest commit must always be "Branch 1",
+            regardless of content, file types, or logical grouping.
+        </critical_principle>
+    </example>
+
     <key_takeaways>
         <takeaway>Always start from updated main branch for each new branch</takeaway>
         <takeaway>Cherry-pick commits in chronological order within groups</takeaway>
+        <takeaway>CRITICAL: Order branch groups by oldest commit timestamp (oldest first)</takeaway>
+        <takeaway>Capture commit timestamps using %at in git log for accurate sorting</takeaway>
         <takeaway>Handle conflicts gracefully with user input</takeaway>
         <takeaway>Wait for user confirmation after each PR is created</takeaway>
         <takeaway>Update main after each merge before creating next branch</takeaway>

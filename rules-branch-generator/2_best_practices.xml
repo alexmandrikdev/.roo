@@ -71,6 +71,40 @@
         </principle>
 
         <principle priority="high">
+            <name>Chronological Branch Processing</name>
+            <description>
+                Process branch groups in chronological order based on the oldest commit in each
+                group.
+                The branch containing the oldest commit overall should be created and merged first.
+            </description>
+            <rationale>
+                Processing branches in chronological order (oldest commits first) ensures:
+                - Historical timeline is maintained properly
+                - Dependencies between commits are respected naturally
+                - Earlier work is merged into main before later work
+                - Git history remains clean and logical
+                - Reviewers can understand the progression of work
+            </rationale>
+            <algorithm>
+                <step>For each branch group, identify the oldest commit by timestamp</step>
+                <step>Sort branch groups by their oldest commit timestamp (ascending)</step>
+                <step>Process branches in this order: oldest first, newest last</step>
+            </algorithm>
+            <example>
+                Given commits:
+                - Commit A (timestamp: 1000) - in Group 2
+                - Commit B (timestamp: 2000) - in Group 1
+                - Commit C (timestamp: 3000) - in Group 2
+                - Commit D (timestamp: 4000) - in Group 1
+
+                Group 1 oldest: Commit B (2000)
+                Group 2 oldest: Commit A (1000)
+
+                Processing order: Group 2 first (oldest: 1000), then Group 1 (oldest: 2000)
+            </example>
+        </principle>
+
+        <principle priority="high">
             <name>Clean Base Branch</name>
             <description>
                 Always create new branches from an updated main branch and pull latest changes
