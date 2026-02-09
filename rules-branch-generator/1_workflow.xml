@@ -22,12 +22,14 @@
         </step>
 
         <step number="2">
-            <action>Retrieve unmerged commits</action>
+            <action>Retrieve unmerged commits with timestamps</action>
             <details>
                 Get all commits on current branch that are not in main:
                 - Use 'git log main..HEAD --oneline' for commit list
-                - Use 'git log main..HEAD --pretty=format:"%H|%s|%b"' for detailed info
-                - Store commit hashes, subjects, and bodies
+                - Use 'git log main..HEAD --pretty=format:"%H|%at|%s|%b"' for detailed info with
+                timestamps
+                - Store commit hashes, timestamps (%at = Unix timestamp), subjects, and bodies
+                - Timestamps are essential for chronological ordering of branch groups
             </details>
             <tools>
                 <tool>execute_command - Execute git log commands</tool>
@@ -78,6 +80,23 @@
                         - Can stand alone as a PR
                         - Follows a logical dependency order
                     </action>
+                </step>
+
+                <step>
+                    <title>Order branch groups chronologically</title>
+                    <action>Sort the branch groups by the timestamp of their oldest commit:
+                        - For each branch group, identify the oldest commit (earliest timestamp)
+                        - Order branch groups so branches with older commits are processed first
+                        - This ensures dependencies are respected and maintains chronological
+                        progression
+                        - The first branch to be created should contain the oldest commit overall
+                    </action>
+                    <rationale>
+                        Processing branches in chronological order (oldest first) ensures that:
+                        - Historical dependencies are maintained
+                        - The git history remains logical and clean
+                        - Earlier work is merged before later work that may depend on it
+                    </rationale>
                 </step>
 
                 <step>
