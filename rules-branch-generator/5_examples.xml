@@ -576,6 +576,196 @@ Found 3 unmerged commits to organize into 3 branches:
         </critical_principle>
     </example>
 
+    <example name="single_branch_optimization">
+        <scenario>
+            User has commits on a feature branch that should be organized, but there is only
+            ONE logical group. Instead of creating a new branch and cherry-picking, the mode
+            optimizes by rebasing the current branch to main and renaming it.
+        </scenario>
+
+        <initial_state>
+            <current_branch>feature/auth-refactor</current_branch>
+            <commits>
+                <commit hash="abc1234">refactor: extract auth logic to service</commit>
+                <commit hash="def5678">refactor: reorganize auth tests</commit>
+                <commit hash="ghi9012">test: add comprehensive auth unit tests</commit>
+            </commits>
+        </initial_state>
+
+        <workflow_execution>
+            <step phase="initialization">
+                <execute_command>git status</execute_command>
+                <output>On branch feature/auth-refactor, nothing to commit, working tree clean</output>
+            </step>
+
+            <step phase="commit_retrieval">
+                <execute_command>git log main..HEAD --pretty=format:"%H|%s|%b" --reverse</execute_command>
+                <output><![CDATA[
+abc1234|refactor: extract auth logic to service|
+def5678|refactor: reorganize auth tests|
+ghi9012|test: add comprehensive auth unit tests|
+        ]]></output>
+            </step>
+
+            <step phase="analysis">
+                <analysis>
+                    All three commits are part of the same refactoring effort:
+                    - All related to auth module
+                    - No dependency on other features
+                    - Can be merged as single PR
+
+                    RESULT: Only 1 branch in plan
+                </analysis>
+            </step>
+
+            <step phase="plan_presentation">
+                <output><![CDATA[
+## Branching Plan
+
+Found 3 unmerged commits to organize into 1 branch:
+
+### Branch 1: alexmandrik/refactor/auth-module
+**Commits:**
+- abc1234 refactor: extract auth logic to service
+- def5678 refactor: reorganize auth tests
+- ghi9012 test: add comprehensive auth unit tests
+
+**Rationale:** This is a comprehensive auth module refactoring that improves code organization
+and test coverage. All commits work together as a single unit.
+
+**Optimization:** Since there's only one branch, we'll rebase the current branch to main
+and rename it instead of creating a new branch from scratch.
+        ]]></output>
+            </step>
+
+            <step phase="single_branch_check">
+                <condition>Plan contains exactly 1 branch</condition>
+                <action>Use optimized single-branch workflow</action>
+            </step>
+
+            <step phase="rebase_to_main">
+                <action>Rebase current branch to main to ensure all changes are up-to-date</action>
+                <execute_command>git pull origin main &amp;&amp; git rebase main</execute_command>
+                <output><![CDATA[
+Successfully rebased and updated refs/heads/feature/auth-refactor.
+        ]]></output>
+                <rationale>Rebasing ensures the branch includes any recent changes from main
+                    and gives us a clean commit history</rationale>
+            </step>
+
+            <step phase="rename_branch">
+                <action>Rename the current branch to match the planned branch name</action>
+                <execute_command>git branch -m feature/auth-refactor
+                    alexmandrik/refactor/auth-module</execute_command>
+                <output>Branch renamed</output>
+                <confirmation>Branch successfully renamed from feature/auth-refactor to
+                    alexmandrik/refactor/auth-module</confirmation>
+            </step>
+
+            <step phase="pr_creation">
+                <action>Create PR using pr-creator mode</action>
+                <new_task>
+                    <mode>pr-creator</mode>
+                    <message>Create a PR for branch alexmandrik/refactor/auth-module to merge
+                        into main.</message>
+                </new_task>
+                <pr_result>https://github.com/user/repo/pull/151</pr_result>
+            </step>
+
+            <step phase="wait_for_merge">
+                <ask_followup_question>
+                    <question>PR created at https://github.com/user/repo/pull/151. Has it been
+                        merged?</question>
+                    <user_response>Yes, PR is merged</user_response>
+                </ask_followup_question>
+            </step>
+
+            <step phase="completion">
+                <attempt_completion>
+                    Successfully organized 3 commits into 1 optimized branch:
+
+                    1. alexmandrik/refactor/auth-module (PR #151 - merged)
+                    - 3 commits refactoring auth module
+
+                    The single-branch optimization saved a step by rebasing and renaming
+                    the current branch instead of creating a new one from main and cherry-picking.
+                </attempt_completion>
+            </step>
+        </workflow_execution>
+
+        <optimization_benefits>
+            <benefit>Fewer git operations: rebase + rename instead of create + cherry-pick + push</benefit>
+            <benefit>Cleaner history: no new branch creation, just rename of existing</benefit>
+            <benefit>Faster execution: single rebase is more efficient than cherry-picking multiple
+                commits</benefit>
+            <benefit>Same end result: properly named branch ready for PR</benefit>
+        </optimization_benefits>
+
+        <key_points>
+            <point>Single-branch optimization is automatically detected and applied</point>
+            <point>Rebase ensures compatibility with current main</point>
+            <point>Rename gives branch the proper naming convention</point>
+            <point>No need to create a new branch from main when only one group exists</point>
+        </key_points>
+    </example>
+
+    <example name="single_branch_with_rebase_conflicts">
+        <scenario>
+            A single-branch scenario where rebase conflicts occur during the optimization step.
+            User must resolve them before continuing.
+        </scenario>
+
+        <initial_state>
+            <current_branch>feature/ui-updates</current_branch>
+            <commits>
+                <commit hash="xyz7890">feat: redesign login form</commit>
+                <commit hash="uvw4567">feat: add animation to form submission</commit>
+            </commits>
+        </initial_state>
+
+        <single_branch_detection>
+            <analysis>Only 1 branch in plan - use optimized workflow</analysis>
+        </single_branch_detection>
+
+        <rebase_with_conflicts>
+            <step>
+                <execute_command>git rebase main</execute_command>
+                <output><![CDATA[
+error: could not apply xyz7890... feat: redesign login form
+hint: Resolve all conflicts manually, mark them as resolved with
+hint: "git add/rm <conflicted_files>", then run "git rebase --continue".
+hint: You can instead skip this commit: run "git rebase --skip".
+hint: To abort and get back to the state before "git rebase --continue", run "git rebase --abort".
+CONFLICT (modify/delete): src/components/LoginForm.tsx deleted by them, modified by us.
+        ]]></output>
+            </step>
+
+            <step>
+                <ask_followup_question>
+                    <question>Rebase conflicts detected in src/components/LoginForm.tsx.
+                        How should we proceed?</question>
+                    <follow_up>
+                        <option>Resolve conflicts manually (pause)</option>
+                        <option>Abort rebase</option>
+                    </follow_up>
+                </ask_followup_question>
+            </step>
+
+            <resolution>
+                <user_choice>Resolve conflicts manually (pause)</user_choice>
+                <inform_user>
+                    Please resolve the conflicts in src/components/LoginForm.tsx, then run:
+                    git add src/components/LoginForm.tsx
+                    git rebase --continue
+
+                    Let me know when ready to continue.
+                </inform_user>
+                <user_action>User manually resolves conflict and confirms</user_action>
+                <mode_continues>Resume with branch rename and PR creation steps</mode_continues>
+            </resolution>
+        </rebase_with_conflicts>
+    </example>
+
     <key_takeaways>
         <takeaway>Always start from updated main branch for each new branch</takeaway>
         <takeaway>Cherry-pick commits in chronological order within groups</takeaway>
