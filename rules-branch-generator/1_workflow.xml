@@ -152,35 +152,84 @@
             <description>Execute the branching plan systematically</description>
             <steps>
                 <step>
-                    <title>Prepare base</title>
+                    <title>Check if single branch plan</title>
                     <action>
-                        - Ensure we're starting from main branch
-                        - Run 'git checkout main'
-                        - Pull latest changes: 'git pull origin main'
+                        - If the plan contains only ONE branch:
+                        * Skip to optimized_single_branch workflow (see below)
+                        * Do not proceed with standard multi-branch workflow
+                        - If the plan contains MULTIPLE branches:
+                        * Continue with standard workflow (steps 5.2-5.6)
                     </action>
                 </step>
 
                 <step>
-                    <title>Iterate through each branch group</title>
-                    <action>For each branch in the plan:
+                    <title>OPTIMIZED SINGLE BRANCH WORKFLOW</title>
+                    <action>If there is only one branch in the plan:
 
-                        5.1. CREATE BRANCH:
+                        5.1. REBASE CURRENT BRANCH TO MAIN:
+                        - Run 'git pull origin main &amp;&amp; git rebase main'
+                        - Handle any conflicts that occur:
+                        * Show conflict details to user
+                        * Use ask_followup_question for resolution:
+                        - "Conflicts detected during rebase. How should we proceed?"
+                        - Suggestions:
+                        - "Resolve conflicts manually (pause)"
+                        - "Abort rebase"
+                        * If user resolves manually, continue with 'git rebase --continue'
+
+                        5.2. RENAME CURRENT BRANCH:
+                        - Run 'git branch -m {current-branch-name} {new-branch-name}'
+                        - Where {new-branch-name} is the planned branch name
+                        (alexmandrik/{type}/{name})
+                        - Confirm rename success
+
+                        5.3. CREATE PR VIA PR-CREATOR MODE:
+                        - Use new_task tool to create a subtask in pr-creator mode
+                        - Pass context about the branch and commits
+                        - Message: "Create a PR for branch {new-branch-name} to main"
+                        - Wait for pr-creator mode to complete and get PR URL
+
+                        5.4. WAIT FOR USER TO MERGE:
+                        - Inform user: "PR created at {pr-url}. Please merge it when ready."
+                        - Use ask_followup_question:
+                        * Question: "Has the PR been merged?"
+                        * Suggestions:
+                        - "Yes, PR is merged"
+                        - "Wait, I need to review"
+
+                        Skip step 5.5 - we're already on main after push
+                    </action>
+                </step>
+
+                <step>
+                    <title>STANDARD MULTI-BRANCH WORKFLOW</title>
+                    <action>If there are MULTIPLE branches in the plan:
+
+                        5.2. PREPARE BASE:
+                        - Ensure we're starting from main branch
+                        - Run 'git checkout main'
+                        - Pull latest changes: 'git pull origin main'
+
+                        5.3. ITERATE THROUGH EACH BRANCH GROUP:
+                        - For each branch in the plan:
+
+                        5.3.1. CREATE BRANCH:
                         - Run 'git checkout -b {branch-name}' from main
                         - Confirm branch creation
 
-                        5.2. CHERRY-PICK COMMITS:
+                        5.3.2. CHERRY-PICK COMMITS:
                         - For each commit in the group (in chronological order):
                         * Run 'git cherry-pick {commit-hash}'
                         * Handle conflicts if they occur (inform user and get guidance)
                         * Verify cherry-pick success
 
-                        5.3. CREATE PR VIA PR-CREATOR MODE:
+                        5.3.3. CREATE PR VIA PR-CREATOR MODE:
                         - Use new_task tool to create a subtask in pr-creator mode
                         - Pass context about the branch and commits
                         - Message: "Create a PR for branch {branch-name} to main"
                         - Wait for pr-creator mode to complete and get PR URL
 
-                        5.4. WAIT FOR USER TO MERGE:
+                        5.3.4. WAIT FOR USER TO MERGE:
                         - Inform user: "PR created at {pr-url}. Please merge it when ready."
                         - Use ask_followup_question:
                         * Question: "Has the PR been merged? Once merged, I'll update main and
@@ -190,19 +239,20 @@
                         - "Wait, I need to review"
                         - Poll until user confirms merge
 
-                        5.5. UPDATE MAIN AND CONTINUE:
+                        5.3.5. UPDATE MAIN AND CONTINUE:
                         - Run 'git checkout main'
                         - Run 'git pull origin main' to get the merged changes
-                        - Move to next branch group and repeat from 5.1
+                        - Move to next branch group and repeat from 5.3.1
                     </action>
                 </step>
 
                 <step>
-                    <title>Return to original branch</title>
+                    <title>Completion</title>
                     <action>
                         - After all branches are processed
                         - Inform user of completion
-                        - Stay on main branch (already there from last iteration)
+                        - For single branch: already on main after PR merge
+                        - For multi-branch: stay on main branch (already there from last iteration)
                     </action>
                 </step>
             </steps>
