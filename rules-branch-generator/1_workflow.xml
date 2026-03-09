@@ -257,6 +257,50 @@
                 </step>
             </steps>
         </phase>
+
+        <phase name="cleanup">
+            <description>Clean up all created branches and prune remote tracking references</description>
+            <steps>
+                <step>
+                    <title>Confirm cleanup</title>
+                    <action>
+                        - Ask user if they want to proceed with cleanup
+                        - Use ask_followup_question:
+                        * Question: "All PRs have been merged. Should I clean up the created
+                        branches and the original feature branch?"
+                        * Suggestions:
+                        - "Yes, clean up all branches"
+                        - "No, keep the branches"
+                    </action>
+                </step>
+
+                <step>
+                    <title>Delete all branches and prune remote references</title>
+                    <action>
+                        - Collect all branches to delete:
+                        * All branches created during this workflow (from the branching plan)
+                        * The original feature branch that contained all the commits
+                        - Execute cleanup in a single command:
+                        * Run 'git branch -D {branch-1} {branch-2} {branch-3} ... {original-branch}
+                        &amp;&amp; git fetch --prune'
+                        * This efficiently deletes all branches and prunes remote tracking
+                        references in one operation
+                        - Confirm deletion and pruning
+                        - Log which branches were deleted
+                    </action>
+                </step>
+
+                <step>
+                    <title>Verify final state</title>
+                    <action>
+                        - Run 'git branch' to show remaining branches
+                        - Confirm user is on main branch
+                        - List all branches that were deleted
+                        - Inform user of successful cleanup
+                    </action>
+                </step>
+            </steps>
+        </phase>
     </main_workflow>
 
     <error_handling>
@@ -309,6 +353,9 @@
         <criterion>PRs have been created for all branches (or user notified of failures)</criterion>
         <criterion>All PRs have been merged (user confirmed)</criterion>
         <criterion>Main branch is up to date with all merged changes</criterion>
+        <criterion>All created feature branches have been deleted</criterion>
+        <criterion>The original feature branch has been deleted</criterion>
+        <criterion>Remote tracking references have been pruned (git fetch --prune)</criterion>
         <criterion>User is informed of final state and any manual actions needed</criterion>
     </completion_criteria>
 
