@@ -1,0 +1,365 @@
+<slash_command_best_practices>
+    <overview>
+        Best practices for creating effective, maintainable, and user-friendly
+        slash commands in Roo Code.
+    </overview>
+
+    <naming_conventions>
+        <principle name="descriptive_names">
+            <description>Command names should clearly communicate their purpose</description>
+            <guidelines>
+                <guideline priority="high">Use action-oriented verbs (review, generate, analyze,
+                    test)</guideline>
+                <guideline priority="high">Include the target or object (api-endpoint, readme,
+                    security)</guideline>
+                <guideline priority="medium">Keep to 2-3 words maximum for brevity</guideline>
+                <guideline priority="medium">Avoid abbreviations unless universally understood</guideline>
+            </guidelines>
+            <examples>
+                <good_names>
+                    <name reason="Clear action and target">security-review</name>
+                    <name reason="Specific and actionable">api-endpoint</name>
+                    <name reason="Clear purpose">test-coverage</name>
+                    <name reason="Descriptive workflow">deploy-check</name>
+                </good_names>
+                <bad_names>
+                    <name reason="Too generic">review</name>
+                    <name reason="Unclear abbreviation">sec-rev</name>
+                    <name reason="Too long">generate-comprehensive-api-documentation</name>
+                    <name reason="Non-descriptive">helper</name>
+                </bad_names>
+            </examples>
+        </principle>
+
+        <principle name="naming_format">
+            <description>Follow consistent formatting rules</description>
+            <rules>
+                <rule>Always use lowercase letters</rule>
+                <rule>Separate words with hyphens (kebab-case)</rule>
+                <rule>Avoid special characters except hyphens</rule>
+                <rule>Do not use underscores or spaces</rule>
+                <rule>Keep filenames matching: filename.md → /filename</rule>
+            </rules>
+            <automatic_processing>
+                <note>Roo Code automatically processes command names:</note>
+                <processing>Converts to lowercase</processing>
+                <processing>Replaces spaces with hyphens</processing>
+                <processing>Removes special characters (except hyphens)</processing>
+                <processing>Replaces multiple consecutive hyphens with single dash</processing>
+                <processing>Removes leading/trailing dashes</processing>
+            </automatic_processing>
+        </principle>
+
+        <principle name="avoid_conflicts">
+            <description>Prevent naming conflicts with existing commands</description>
+            <guidelines>
+                <guideline>Check built-in commands before naming (they cannot be overridden)</guideline>
+                <guideline>Use project-specific prefixes for team commands</guideline>
+                <guideline>Document command purpose to prevent duplicate creations</guideline>
+            </guidelines>
+            <conflict_resolution>
+                <priority level="1">Built-in commands (init, clarify, etc.)</priority>
+                <priority level="2">Project commands (.roo/commands/)</priority>
+                <priority level="3">Global commands (~/.roo/commands/)</priority>
+            </conflict_resolution>
+        </principle>
+    </naming_conventions>
+
+    <content_structure>
+        <principle name="clear_directives">
+            <description>Start with clear, actionable instructions</description>
+            <structure>
+                <opening>Begin with imperative verbs: "Create", "Analyze", "Review", "Generate"</opening>
+                <context>Provide immediate context about what to work on</context>
+                <requirements>List specific requirements or criteria</requirements>
+            </structure>
+            <examples>
+                <good>
+                    Create a REST API endpoint with the following specifications:
+                    - Proper error handling
+                    - Input validation
+                    - Authentication middleware
+                </good>
+                <bad>
+                    Please help me with an API endpoint if you can
+                </bad>
+            </examples>
+        </principle>
+
+        <principle name="structured_lists">
+            <description>Use lists for clarity and parseability</description>
+            <when_to_use>
+                <case>Multiple requirements or criteria</case>
+                <case>Step-by-step instructions</case>
+                <case>Checklist items to verify</case>
+                <case>Categories to consider</case>
+            </when_to_use>
+            <list_types>
+                <type name="numbered">
+                    <use>For sequential steps or ordered priorities</use>
+                    <example>
+                        1. Analyze current architecture
+                        2. Identify bottlenecks
+                        3. Propose improvements
+                    </example>
+                </type>
+                <type name="bulleted">
+                    <use>For unordered requirements or features</use>
+                    <example>
+                        - Include error handling
+                        - Add input validation
+                        - Document all endpoints
+                    </example>
+                </type>
+            </list_types>
+        </principle>
+
+        <principle name="project_context">
+            <description>Reference project-specific conventions and patterns</description>
+            <guidelines>
+                <guideline>Mention project conventions when relevant</guideline>
+                <guideline>Reference existing patterns to follow</guideline>
+                <guideline>Specify coding standards or style guides</guideline>
+                <guideline>Include testing requirements</guideline>
+            </guidelines>
+            <examples>
+                <example>Follow our project's REST API conventions and naming patterns</example>
+                <example>Use our established error handling middleware</example>
+                <example>Include tests following our Jest testing patterns</example>
+            </examples>
+        </principle>
+
+        <principle name="specificity">
+            <description>Be specific about expectations and requirements</description>
+            <avoid>
+                <vague>Make the code better</vague>
+                <vague>Fix any issues</vague>
+                <vague>Improve performance</vague>
+            </avoid>
+            <prefer>
+                <specific>Identify O(n²) algorithms and suggest optimizations</specific>
+                <specific>Check for SQL injection vulnerabilities in query builders</specific>
+                <specific>Reduce memory usage by implementing lazy loading</specific>
+            </prefer>
+        </principle>
+    </content_structure>
+
+    <frontmatter_best_practices>
+        <field name="description">
+            <importance>critical</importance>
+            <purpose>Appears in command menu to help users choose commands</purpose>
+            <guidelines>
+                <guideline>Keep under 80 characters for readability</guideline>
+                <guideline>Start with action verb</guideline>
+                <guideline>Be specific about what the command does</guideline>
+                <guideline>Avoid redundancy with command name</guideline>
+            </guidelines>
+            <examples>
+                <good command="api-endpoint">Generate a new REST API endpoint with best practices</good>
+                <good command="security-review">Analyze code for security vulnerabilities and risks</good>
+                <bad command="review">Reviews your code</bad>
+                <bad command="test-generator">This command generates tests for the selected code
+                    including unit tests and integration tests and more</bad>
+            </examples>
+        </field>
+
+        <field name="argument-hint">
+            <importance>high</importance>
+            <purpose>Shows users what arguments to provide</purpose>
+            <guidelines>
+                <guideline>Use angle brackets: &lt;argument-name&gt;</guideline>
+                <guideline>Be specific and descriptive</guideline>
+                <guideline>Show multiple arguments clearly: &lt;arg1&gt; &lt;arg2&gt;</guideline>
+                <guideline>Use terms users will understand</guideline>
+            </guidelines>
+            <examples>
+                <good>&lt;endpoint-name&gt; &lt;http-method&gt;</good>
+                <good>&lt;component-name&gt;</good>
+                <good>&lt;source-branch&gt; &lt;target-branch&gt;</good>
+                <bad>&lt;arg&gt;</bad>
+                <bad>&lt;thing&gt;</bad>
+                <bad>endpoint and method</bad>
+            </examples>
+        </field>
+
+        <field name="mode">
+            <importance>medium</importance>
+            <purpose>Switches to specific mode before running command</purpose>
+            <when_to_use>
+                <case mode="code">Command creates or modifies code files</case>
+                <case mode="architect">Command involves design or planning</case>
+                <case mode="debug">Command troubleshoots or analyzes issues</case>
+                <case mode="ask">Command provides explanations without changes</case>
+            </when_to_use>
+            <guidelines>
+                <guideline>Use when command needs specific mode capabilities</guideline>
+                <guideline>Omit if command works in any mode</guideline>
+                <guideline>Ensure mode slug is valid and exists</guideline>
+            </guidelines>
+        </field>
+    </frontmatter_best_practices>
+
+    <organizational_practices>
+        <principle name="command_scope">
+            <description>Choose appropriate scope for each command</description>
+            <decision_guide>
+                <use_project_scope>
+                    <when>Command is specific to project structure</when>
+                    <when>Command references project conventions</when>
+                    <when>Team should share the command</when>
+                    <when>Command should be version controlled</when>
+                </use_project_scope>
+                <use_global_scope>
+                    <when>Command applicable across all projects</when>
+                    <when>Command is a personal workflow preference</when>
+                    <when>Command contains no project-specific logic</when>
+                    <when>User doesn't want to share with team</when>
+                </use_global_scope>
+            </decision_guide>
+        </principle>
+
+        <principle name="command_grouping">
+            <description>Organize related commands effectively</description>
+            <strategies>
+                <strategy>Use consistent prefixes for related commands</strategy>
+                <strategy>Group by functional area (api-, test-, docs-)</strategy>
+                <strategy>Use subdirectories for large command sets</strategy>
+                <strategy>Document command relationships in README</strategy>
+            </strategies>
+            <examples>
+                <group prefix="api">
+                    <command>api-endpoint.md</command>
+                    <command>api-middleware.md</command>
+                    <command>api-docs.md</command>
+                </group>
+                <group prefix="test">
+                    <command>test-generator.md</command>
+                    <command>test-coverage.md</command>
+                    <command>test-e2e.md</command>
+                </group>
+            </examples>
+        </principle>
+
+        <principle name="version_control">
+            <description>Best practices for version controlling commands</description>
+            <project_commands>
+                <practice>Always version control .roo/commands/ directory</practice>
+                <practice>Document commands in project README or docs</practice>
+                <practice>Review command changes in PRs</practice>
+                <practice>Keep commands updated with project evolution</practice>
+            </project_commands>
+            <global_commands>
+                <practice>Consider backing up ~/.roo/commands/ separately</practice>
+                <practice>Do not version control in projects</practice>
+                <practice>Share valuable commands by moving to project scope</practice>
+            </global_commands>
+        </principle>
+    </organizational_practices>
+
+    <maintenance_practices>
+        <principle name="regular_review">
+            <description>Keep commands relevant and effective</description>
+            <checklist>
+                <item>Review commands quarterly for relevance</item>
+                <item>Update commands when project conventions change</item>
+                <item>Remove outdated or unused commands</item>
+                <item>Refine prompts based on AI responses</item>
+                <item>Update descriptions for clarity</item>
+            </checklist>
+        </principle>
+
+        <principle name="command_testing">
+            <description>Verify commands work as expected</description>
+            <testing_approach>
+                <step>Test command immediately after creation</step>
+                <step>Verify arguments are clear if using hints</step>
+                <step>Check mode switching works if specified</step>
+                <step>Ensure output matches expectations</step>
+                <step>Get feedback from team members</step>
+            </testing_approach>
+        </principle>
+
+        <principle name="documentation">
+            <description>Document commands for team understanding</description>
+            <what_to_document>
+                <item>Purpose and use cases for each command</item>
+                <item>Expected arguments and their format</item>
+                <item>Any prerequisites or setup needed</item>
+                <item>Examples of when to use the command</item>
+                <item>Related commands or workflows</item>
+            </what_to_document>
+            <where_to_document>
+                <location>Project README.md for team commands</location>
+                <location>Inline comments in command files</location>
+                <location>Separate COMMANDS.md documentation file</location>
+            </where_to_document>
+        </principle>
+    </maintenance_practices>
+
+    <common_pitfalls>
+        <pitfall name="overly_generic">
+            <problem>Commands are too broad and don't provide enough direction</problem>
+            <example>
+                Bad: "Review this code"
+                Good: "Review this code for security vulnerabilities, focusing on
+                authentication, input validation, and data sanitization"
+            </example>
+        </pitfall>
+
+        <pitfall name="too_specific">
+            <problem>Commands are so specific they're only useful once</problem>
+            <example>
+                Bad: "Create endpoint for user ID 12345 with email validation"
+                Good: "Create user management endpoint with validation"
+            </example>
+        </pitfall>
+
+        <pitfall name="missing_context">
+            <problem>Commands don't reference project conventions or patterns</problem>
+            <solution>Always include references to project-specific requirements</solution>
+        </pitfall>
+
+        <pitfall name="poor_argument_design">
+            <problem>Argument hints are unclear or missing when needed</problem>
+            <example>
+                Bad: /create-component (no hint, but needs component name)
+                Good: /create-component &lt;component-name&gt;
+            </example>
+        </pitfall>
+
+        <pitfall name="duplicate_commands">
+            <problem>Multiple commands do similar things with different names</problem>
+            <solution>Consolidate similar commands or differentiate clearly</solution>
+        </pitfall>
+
+        <pitfall name="neglected_maintenance">
+            <problem>Commands become outdated as project evolves</problem>
+            <solution>Review and update commands when conventions change</solution>
+        </pitfall>
+    </common_pitfalls>
+
+    <quality_checklist>
+        <category name="before_creation">
+            <item>Is the command name clear and descriptive?</item>
+            <item>Does a similar command already exist?</item>
+            <item>Is this the right scope (global vs project)?</item>
+            <item>Do I need arguments? If so, are they clear?</item>
+        </category>
+
+        <category name="during_creation">
+            <item>Does the description clearly explain the purpose?</item>
+            <item>Are instructions specific and actionable?</item>
+            <item>Have I included project-specific context?</item>
+            <item>Is the content well-structured (lists, sections)?</item>
+            <item>Does it need mode targeting?</item>
+        </category>
+
+        <category name="after_creation">
+            <item>Does the command appear in the / menu?</item>
+            <item>Is the description clear in the menu?</item>
+            <item>Do argument hints display correctly?</item>
+            <item>Does the command produce expected results?</item>
+            <item>Should this be documented for the team?</item>
+        </category>
+    </quality_checklist>
+</slash_command_best_practices>
