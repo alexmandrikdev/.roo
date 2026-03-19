@@ -1,0 +1,495 @@
+<tool_usage_for_slash_commands>
+    <overview>
+        Specific guidance on using tools effectively when creating and managing
+        slash commands. This mode has restricted file access to command files only.
+    </overview>
+
+    <file_access_restrictions>
+        <restriction>
+            <description>This mode can only edit slash command markdown files</description>
+            <allowed_patterns>
+                <pattern>.roo/commands/*.md</pattern>
+                <pattern>~/.roo/commands/*.md</pattern>
+                <pattern>commands/*.md</pattern>
+            </allowed_patterns>
+            <note>Attempting to edit other files will result in FileRestrictionError</note>
+        </restriction>
+    </file_access_restrictions>
+
+    <tool_priorities>
+        <priority level="1">
+            <tools>
+                <tool>list_files</tool>
+                <tool>read_file</tool>
+            </tools>
+            <purpose>Explore and understand existing commands before creating new ones</purpose>
+            <rationale>Prevents duplicate commands and ensures consistency</rationale>
+        </priority>
+
+        <priority level="2">
+            <tools>
+                <tool>write_to_file</tool>
+            </tools>
+            <purpose>Create new command files</purpose>
+            <rationale>Primary tool for command creation</rationale>
+        </priority>
+
+        <priority level="3">
+            <tools>
+                <tool>apply_diff</tool>
+            </tools>
+            <purpose>Modify existing commands</purpose>
+            <rationale>Make targeted updates to command files</rationale>
+        </priority>
+
+        <priority level="4">
+            <tools>
+                <tool>execute_command</tool>
+            </tools>
+            <purpose>Create directories or perform file operations</purpose>
+            <rationale>Sometimes needed to set up command directories</rationale>
+        </priority>
+    </tool_priorities>
+
+    <tool_specific_guidance>
+        <tool name="list_files">
+            <purpose>Explore command directories and check for existing commands</purpose>
+            <best_practices>
+                <practice>
+                    <action>Check project commands first</action>
+                    <command>list_files(".roo/commands", recursive=true)</command>
+                    <reason>See what project-specific commands exist</reason>
+                </practice>
+                <practice>
+                    <action>Check global commands if relevant</action>
+                    <command>list_files("~/.roo/commands", recursive=false)</command>
+                    <reason>Avoid duplicating global commands</reason>
+                </practice>
+                <practice>
+                    <action>Verify directory exists before creating files</action>
+                    <command>list_files(".roo", recursive=false)</command>
+                    <reason>Check if commands directory exists</reason>
+                </practice>
+            </best_practices>
+            <examples>
+                <example scenario="checking_existing_commands">
+                    <description>Before creating a new command, check what exists</description>
+                    <code>list_files(".roo/commands", recursive=true)</code>
+                    <interpretation>
+                        - Look for similar command names
+                        - Check naming patterns used
+                        - Identify possible duplicates
+                    </interpretation>
+                </example>
+            </examples>
+        </tool>
+
+        <tool name="read_file">
+            <purpose>Examine existing commands to understand patterns and avoid duplicates</purpose>
+            <best_practices>
+                <practice>
+                    <action>Read similar commands for reference</action>
+                    <reason>Understand established patterns and conventions</reason>
+                </practice>
+                <practice>
+                    <action>Check frontmatter structure</action>
+                    <reason>Ensure consistency in metadata format</reason>
+                </practice>
+                <practice>
+                    <action>Review command content style</action>
+                    <reason>Match the tone and structure of existing commands</reason>
+                </practice>
+            </best_practices>
+            <examples>
+                <example scenario="learning_from_existing">
+                    <description>Read an existing command to understand the pattern</description>
+                    <code>read_file(".roo/commands/review.md")</code>
+                    <what_to_look_for>
+                        - Frontmatter fields used
+                        - Content structure (lists, sections)
+                        - Level of detail
+                        - Project-specific references
+                    </what_to_look_for>
+                </example>
+            </examples>
+        </tool>
+
+        <tool name="write_to_file">
+            <purpose>Create new slash command files</purpose>
+            <best_practices>
+                <practice priority="high">
+                    <action>Always use .md extension</action>
+                    <reason>Required for Roo Code to recognize as command</reason>
+                </practice>
+                <practice priority="high">
+                    <action>Use lowercase with hyphens in filenames</action>
+                    <reason>Follows naming conventions and creates clean command names</reason>
+                </practice>
+                <practice priority="high">
+                    <action>Include frontmatter for all non-trivial commands</action>
+                    <reason>Provides better UX in command menu</reason>
+                </practice>
+                <practice priority="medium">
+                    <action>Use clear, structured content</action>
+                    <reason>Commands should be immediately actionable</reason>
+                </practice>
+            </best_practices>
+            <file_structure>
+                <component name="frontmatter" optional="false">
+                    <format>YAML between --- delimiters</format>
+                    <fields>
+                        <field name="description" required="true">Brief description for menu</field>
+                        <field name="argument-hint" required="false">Argument placeholder hints</field>
+                        <field name="mode" required="false">Target mode slug</field>
+                    </fields>
+                </component>
+                <component name="content" optional="false">
+                    <format>Markdown</format>
+                    <structure>
+                        <element>Opening directive</element>
+                        <element>Requirements list</element>
+                        <element>Context and constraints</element>
+                    </structure>
+                </component>
+            </file_structure>
+            <examples>
+                <example scenario="creating_simple_command">
+                    <description>Create a basic command without arguments</description>
+                    <code><![CDATA[
+write_to_file(
+    path=".roo/commands/optimize.md",
+    content="""---
+description: Analyze code for performance optimizations
+---
+
+Analyze the selected code for performance improvements:
+- Identify inefficient algorithms
+- Find unnecessary computations
+- Suggest caching opportunities
+- Recommend async improvements
+- Check for memory leaks
+"""
+)
+                    ]]></code>
+                </example>
+
+                <example scenario="creating_command_with_arguments">
+                    <description>Create a command that expects arguments</description>
+                    <code><![CDATA[
+write_to_file(
+    path=".roo/commands/create-component.md",
+    content="""---
+description: Create a new React component with TypeScript
+argument-hint: <component-name>
+mode: code
+---
+
+Create a new React component with the specified name:
+- Use TypeScript with proper prop types
+- Include JSDoc comments
+- Add CSS module for styling
+- Create Storybook story
+- Write unit tests with React Testing Library
+
+Follow our project's component structure and naming conventions.
+"""
+)
+                    ]]></code>
+                </example>
+
+                <example scenario="creating_mode_targeted_command">
+                    <description>Create a command that runs in specific mode</description>
+                    <code><![CDATA[
+write_to_file(
+    path=".roo/commands/architecture-review.md",
+    content="""---
+description: Analyze and improve system architecture
+mode: architect
+---
+
+Review the system architecture and provide recommendations:
+
+**Analysis:**
+1. Document component hierarchy and relationships
+2. Identify coupling and cohesion issues
+3. Review data flow patterns
+4. Assess scalability concerns
+
+**Recommendations:**
+- Propose architectural improvements
+- Suggest refactoring strategies
+- Document design patterns to adopt
+- Create architecture diagrams
+"""
+)
+                    ]]></code>
+                </example>
+            </examples>
+        </tool>
+
+        <tool name="apply_diff">
+            <purpose>Modify existing command files</purpose>
+            <when_to_use>
+                <case>Adding or updating frontmatter fields</case>
+                <case>Refining command instructions</case>
+                <case>Adding new requirements to existing command</case>
+                <case>Fixing typos or improving clarity</case>
+            </when_to_use>
+            <best_practices>
+                <practice>
+                    <action>Always read the file first</action>
+                    <reason>Ensure exact content match for SEARCH block</reason>
+                </practice>
+                <practice>
+                    <action>Include :start_line: in SEARCH block</action>
+                    <reason>Required for apply_diff to work correctly</reason>
+                </practice>
+                <practice>
+                    <action>Make focused changes</action>
+                    <reason>Easier to review and less error-prone</reason>
+                </practice>
+            </best_practices>
+            <examples>
+                <example scenario="adding_argument_hint">
+                    <description>Add argument hint to existing command</description>
+                    <prerequisite>Read the file first to get exact content</prerequisite>
+                    <code><![CDATA[
+apply_diff(
+    path=".roo/commands/api-endpoint.md",
+    diff="""
+<<<<<<< SEARCH
+:start_line:1
+-------
+---
+description: Generate REST API endpoint with best practices
+---
+=======
+---
+description: Generate REST API endpoint with best practices
+argument-hint: <endpoint-name> <http-method>
+mode: code
+---
+>>>>>>> REPLACE
+"""
+)
+                    ]]></code>
+                </example>
+
+                <example scenario="refining_instructions">
+                    <description>Update command content for clarity</description>
+                    <code><![CDATA[
+apply_diff(
+    path=".roo/commands/review.md",
+    diff="""
+<<<<<<< SEARCH
+:start_line:5
+-------
+Review the code for issues:
+- Check for bugs
+- Look at performance
+=======
+Review the code for potential issues:
+- Identify logical bugs and edge cases
+- Analyze performance bottlenecks
+- Check for security vulnerabilities
+- Verify error handling
+>>>>>>> REPLACE
+"""
+)
+                    ]]></code>
+                </example>
+            </examples>
+        </tool>
+
+        <tool name="execute_command">
+            <purpose>Create directories or perform file system operations</purpose>
+            <when_to_use>
+                <case>Commands directory doesn't exist</case>
+                <case>Need to create subdirectories for organization</case>
+                <case>Want to list commands using shell commands</case>
+            </when_to_use>
+            <best_practices>
+                <practice>
+                    <action>Use mkdir -p for safe directory creation</action>
+                    <reason>Creates parent directories and doesn't error if exists</reason>
+                </practice>
+                <practice>
+                    <action>Check directory existence with list_files first</action>
+                    <reason>Avoid unnecessary command execution</reason>
+                </practice>
+            </best_practices>
+            <examples>
+                <example scenario="creating_commands_directory">
+                    <description>Create the commands directory if it doesn't exist</description>
+                    <code>execute_command("mkdir -p .roo/commands")</code>
+                    <note>Use -p flag to avoid errors if directory exists</note>
+                </example>
+
+                <example scenario="creating_subdirectory">
+                    <description>Organize commands in subdirectories</description>
+                    <code>execute_command("mkdir -p .roo/commands/api")</code>
+                    <note>Subdirectories are supported for command organization</note>
+                </example>
+
+                <example scenario="global_commands_directory">
+                    <description>Create global commands directory</description>
+                    <code>execute_command("mkdir -p ~/.roo/commands")</code>
+                    <note>Global commands are stored in home directory</note>
+                </example>
+            </examples>
+        </tool>
+
+        <tool name="ask_followup_question">
+            <purpose>Clarify requirements before creating commands</purpose>
+            <when_to_use>
+                <case>User request is ambiguous</case>
+                <case>Need to determine scope (global vs project)</case>
+                <case>Unclear what arguments the command should accept</case>
+                <case>Mode targeting isn't obvious</case>
+            </when_to_use>
+            <best_practices>
+                <practice>
+                    <action>Provide specific, actionable suggestions</action>
+                    <reason>Helps user make quick decisions</reason>
+                </practice>
+                <practice>
+                    <action>Include 2-4 suggestions</action>
+                    <reason>Gives good options without overwhelming</reason>
+                </practice>
+                <practice>
+                    <action>Order suggestions by likelihood or best practice</action>
+                    <reason>User can quickly select the most common option</reason>
+                </practice>
+            </best_practices>
+            <examples>
+                <example scenario="clarifying_scope">
+                    <question>Should this be a global or project-specific command?</question>
+                    <suggestions>
+                        <suggestion>Project-specific (.roo/commands/) - team will use this</suggestion>
+                        <suggestion>Global (~/.roo/commands/) - just for me across all projects</suggestion>
+                    </suggestions>
+                </example>
+
+                <example scenario="determining_arguments">
+                    <question>What arguments should this command accept?</question>
+                    <suggestions>
+                        <suggestion>Component name only: &lt;component-name&gt;</suggestion>
+                        <suggestion>Name and type: &lt;component-name&gt; &lt;type&gt;</suggestion>
+                        <suggestion>No arguments - work with selected code</suggestion>
+                    </suggestions>
+                </example>
+
+                <example scenario="mode_targeting">
+                    <question>Should this command target a specific mode?</question>
+                    <suggestions>
+                        <suggestion>code - will create/modify files</suggestion>
+                        <suggestion>architect - for planning and design</suggestion>
+                        <suggestion>No mode - works in any mode</suggestion>
+                    </suggestions>
+                </example>
+            </examples>
+        </tool>
+    </tool_specific_guidance>
+
+    <workflow_tool_sequences>
+        <sequence name="create_new_command">
+            <description>Complete workflow for creating a new command</description>
+            <steps>
+                <step number="1">
+                    <tool>list_files</tool>
+                    <purpose>Check existing commands to avoid duplicates</purpose>
+                    <example>list_files(".roo/commands", recursive=true)</example>
+                </step>
+                <step number="2">
+                    <tool>read_file</tool>
+                    <purpose>Read similar commands for reference (if any exist)</purpose>
+                    <example>read_file(".roo/commands/similar-command.md")</example>
+                </step>
+                <step number="3">
+                    <tool>execute_command</tool>
+                    <purpose>Create directory if it doesn't exist</purpose>
+                    <example>execute_command("mkdir -p .roo/commands")</example>
+                    <conditional>Only if directory doesn't exist</conditional>
+                </step>
+                <step number="4">
+                    <tool>write_to_file</tool>
+                    <purpose>Create the new command file</purpose>
+                    <example>write_to_file(".roo/commands/new-command.md", content)</example>
+                </step>
+            </steps>
+        </sequence>
+
+        <sequence name="update_existing_command">
+            <description>Workflow for modifying an existing command</description>
+            <steps>
+                <step number="1">
+                    <tool>read_file</tool>
+                    <purpose>Read current command content</purpose>
+                    <example>read_file(".roo/commands/command.md")</example>
+                </step>
+                <step number="2">
+                    <tool>apply_diff</tool>
+                    <purpose>Make targeted changes</purpose>
+                    <example>apply_diff with SEARCH/REPLACE blocks</example>
+                </step>
+            </steps>
+        </sequence>
+
+        <sequence name="migrate_to_project">
+            <description>Move global command to project scope</description>
+            <steps>
+                <step number="1">
+                    <tool>read_file</tool>
+                    <purpose>Read the global command</purpose>
+                    <example>read_file("~/.roo/commands/command.md")</example>
+                </step>
+                <step number="2">
+                    <tool>execute_command</tool>
+                    <purpose>Ensure project commands directory exists</purpose>
+                    <example>execute_command("mkdir -p .roo/commands")</example>
+                </step>
+                <step number="3">
+                    <tool>write_to_file</tool>
+                    <purpose>Create in project location</purpose>
+                    <example>write_to_file(".roo/commands/command.md", content)</example>
+                </step>
+            </steps>
+            <note>User must manually delete global version if desired</note>
+        </sequence>
+    </workflow_tool_sequences>
+
+    <error_handling>
+        <error type="FileRestrictionError">
+            <description>Attempting to edit non-command files</description>
+            <solution>Only edit files matching the allowed patterns</solution>
+            <allowed>
+                <pattern>.roo/commands/*.md</pattern>
+                <pattern>~/.roo/commands/*.md</pattern>
+            </allowed>
+        </error>
+
+        <error type="DirectoryNotFound">
+            <description>Commands directory doesn't exist</description>
+            <solution>Use execute_command to create it: mkdir -p .roo/commands</solution>
+        </error>
+
+        <error type="InvalidYAML">
+            <description>Frontmatter YAML is malformed</description>
+            <solution>
+                - Check for proper --- delimiters
+                - Verify YAML syntax (colons, indentation)
+                - Ensure quotes around strings with special chars
+            </solution>
+        </error>
+
+        <error type="CommandNotAppearing">
+            <description>Command file created but doesn't show in menu</description>
+            <troubleshooting>
+                - Verify .md extension is present
+                - Check file is in correct directory
+                - Ensure filename uses valid characters
+                - Try reloading VS Code window
+            </troubleshooting>
+        </error>
+    </error_handling>
+</tool_usage_for_slash_commands>

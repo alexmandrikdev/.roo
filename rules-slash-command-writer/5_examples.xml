@@ -1,0 +1,634 @@
+<complete_command_examples>
+    <overview>
+        Complete end-to-end examples of creating slash commands for different
+        scenarios and use cases. Each example includes the full workflow from
+        requirements to implementation.
+    </overview>
+
+    <example name="api_endpoint_generator">
+        <scenario>
+            Create a command that helps developers generate REST API endpoints
+            with all the necessary boilerplate and best practices.
+        </scenario>
+
+        <requirements>
+            <requirement>Command should accept endpoint name and HTTP method as arguments</requirement>
+            <requirement>Should switch to code mode for file creation</requirement>
+            <requirement>Include security, testing, and documentation requirements</requirement>
+            <requirement>Reference project conventions</requirement>
+            <requirement>Should be available to entire team</requirement>
+        </requirements>
+
+        <decisions>
+            <decision aspect="scope">Project-specific (.roo/commands/)</decision>
+            <decision aspect="name">api-endpoint.md</decision>
+            <decision aspect="arguments">Yes - &lt;endpoint-name&gt; &lt;http-method&gt;</decision>
+            <decision aspect="mode">code</decision>
+        </decisions>
+
+        <implementation>
+            <file_path>.roo/commands/api-endpoint.md</file_path>
+            <content><![CDATA[
+---
+description: Generate REST API endpoint with best practices
+argument-hint: <endpoint-name> <http-method>
+mode: code
+---
+
+Create a REST API endpoint with the following specifications:
+
+**Core Implementation:**
+- Route handler with proper HTTP method
+- Request validation using Joi
+- Error handling with appropriate status codes
+- Response formatting following our API standards
+
+**Security:**
+- Authentication middleware
+- Authorization checks
+- Input sanitization
+- Rate limiting consideration
+
+**Documentation:**
+- OpenAPI/Swagger annotations
+- Example requests and responses
+- Error response documentation
+
+**Testing:**
+- Unit tests for business logic
+- Integration tests for the endpoint
+- Test error scenarios
+
+Follow our project's REST API conventions and Express.js patterns.
+            ]]></content>
+        </implementation>
+
+        <usage>
+            <step>Type /api-endpoint in chat</step>
+            <step>Command appears with hint: &lt;endpoint-name&gt; &lt;http-method&gt;</step>
+            <step>Type: /api-endpoint users GET</step>
+            <step>Roo switches to code mode and creates the endpoint</step>
+        </usage>
+    </example>
+
+    <example name="security_review_command">
+        <scenario>
+            Create a command for performing comprehensive security reviews
+            of code, focusing on common vulnerabilities.
+        </scenario>
+
+        <requirements>
+            <requirement>No arguments needed - works with selected code</requirement>
+            <requirement>Should be thorough and systematic</requirement>
+            <requirement>Can be used in any mode</requirement>
+            <requirement>Personal command, not team-specific</requirement>
+        </requirements>
+
+        <decisions>
+            <decision aspect="scope">Global (~/.roo/commands/)</decision>
+            <decision aspect="name">security-review.md</decision>
+            <decision aspect="arguments">No arguments needed</decision>
+            <decision aspect="mode">No specific mode</decision>
+        </decisions>
+
+        <implementation>
+            <file_path>~/.roo/commands/security-review.md</file_path>
+            <content><![CDATA[
+---
+description: Comprehensive security analysis and vulnerability detection
+---
+
+Perform a thorough security review of the selected code:
+
+**Authentication & Authorization:**
+- Verify proper authentication checks
+- Check authorization before sensitive operations
+- Review session management
+- Validate token handling
+
+**Input Validation:**
+- Identify potential injection points (SQL, XSS, LDAP, Command)
+- Check input sanitization and escaping
+- Verify data type validation
+- Review file upload handling and restrictions
+
+**Data Security:**
+- Check for hardcoded secrets or credentials
+- Verify encryption for sensitive data at rest and in transit
+- Review secure communication protocols (HTTPS, TLS)
+- Check password hashing methods (bcrypt, Argon2)
+- Validate secure random number generation
+
+**Common Vulnerabilities:**
+- OWASP Top 10 considerations
+- Check dependencies for known vulnerabilities
+- Review error messages for information leakage
+- Check for insecure deserialization
+- Verify CSRF protection
+- Check for clickjacking protections
+
+**Access Control:**
+- Review principle of least privilege implementation
+- Check for horizontal/vertical privilege escalation
+- Verify resource-level authorization
+
+**Output Encoding:**
+- Check for proper output encoding
+- Verify context-appropriate escaping
+- Review templating security
+
+For each finding, provide:
+- Severity level (Critical/High/Medium/Low)
+- Specific code location
+- Explanation of the vulnerability
+- Concrete remediation steps
+- Example of secure implementation
+            ]]></content>
+        </implementation>
+
+        <usage>
+            <step>Select code to review</step>
+            <step>Type /security-review</step>
+            <step>Roo performs comprehensive security analysis</step>
+        </usage>
+    </example>
+
+    <example name="test_generator_command">
+        <scenario>
+            Create a command that generates comprehensive test suites for
+            selected code, including unit and integration tests.
+        </scenario>
+
+        <requirements>
+            <requirement>Should work with selected code/functions</requirement>
+            <requirement>Generate tests in project's testing framework</requirement>
+            <requirement>Create files, so needs code mode</requirement>
+            <requirement>Team command for consistency</requirement>
+        </requirements>
+
+        <decisions>
+            <decision aspect="scope">Project-specific (.roo/commands/)</decision>
+            <decision aspect="name">generate-tests.md</decision>
+            <decision aspect="arguments">No arguments needed</decision>
+            <decision aspect="mode">code</decision>
+        </decisions>
+
+        <implementation>
+            <file_path>.roo/commands/generate-tests.md</file_path>
+            <content><![CDATA[
+---
+description: Generate comprehensive test suites for selected code
+mode: code
+---
+
+Create a complete test suite for the selected code:
+
+**Unit Tests:**
+- Test all public methods/functions
+- Cover happy path scenarios
+- Test edge cases and boundary conditions
+- Test error handling paths
+- Mock external dependencies
+- Aim for 90%+ code coverage
+
+**Test Organization:**
+- Group related tests with describe blocks
+- Use clear, descriptive test names: "it should... when..."
+- Follow AAA pattern (Arrange, Act, Assert)
+- Keep tests independent and isolated
+- One assertion per test when possible
+
+**Test Data:**
+- Use meaningful, realistic test data
+- Create reusable fixtures when appropriate
+- Test with valid and invalid inputs
+- Include boundary values
+
+**Assertions:**
+- Verify return values match expectations
+- Check state changes are correct
+- Validate side effects occur as expected
+- Test error messages are appropriate
+
+**Integration Tests:**
+- Test component interactions
+- Verify database operations
+- Test API endpoints with real requests
+- Check external service integrations
+
+Use Jest and React Testing Library following our project conventions.
+Include setup and teardown functions where needed.
+            ]]></content>
+        </implementation>
+
+        <usage>
+            <step>Select function or component to test</step>
+            <step>Type /generate-tests</step>
+            <step>Roo switches to code mode and creates test file</step>
+        </usage>
+    </example>
+
+    <example name="architecture_review_command">
+        <scenario>
+            Create a command that performs architectural analysis and provides
+            improvement recommendations, using architect mode capabilities.
+        </scenario>
+
+        <requirements>
+            <requirement>Should analyze system architecture</requirement>
+            <requirement>Needs architect mode for planning focus</requirement>
+            <requirement>Provide structured recommendations</requirement>
+            <requirement>Personal workflow command</requirement>
+        </requirements>
+
+        <decisions>
+            <decision aspect="scope">Global (~/.roo/commands/)</decision>
+            <decision aspect="name">arch-review.md</decision>
+            <decision aspect="arguments">No arguments needed</decision>
+            <decision aspect="mode">architect</decision>
+        </decisions>
+
+        <implementation>
+            <file_path>~/.roo/commands/arch-review.md</file_path>
+            <content><![CDATA[
+---
+description: Analyze system architecture and propose improvements
+mode: architect
+---
+
+Review the current system architecture and provide recommendations:
+
+**Architecture Analysis:**
+1. **Component Structure**
+   - Document component hierarchy and relationships
+   - Identify dependencies and data flow
+   - Map service boundaries
+
+2. **Design Patterns**
+   - Identify patterns currently in use
+   - Evaluate pattern appropriateness
+   - Suggest additional beneficial patterns
+
+3. **Coupling and Cohesion**
+   - Measure coupling between components
+   - Assess cohesion within modules
+   - Identify tight coupling issues
+   - Find components with weak cohesion
+
+4. **Scalability Assessment**
+   - Identify bottlenecks
+   - Review stateless vs stateful components
+   - Assess horizontal scaling readiness
+   - Check for single points of failure
+
+**Architectural Concerns:**
+- Data consistency strategies
+- Error handling and recovery
+- Security boundaries
+- Performance considerations
+- Deployment complexity
+
+**Recommendations:**
+For each issue, provide:
+- **Priority**: Critical/High/Medium/Low
+- **Current State**: What exists now
+- **Proposed Solution**: Specific architectural change
+- **Benefits**: Expected improvements
+- **Risks**: Potential challenges
+- **Implementation**: High-level approach
+
+**Deliverables:**
+- Architecture diagram (ASCII or description)
+- Component relationship map
+- Prioritized improvement roadmap
+- Quick wins vs long-term initiatives
+            ]]></content>
+        </implementation>
+
+        <usage>
+            <step>Navigate to project or select files</step>
+            <step>Type /arch-review</step>
+            <step>Roo switches to architect mode and performs analysis</step>
+        </usage>
+    </example>
+
+    <example name="component_creator_with_args">
+        <scenario>
+            Create a command that generates React components with proper structure,
+            accepting the component name as an argument.
+        </scenario>
+
+        <requirements>
+            <requirement>Accept component name as argument</requirement>
+            <requirement>Create multiple files (component, styles, tests, story)</requirement>
+            <requirement>Needs code mode for file creation</requirement>
+            <requirement>Team command for consistency</requirement>
+        </requirements>
+
+        <decisions>
+            <decision aspect="scope">Project-specific (.roo/commands/)</decision>
+            <decision aspect="name">component.md</decision>
+            <decision aspect="arguments">Yes - &lt;component-name&gt;</decision>
+            <decision aspect="mode">code</decision>
+        </decisions>
+
+        <implementation>
+            <file_path>.roo/commands/component.md</file_path>
+            <content><![CDATA[
+---
+description: Create a new React component with all supporting files
+argument-hint: <component-name>
+mode: code
+---
+
+Create a new React component with the specified name:
+
+**Component File (ComponentName.tsx):**
+- Functional component using TypeScript
+- Proper prop interface with JSDoc comments
+- Exported component and prop types
+- Display name set for debugging
+- Default props where appropriate
+
+**Styling (ComponentName.module.css):**
+- CSS Module for scoped styling
+- Use CSS custom properties for theming
+- Follow our BEM naming within component
+- Responsive design considerations
+
+**Storybook Story (ComponentName.stories.tsx):**
+- Default export with component metadata
+- At least 3 stories: Default, With Props, Edge Cases
+- Controls for interactive prop testing
+- Accessibility annotations
+
+**Unit Tests (ComponentName.test.tsx):**
+- Test rendering with minimal props
+- Test all prop combinations
+- Test user interactions
+- Test accessibility with @testing-library/jest-dom
+- Aim for 100% coverage
+
+**Structure:**
+Place all files in: `src/components/ComponentName/`
+
+Follow our project's component conventions:
+- Use named exports for components
+- Include PropTypes for runtime validation
+- Use semantic HTML elements
+- Ensure WCAG 2.1 AA compliance
+            ]]></content>
+        </implementation>
+
+        <usage>
+            <step>Type /component in chat</step>
+            <step>See hint: &lt;component-name&gt;</step>
+            <step>Type: /component UserProfile</step>
+            <step>Roo creates all files in proper structure</step>
+        </usage>
+    </example>
+
+    <example name="refactoring_command">
+        <scenario>
+            Create a command that identifies refactoring opportunities and
+            suggests improvements for selected code.
+        </scenario>
+
+        <requirements>
+            <requirement>Analyze selected code</requirement>
+            <requirement>No arguments needed</requirement>
+            <requirement>Can suggest changes without making them</requirement>
+            <requirement>Personal productivity tool</requirement>
+        </requirements>
+
+        <decisions>
+            <decision aspect="scope">Global (~/.roo/commands/)</decision>
+            <decision aspect="name">refactor.md</decision>
+            <decision aspect="arguments">No arguments</decision>
+            <decision aspect="mode">No specific mode</decision>
+        </decisions>
+
+        <implementation>
+            <file_path>~/.roo/commands/refactor.md</file_path>
+            <content><![CDATA[
+---
+description: Identify and suggest refactoring opportunities
+---
+
+Analyze the selected code for refactoring opportunities:
+
+**Code Smells:**
+- Long methods (>20 lines)
+- Long parameter lists (>4 parameters)
+- Duplicate code
+- Large classes (>300 lines)
+- Feature envy (method more interested in other class)
+- Data clumps (groups of data appearing together)
+- Primitive obsession
+- God objects with too many responsibilities
+
+**SOLID Principles:**
+- **Single Responsibility**: Check if classes/functions do one thing
+- **Open/Closed**: Can extend without modifying?
+- **Liskov Substitution**: Subtypes properly substitutable?
+- **Interface Segregation**: Are interfaces too large?
+- **Dependency Inversion**: Depend on abstractions?
+
+**Refactoring Suggestions:**
+For each opportunity, provide:
+
+1. **Current Issue**: What's wrong
+2. **Refactoring Type**: Extract method, introduce parameter object, etc.
+3. **Proposed Solution**: How to refactor
+4. **Benefits**: Why it's worth doing
+5. **Code Example**: Before and after snippets
+
+**Naming Improvements:**
+- Variable names too short or unclear
+- Function names not descriptive
+- Class names not representing purpose
+- Suggest better names
+
+**Complexity Reduction:**
+- Simplify nested conditionals
+- Replace switch statements with polymorphism
+- Reduce cyclomatic complexity
+- Extract magic numbers to constants
+
+**Design Patterns:**
+Suggest where patterns could improve code:
+- Strategy pattern for varying algorithms
+- Factory pattern for object creation
+- Observer pattern for event handling
+- Decorator pattern for extending behavior
+
+Prioritize suggestions by impact and effort required.
+            ]]></content>
+        </implementation>
+
+        <usage>
+            <step>Select code that needs refactoring</step>
+            <step>Type /refactor</step>
+            <step>Roo analyzes and provides suggestions</step>
+        </usage>
+    </example>
+
+    <example name="multi_step_deployment_check">
+        <scenario>
+            Create a command that guides through pre-deployment verification
+            steps, ensuring nothing is missed before deploying.
+        </scenario>
+
+        <requirements>
+            <requirement>Multi-step checklist workflow</requirement>
+            <requirement>No arguments needed</requirement>
+            <requirement>Should verify multiple aspects</requirement>
+            <requirement>Team command for deployment safety</requirement>
+        </requirements>
+
+        <decisions>
+            <decision aspect="scope">Project-specific (.roo/commands/)</decision>
+            <decision aspect="name">deploy-check.md</decision>
+            <decision aspect="arguments">No arguments</decision>
+            <decision aspect="mode">No specific mode</decision>
+        </decisions>
+
+        <implementation>
+            <file_path>.roo/commands/deploy-check.md</file_path>
+            <content><![CDATA[
+---
+description: Comprehensive pre-deployment verification checklist
+---
+
+Perform a complete deployment readiness check:
+
+**Phase 1: Code Quality**
+- [ ] All tests passing (unit, integration, E2E)
+- [ ] No linting errors or warnings
+- [ ] Code coverage meets threshold (>80%)
+- [ ] No TypeScript/type errors
+- [ ] Run security audit: `npm audit` or equivalent
+- [ ] Check for outdated dependencies with security issues
+
+**Phase 2: Configuration**
+- [ ] Environment variables documented in .env.example
+- [ ] Secrets configured in deployment environment
+- [ ] Database connection strings verified
+- [ ] API keys for third-party services configured
+- [ ] Feature flags set appropriately
+- [ ] CORS settings configured for production
+
+**Phase 3: Database**
+- [ ] All migrations tested and ready
+- [ ] Migration rollback tested
+- [ ] Database backup created
+- [ ] Data seeding scripts ready (if needed)
+- [ ] Database indexes optimized
+
+**Phase 4: Documentation**
+- [ ] README.md up to date
+- [ ] CHANGELOG.md updated with version changes
+- [ ] API documentation current
+- [ ] Deployment guide reviewed
+- [ ] Runbook updated with new procedures
+
+**Phase 5: Monitoring & Logging**
+- [ ] Error tracking configured (Sentry, etc.)
+- [ ] Logging levels appropriate
+- [ ] Performance monitoring setup
+- [ ] Health check endpoint working
+- [ ] Alerts configured for critical issues
+
+**Phase 6: Performance**
+- [ ] Build optimization complete
+- [ ] Static assets cached properly
+- [ ] Images optimized
+- [ ] Lazy loading implemented where beneficial
+- [ ] Bundle size within acceptable limits
+
+**Phase 7: Security**
+- [ ] Security headers configured
+- [ ] SSL/TLS certificate valid
+- [ ] Authentication/authorization tested
+- [ ] Rate limiting configured
+- [ ] Input validation reviewed
+
+**Phase 8: Rollback Plan**
+- [ ] Previous version tagged in git
+- [ ] Rollback procedure documented and tested
+- [ ] Database rollback plan ready
+- [ ] Communication plan for rollback
+
+**Phase 9: Communication**
+- [ ] Stakeholders notified of deployment
+- [ ] Maintenance window scheduled (if needed)
+- [ ] Team members aware and available
+- [ ] Status page updated
+
+**Phase 10: Post-Deployment**
+- [ ] Smoke tests defined
+- [ ] Monitoring dashboards ready to observe
+- [ ] Team ready to respond to issues
+
+Verify each item and report any failures or concerns before proceeding.
+            ]]></content>
+        </implementation>
+
+        <usage>
+            <step>Type /deploy-check before deploying</step>
+            <step>Roo verifies each phase systematically</step>
+            <step>Address any issues found</step>
+        </usage>
+    </example>
+
+    <best_practices_demonstrated>
+        <practice name="clear_descriptions">
+            <demonstrated_in>All examples</demonstrated_in>
+            <explanation>Every command has a concise, action-oriented description</explanation>
+        </practice>
+
+        <practice name="argument_hints">
+            <demonstrated_in>api-endpoint, component</demonstrated_in>
+            <explanation>Commands that need input show clear argument hints</explanation>
+        </practice>
+
+        <practice name="mode_targeting">
+            <demonstrated_in>api-endpoint, generate-tests, arch-review, component</demonstrated_in>
+            <explanation>Commands use mode field when specific capabilities needed</explanation>
+        </practice>
+
+        <practice name="structured_content">
+            <demonstrated_in>All examples</demonstrated_in>
+            <explanation>Commands use lists, sections, and clear organization</explanation>
+        </practice>
+
+        <practice name="project_context">
+            <demonstrated_in>api-endpoint, generate-tests, component</demonstrated_in>
+            <explanation>Commands reference project conventions and tools</explanation>
+        </practice>
+
+        <practice name="scope_appropriateness">
+            <demonstrated_in>All examples</demonstrated_in>
+            <explanation>Team commands in project, personal commands global</explanation>
+        </practice>
+    </best_practices_demonstrated>
+
+    <customization_notes>
+        <note>
+            Replace framework-specific references (Jest, React, Express) with
+            your project's actual technology stack
+        </note>
+        <note>
+            Update file paths and structures to match your project conventions
+        </note>
+        <note>
+            Adjust coverage thresholds and quality metrics to your standards
+        </note>
+        <note>
+            Reference your actual tools (linters, test runners, build systems)
+        </note>
+        <note>
+            Include your team's specific coding standards and patterns
+        </note>
+    </customization_notes>
+</complete_command_examples>

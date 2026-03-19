@@ -1,0 +1,640 @@
+<command_template_patterns>
+    <overview>
+        Common templates and patterns for creating effective slash commands
+        across different use cases and domains.
+    </overview>
+
+    <basic_templates>
+        <template name="simple_command">
+            <description>Minimal command without frontmatter</description>
+            <structure><![CDATA[
+# filename.md
+
+[Clear directive of what to do]
+
+[Optional requirements or context]
+            ]]></structure>
+            <example><![CDATA[
+# optimize.md
+
+Analyze the selected code for performance optimizations:
+- Identify inefficient algorithms
+- Check for unnecessary computations
+- Suggest caching opportunities
+- Recommend async improvements
+            ]]></example>
+        </template>
+
+        <template name="command_with_description">
+            <description>Command with frontmatter description</description>
+            <structure><![CDATA[
+---
+description: [Brief description for command menu]
+---
+
+# filename.md
+
+[Clear directive]
+
+[Requirements]
+            ]]></structure>
+            <example><![CDATA[
+---
+description: Analyze code for performance bottlenecks and optimizations
+---
+
+Perform a comprehensive performance analysis:
+- Identify O(n²) or worse time complexity
+- Find memory leaks or excessive allocations
+- Check for unnecessary database queries
+- Suggest caching strategies
+- Recommend parallelization opportunities
+            ]]></example>
+        </template>
+
+        <template name="command_with_arguments">
+            <description>Command that expects user arguments</description>
+            <structure><![CDATA[
+---
+description: [Brief description]
+argument-hint: <argument-name> <arg2-name>
+---
+
+# filename.md
+
+[Directive mentioning the expected arguments]
+
+[How to use the arguments]
+
+[Requirements]
+            ]]></structure>
+            <example><![CDATA[
+---
+description: Create a new React component with TypeScript
+argument-hint: <component-name>
+---
+
+Create a new React component with the specified name:
+- Use TypeScript with proper prop types
+- Include JSDoc comments
+- Add basic styling with CSS modules
+- Create a Storybook story
+- Write unit tests with React Testing Library
+
+Follow our project's component structure and naming conventions.
+            ]]></example>
+        </template>
+
+        <template name="mode_targeted_command">
+            <description>Command that switches to a specific mode</description>
+            <structure><![CDATA[
+---
+description: [Brief description]
+mode: [mode-slug]
+---
+
+# filename.md
+
+[Directive specific to the mode's capabilities]
+
+[Requirements that leverage the mode's strengths]
+            ]]></structure>
+            <example><![CDATA[
+---
+description: Design system architecture and component relationships
+mode: architect
+---
+
+Analyze the current system architecture and:
+1. Document component hierarchy and relationships
+2. Identify coupling and cohesion issues
+3. Propose architectural improvements
+4. Create architecture diagrams
+5. Document design patterns in use
+6. Suggest refactoring strategies
+            ]]></example>
+        </template>
+    </basic_templates>
+
+    <domain_specific_patterns>
+        <domain name="api_development">
+            <pattern name="endpoint_generator">
+                <description>Generate REST API endpoints</description>
+                <template><![CDATA[
+---
+description: Generate REST API endpoint with best practices
+argument-hint: <endpoint-name> <http-method>
+mode: code
+---
+
+Create a REST API endpoint with the following:
+
+**Core Implementation:**
+- Route handler with proper HTTP method
+- Request validation using our validation library
+- Error handling with appropriate status codes
+- Response formatting following our API standards
+
+**Security:**
+- Authentication middleware
+- Authorization checks
+- Input sanitization
+- Rate limiting consideration
+
+**Documentation:**
+- OpenAPI/Swagger annotations
+- Example requests and responses
+- Error response documentation
+
+**Testing:**
+- Unit tests for business logic
+- Integration tests for the endpoint
+- Test error scenarios
+
+Follow our project's REST API conventions and patterns.
+                ]]></template>
+            </pattern>
+
+            <pattern name="api_documentation">
+                <description>Document existing API endpoints</description>
+                <template><![CDATA[
+---
+description: Generate OpenAPI/Swagger documentation for endpoints
+---
+
+Create comprehensive API documentation for the selected endpoints:
+
+**Document:**
+- HTTP method and URL path
+- Request parameters (path, query, body)
+- Request/response schemas with types
+- Authentication requirements
+- Success response examples
+- Error response examples with status codes
+- Rate limiting information
+
+**Format:**
+- Use OpenAPI 3.0 specification
+- Include realistic example data
+- Add descriptions for all fields
+- Document validation rules
+
+Follow our API documentation standards.
+                ]]></template>
+            </pattern>
+        </domain>
+
+        <domain name="code_quality">
+            <pattern name="security_review">
+                <description>Security-focused code review</description>
+                <template><![CDATA[
+---
+description: Comprehensive security analysis and vulnerability detection
+---
+
+Perform a thorough security review of the selected code:
+
+**Authentication & Authorization:**
+- Verify proper authentication checks
+- Check authorization before sensitive operations
+- Review session management
+- Validate token handling
+
+**Input Validation:**
+- Identify potential injection points (SQL, XSS, etc.)
+- Check input sanitization
+- Verify data type validation
+- Review file upload handling
+
+**Data Security:**
+- Check for hardcoded secrets or credentials
+- Verify encryption for sensitive data
+- Review secure communication (HTTPS)
+- Check password hashing methods
+
+**Common Vulnerabilities:**
+- OWASP Top 10 considerations
+- Dependency vulnerabilities
+- Error message information leakage
+- Insecure deserialization
+
+Provide specific remediation steps for each finding.
+                ]]></template>
+            </pattern>
+
+            <pattern name="code_refactoring">
+                <description>Suggest code refactoring improvements</description>
+                <template><![CDATA[
+---
+description: Identify and suggest refactoring opportunities
+---
+
+Analyze the selected code for refactoring opportunities:
+
+**Code Smells:**
+- Long methods or classes
+- Duplicate code
+- God objects with too many responsibilities
+- Feature envy
+- Data clumps
+
+**SOLID Principles:**
+- Single Responsibility violations
+- Open/Closed principle adherence
+- Liskov Substitution issues
+- Interface segregation opportunities
+- Dependency inversion improvements
+
+**Suggested Refactorings:**
+- Extract method/class
+- Introduce parameter object
+- Replace conditional with polymorphism
+- Simplify complex conditionals
+- Improve naming clarity
+
+For each suggestion, explain the benefit and provide a refactored example.
+                ]]></template>
+            </pattern>
+        </domain>
+
+        <domain name="testing">
+            <pattern name="test_generator">
+                <description>Generate comprehensive test suites</description>
+                <template><![CDATA[
+---
+description: Generate unit and integration tests for code
+mode: code
+---
+
+Create a comprehensive test suite for the selected code:
+
+**Unit Tests:**
+- Test all public methods/functions
+- Cover edge cases and boundary conditions
+- Test error handling paths
+- Mock external dependencies
+- Aim for high code coverage
+
+**Test Organization:**
+- Group related tests with describe blocks
+- Use descriptive test names (it should...)
+- Follow AAA pattern (Arrange, Act, Assert)
+- Keep tests independent and isolated
+
+**Test Data:**
+- Use meaningful test data
+- Create reusable fixtures when appropriate
+- Test with valid and invalid inputs
+
+**Assertions:**
+- Verify return values
+- Check state changes
+- Validate side effects
+- Test error messages
+
+Use our project's testing framework ({Jest|Mocha|Pytest|etc.}) and conventions.
+                ]]></template>
+            </pattern>
+
+            <pattern name="test_coverage_analyzer">
+                <description>Identify gaps in test coverage</description>
+                <template><![CDATA[
+---
+description: Analyze test coverage and identify untested code paths
+---
+
+Review the current test coverage and identify gaps:
+
+**Coverage Analysis:**
+- Identify untested functions/methods
+- Find uncovered code branches
+- Locate edge cases without tests
+- Check error handling coverage
+
+**Missing Tests:**
+- Critical business logic paths
+- Error scenarios and exceptions
+- Edge cases and boundary conditions
+- Integration points
+- Async operation handling
+
+**Test Recommendations:**
+- Prioritize tests by risk/importance
+- Suggest specific test cases to add
+- Recommend integration tests needed
+- Identify areas requiring E2E tests
+
+Provide specific test case examples for high-priority gaps.
+                ]]></template>
+            </pattern>
+        </domain>
+
+        <domain name="documentation">
+            <pattern name="readme_generator">
+                <description>Generate README documentation</description>
+                <template><![CDATA[
+---
+description: Create comprehensive README for the project
+mode: code
+---
+
+Generate a comprehensive README.md file that includes:
+
+**Project Overview:**
+- Clear project title
+- Brief description of purpose
+- Key features and benefits
+- Technology stack
+
+**Getting Started:**
+- Prerequisites and requirements
+- Installation instructions (step-by-step)
+- Configuration setup
+- Quick start example
+
+**Usage:**
+- Basic usage examples
+- API reference or CLI commands
+- Configuration options
+- Common use cases
+
+**Development:**
+- Development setup
+- Running tests
+- Building the project
+- Contributing guidelines
+
+**Additional Sections:**
+- License information
+- Credits and acknowledgments
+- Links to documentation
+- Contact or support information
+
+Base the content on the current project structure and existing code.
+                ]]></template>
+            </pattern>
+
+            <pattern name="function_documentation">
+                <description>Add JSDoc/docstring documentation</description>
+                <template><![CDATA[
+---
+description: Generate comprehensive function documentation
+mode: code
+---
+
+Add thorough documentation to the selected functions:
+
+**Documentation Format:**
+- Use appropriate doc format (JSDoc, docstring, etc.)
+- Clear description of what the function does
+- Document all parameters with types
+- Document return value with type
+- List possible exceptions/errors
+- Add usage examples for complex functions
+
+**Content Guidelines:**
+- Explain the "why" not just the "what"
+- Document side effects if any
+- Note any performance considerations
+- Include links to related functions
+- Mention deprecation if applicable
+
+**Examples:**
+- Provide realistic usage examples
+- Show common use patterns
+- Include edge case examples
+
+Follow our project's documentation standards.
+                ]]></template>
+            </pattern>
+        </domain>
+
+        <domain name="database">
+            <pattern name="migration_generator">
+                <description>Create database migrations</description>
+                <template><![CDATA[
+---
+description: Generate database migration with up and down methods
+mode: code
+---
+
+Create a database migration file with:
+
+**Migration Structure:**
+- Clear migration name with timestamp
+- Up migration (apply changes)
+- Down migration (revert changes)
+- Transaction wrapping
+
+**Schema Changes:**
+- Table creation/modification
+- Index additions
+- Foreign key constraints
+- Data type changes
+
+**Data Migration:**
+- Data transformation if needed
+- Default value handling
+- Validation during migration
+- Rollback data changes
+
+**Safety Checks:**
+- Verify migration is reversible
+- Check for data loss scenarios
+- Add appropriate constraints
+- Include migration comments
+
+Follow our project's migration conventions and ORM patterns.
+                ]]></template>
+            </pattern>
+        </domain>
+
+        <domain name="devops">
+            <pattern name="deployment_checklist">
+                <description>Pre-deployment verification</description>
+                <template><![CDATA[
+---
+description: Verify deployment readiness and configuration
+---
+
+Perform a comprehensive deployment readiness check:
+
+**Code Quality:**
+- All tests passing
+- No linting errors
+- Code coverage meets threshold
+- No security vulnerabilities in dependencies
+
+**Configuration:**
+- Environment variables defined
+- API keys and secrets configured
+- Database connections verified
+- Third-party service endpoints correct
+
+**Documentation:**
+- README up to date
+- CHANGELOG updated
+- API documentation current
+- Deployment guide accurate
+
+**Infrastructure:**
+- Database migrations ready
+- Static assets built and optimized
+- Cache strategy configured
+- Monitoring and logging setup
+
+**Rollback Plan:**
+- Previous version tagged
+- Rollback procedure documented
+- Database migration rollback tested
+
+Provide a checklist with status for each item.
+                ]]></template>
+            </pattern>
+        </domain>
+    </domain_specific_patterns>
+
+    <workflow_patterns>
+        <pattern name="multi_step_process">
+            <description>Command that guides through multiple steps</description>
+            <template><![CDATA[
+---
+description: [Multi-step workflow description]
+---
+
+Complete the following process step-by-step:
+
+**Step 1: [Phase Name]**
+- [Action 1]
+- [Action 2]
+- Verify: [What to check]
+
+**Step 2: [Phase Name]**
+- [Action 1]
+- [Action 2]
+- Verify: [What to check]
+
+**Step 3: [Phase Name]**
+- [Action 1]
+- [Action 2]
+- Verify: [What to check]
+
+**Final Verification:**
+- [ ] [Checklist item 1]
+- [ ] [Checklist item 2]
+- [ ] [Checklist item 3]
+            ]]></template>
+        </pattern>
+
+        <pattern name="analysis_and_recommendation">
+            <description>Analyze then provide recommendations</description>
+            <template><![CDATA[
+---
+description: [Analysis description]
+---
+
+Perform analysis and provide recommendations:
+
+**Analysis Phase:**
+Examine the code/system for:
+- [Aspect 1 to analyze]
+- [Aspect 2 to analyze]
+- [Aspect 3 to analyze]
+
+**Findings:**
+Document:
+- Current state
+- Identified issues
+- Performance metrics
+- Risk assessment
+
+**Recommendations:**
+Provide prioritized recommendations:
+1. **High Priority:** [Critical changes]
+2. **Medium Priority:** [Important improvements]
+3. **Low Priority:** [Nice-to-have enhancements]
+
+For each recommendation, include:
+- Rationale
+- Expected benefit
+- Implementation approach
+- Estimated effort
+            ]]></template>
+        </pattern>
+    </workflow_patterns>
+
+    <reusable_components>
+        <component name="project_conventions_reference">
+            <description>Standard phrase to reference project patterns</description>
+            <text>Follow our project's established conventions and patterns.</text>
+            <variations>
+                <variation>Use our project's coding standards and style guide.</variation>
+                <variation>Adhere to the patterns used in similar components.</variation>
+                <variation>Follow the structure established in our codebase.</variation>
+            </variations>
+        </component>
+
+        <component name="testing_requirement">
+            <description>Standard testing requirement</description>
+            <text><![CDATA[
+**Testing:**
+- Write unit tests covering all logic paths
+- Include edge case tests
+- Test error scenarios
+- Ensure tests are independent and repeatable
+            ]]></text>
+        </component>
+
+        <component name="documentation_requirement">
+            <description>Standard documentation requirement</description>
+            <text><![CDATA[
+**Documentation:**
+- Add code comments for complex logic
+- Document public APIs with JSDoc/docstrings
+- Update relevant README sections
+- Include usage examples
+            ]]></text>
+        </component>
+
+        <component name="error_handling_requirement">
+            <description>Standard error handling requirement</description>
+            <text><![CDATA[
+**Error Handling:**
+- Catch and handle all possible errors
+- Use appropriate error types/status codes
+- Provide clear error messages
+- Log errors appropriately
+- Don't expose sensitive information
+            ]]></text>
+        </component>
+    </reusable_components>
+
+    <customization_tips>
+        <tip name="project_specific_terms">
+            <description>Replace generic terms with project-specific ones</description>
+            <examples>
+                <example>Replace "our validation library" with actual library name</example>
+                <example>Replace "our testing framework" with Jest, Mocha, etc.</example>
+                <example>Reference actual project directories or files</example>
+            </examples>
+        </tip>
+
+        <tip name="tech_stack_awareness">
+            <description>Tailor commands to your technology stack</description>
+            <examples>
+                <example>Mention React for frontend components</example>
+                <example>Reference Express for Node.js APIs</example>
+                <example>Specify Django for Python web apps</example>
+            </examples>
+        </tip>
+
+        <tip name="team_conventions">
+            <description>Include your team's specific conventions</description>
+            <examples>
+                <example>File naming conventions</example>
+                <example>Code organization patterns</example>
+                <example>PR and commit message formats</example>
+            </examples>
+        </tip>
+    </customization_tips>
+</command_template_patterns>

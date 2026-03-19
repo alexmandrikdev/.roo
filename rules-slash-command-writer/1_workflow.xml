@@ -1,0 +1,278 @@
+<slash_command_creation_workflow>
+    <overview>
+        This workflow guides you through creating custom slash commands for Roo Code.
+        Slash commands are markdown files that automate repetitive tasks and extend
+        Roo Code's functionality with reusable prompts.
+    </overview>
+
+    <command_fundamentals>
+        <key_concepts>
+            <concept name="command_files">
+                <description>Slash commands are markdown files stored in specific directories</description>
+                <locations>
+                    <location type="project">
+                        <path>.roo/commands/</path>
+                        <description>Project-specific commands, versioned with the project</description>
+                    </location>
+                    <location type="global">
+                        <path>~/.roo/commands/</path>
+                        <description>User-wide commands available across all projects</description>
+                    </location>
+                </locations>
+            </concept>
+
+            <concept name="naming_convention">
+                <description>Filename becomes the command name</description>
+                <rules>
+                    <rule>Use lowercase with hyphens for multi-word commands</rule>
+                    <rule>File extension .md is required but not included in command name</rule>
+                    <rule>Names are automatically slugified (lowercase, special chars removed)</rule>
+                </rules>
+                <examples>
+                    <example file="review.md" command="/review" />
+                    <example file="test-api.md" command="/test-api" />
+                    <example file="deploy-check.md" command="/deploy-check" />
+                </examples>
+            </concept>
+
+            <concept name="frontmatter">
+                <description>Optional YAML metadata at the start of the file</description>
+                <fields>
+                    <field name="description" required="false">
+                        Appears in command menu to help users understand purpose
+                    </field>
+                    <field name="argument-hint" required="false">
+                        Shows expected arguments like &lt;file-path&gt; or &lt;endpoint-name&gt;
+                    </field>
+                    <field name="mode" required="false">
+                        Mode slug to switch to before running command (e.g., code, architect)
+                    </field>
+                </fields>
+            </concept>
+        </key_concepts>
+    </command_fundamentals>
+
+    <creation_workflow>
+        <phase name="requirements_gathering">
+            <step number="1">
+                <title>Understand User Intent</title>
+                <description>Clarify what the command should accomplish</description>
+                <questions>
+                    <question>What task should this command automate?</question>
+                    <question>Should this be global or project-specific?</question>
+                    <question>Does it need arguments from the user?</question>
+                    <question>Should it run in a specific mode?</question>
+                    <question>What context or requirements should be included?</question>
+                </questions>
+            </step>
+
+            <step number="2">
+                <title>Determine Command Scope</title>
+                <description>Decide between global and project-specific</description>
+                <decision_tree>
+                    <case condition="task specific to project structure or conventions">
+                        <result>Project-specific (.roo/commands/)</result>
+                    </case>
+                    <case condition="task applicable across all projects">
+                        <result>Global (~/.roo/commands/)</result>
+                    </case>
+                    <case condition="team should share this command">
+                        <result>Project-specific (version controlled)</result>
+                    </case>
+                    <case condition="personal workflow preference">
+                        <result>Global (not version controlled)</result>
+                    </case>
+                </decision_tree>
+            </step>
+
+            <step number="3">
+                <title>Design Command Name</title>
+                <description>Create a clear, descriptive command name</description>
+                <guidelines>
+                    <guideline>Use action-oriented names that describe what the command does</guideline>
+                    <guideline>Keep names concise but clear (2-3 words max)</guideline>
+                    <guideline>Use hyphens for multi-word commands</guideline>
+                    <guideline>Avoid generic names like "help" or "test"</guideline>
+                </guidelines>
+                <examples>
+                    <good>api-endpoint, security-review, readme-generator</good>
+                    <bad>help, test, do-stuff, mycommand</bad>
+                </examples>
+            </step>
+        </phase>
+
+        <phase name="command_design">
+            <step number="4">
+                <title>Structure Command Content</title>
+                <description>Design the command prompt for clarity and effectiveness</description>
+                <structure>
+                    <element name="opening_directive">
+                        Start with a clear statement of what to do
+                    </element>
+                    <element name="requirements_list">
+                        Use numbered or bulleted lists for specific requirements
+                    </element>
+                    <element name="context_references">
+                        Reference project conventions, patterns, or constraints
+                    </element>
+                    <element name="output_expectations">
+                        Specify what the result should include or look like
+                    </element>
+                </structure>
+            </step>
+
+            <step number="5">
+                <title>Add Frontmatter Metadata</title>
+                <description>Include metadata to enhance command functionality</description>
+                <when_to_include>
+                    <case field="description">
+                        Always include - helps users understand the command in the menu
+                    </case>
+                    <case field="argument-hint">
+                        Include when command expects user input or arguments
+                    </case>
+                    <case field="mode">
+                        Include when command should run in specific mode context
+                    </case>
+                </when_to_include>
+            </step>
+
+            <step number="6">
+                <title>Define Argument Hints (if needed)</title>
+                <description>Create clear argument hints for commands that need input</description>
+                <guidelines>
+                    <guideline>Use angle brackets for placeholders: &lt;argument-name&gt;</guideline>
+                    <guideline>Be specific: &lt;file-path&gt; not &lt;arg&gt;</guideline>
+                    <guideline>Show multiple arguments if needed: &lt;source&gt; &lt;destination&gt;</guideline>
+                    <guideline>Keep hints concise and clear</guideline>
+                </guidelines>
+                <examples>
+                    <example>&lt;endpoint-name&gt; &lt;http-method&gt;</example>
+                    <example>&lt;file-path&gt;</example>
+                    <example>&lt;component-name&gt;</example>
+                </examples>
+            </step>
+        </phase>
+
+        <phase name="implementation">
+            <step number="7">
+                <title>Check Target Directory</title>
+                <description>Verify the target directory exists</description>
+                <actions>
+                    <action tool="list_files">
+                        Check if .roo/commands/ (project) or ~/.roo/commands/ (global) exists
+                    </action>
+                    <action tool="execute_command">
+                        Create directory if needed: mkdir -p .roo/commands/
+                    </action>
+                </actions>
+            </step>
+
+            <step number="8">
+                <title>Create Command File</title>
+                <description>Write the command markdown file</description>
+                <actions>
+                    <action tool="write_to_file">
+                        Create the .md file with frontmatter and content
+                    </action>
+                </actions>
+                <validation>
+                    <check>Filename uses lowercase and hyphens</check>
+                    <check>File has .md extension</check>
+                    <check>Frontmatter YAML is valid</check>
+                    <check>Content is clear and actionable</check>
+                </validation>
+            </step>
+
+            <step number="9">
+                <title>Test and Verify</title>
+                <description>Ensure command appears and works correctly</description>
+                <verification_steps>
+                    <verify>Command appears in / menu</verify>
+                    <verify>Description shows correctly</verify>
+                    <verify>Argument hint displays if provided</verify>
+                    <verify>Command executes as expected</verify>
+                    <verify>Mode switching works if specified</verify>
+                </verification_steps>
+            </step>
+        </phase>
+
+        <phase name="refinement">
+            <step number="10">
+                <title>Optimize and Document</title>
+                <description>Refine command based on usage</description>
+                <refinement_areas>
+                    <area>Clarify ambiguous instructions</area>
+                    <area>Add missing context or requirements</area>
+                    <area>Improve argument hints</area>
+                    <area>Update description for clarity</area>
+                    <area>Consider mode targeting for better context</area>
+                </refinement_areas>
+            </step>
+        </phase>
+    </creation_workflow>
+
+    <special_considerations>
+        <consideration name="mode_targeting">
+            <description>When to use the mode field in frontmatter</description>
+            <use_cases>
+                <case>Command needs code editing capabilities → mode: code</case>
+                <case>Command involves architectural planning → mode: architect</case>
+                <case>Command is for debugging → mode: debug</case>
+                <case>Command analyzes but doesn't change code → mode: ask</case>
+            </use_cases>
+            <benefit>
+                Ensures command runs with appropriate tool access and role context
+            </benefit>
+        </consideration>
+
+        <consideration name="command_conflicts">
+            <description>How commands override each other</description>
+            <priority_order>
+                <priority level="1">Built-in commands (cannot be overridden)</priority>
+                <priority level="2">Project commands (.roo/commands/)</priority>
+                <priority level="3">Global commands (~/.roo/commands/)</priority>
+            </priority_order>
+        </consideration>
+
+        <consideration name="team_sharing">
+            <description>Best practices for sharing commands with team</description>
+            <recommendations>
+                <recommendation>Use project commands for team-wide workflows</recommendation>
+                <recommendation>Version control .roo/commands/ directory</recommendation>
+                <recommendation>Document project-specific commands in README</recommendation>
+                <recommendation>Use consistent naming conventions</recommendation>
+            </recommendations>
+        </consideration>
+    </special_considerations>
+
+    <troubleshooting>
+        <issue name="command_not_appearing">
+            <symptoms>Command doesn't show in / menu</symptoms>
+            <solutions>
+                <solution>Verify file is in correct directory (.roo/commands/ or ~/.roo/commands/)</solution>
+                <solution>Ensure file has .md extension</solution>
+                <solution>Check filename follows naming conventions</solution>
+                <solution>Reload VS Code window</solution>
+            </solutions>
+        </issue>
+
+        <issue name="frontmatter_not_working">
+            <symptoms>Description or mode doesn't work</symptoms>
+            <solutions>
+                <solution>Verify YAML frontmatter is between --- delimiters</solution>
+                <solution>Check YAML syntax is valid (proper indentation, quotes)</solution>
+                <solution>Ensure mode slug exists and is correct</solution>
+            </solutions>
+        </issue>
+
+        <issue name="argument_hint_confusion">
+            <symptoms>Users don't know what to provide</symptoms>
+            <solutions>
+                <solution>Make hint more specific and descriptive</solution>
+                <solution>Add examples in command description</solution>
+                <solution>Include instructions in command content</solution>
+            </solutions>
+        </issue>
+    </troubleshooting>
+</slash_command_creation_workflow>
